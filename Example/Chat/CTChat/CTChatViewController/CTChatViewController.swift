@@ -27,6 +27,8 @@ public final class CTChatViewController: UIViewController {
         self.chatURL = CTChat.shared.webchatURL
         self.visitor = CTChat.shared.visitor
         self.setupWebView()
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(scrollChatToBottom), name: UIResponder.keyboardWillShowNotification, object: nil)
     }
     
     // MARK: - Methods
@@ -115,6 +117,23 @@ public final class CTChatViewController: UIViewController {
         self.present(vc, animated: true)
     }
     
+    private func setInputAttribute() {
+        let source: String = """
+            var inputElement = document.getElementById('webchat-file-input');
+            inputElement.setAttribute('accept', 'image/jpg,image/jpeg,image/gif,image/img,.doc,.docx,.pdf,.txt');
+            """
+        wkWebView.evaluateJavaScript(source)
+    }
+    
+    @objc
+    private func scrollChatToBottom(notification: Notification) {
+        let source: String = """
+            var element = document.getElementsByClassName('webchat-dialog')[0];
+            element.scrollTop = element.scrollHeight;
+            """
+        wkWebView.evaluateJavaScript(source)
+    }
+    
 }
 
 // MARK: - WKNavigationDelegate & WKUIDelegate
@@ -191,14 +210,6 @@ extension CTChatViewController: WKNavigationDelegate, WKUIDelegate {
         let cert1 = NSData(bytes: data, length: size)
         
         return cert1.isEqual(to: cert2)
-    }
-    
-    private func setInputAttribute() {
-        let source: String = """
-            var inputElement = document.getElementById('webchat-file-input');
-            inputElement.setAttribute('accept', 'image/jpg,image/jpeg,image/gif,image/img,.doc,.docx,.pdf,.txt');
-            """
-        wkWebView.evaluateJavaScript(source)
     }
     
 }
