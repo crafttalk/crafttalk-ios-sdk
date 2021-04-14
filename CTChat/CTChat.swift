@@ -9,10 +9,6 @@ import Foundation
 
 public final class CTChat {
     
-    private enum UserDefaultsKeys {
-        static let visitor = "CTChat.visitor"
-    }
-    
     // MARK: - Public Properties
     public static let shared: CTChat = CTChat()
     
@@ -53,8 +49,6 @@ public final class CTChat {
     
     private let networkManager: CTNetworkManager = CTNetworkManager()
     
-    private let objectSaver: CTObjectSavable = UserDefaults.standard
-    
     private let ctqueue = DispatchQueue(label: "crafttalk.chat.queue", qos: .utility, attributes: [.concurrent])
     
     // MARK: - Public methods
@@ -77,12 +71,6 @@ public final class CTChat {
             self.salt = salt
             self.namespace = namespace
             
-            do {
-                self.visitor = try self.objectSaver.getObject(forKey: UserDefaultsKeys.visitor, castTo: CTVisitior.self)
-            } catch {
-                print("CTChat: Visitor object not found")
-            }
-            
             self.networkManager.set(baseURL: baseURL, namespace: namespace)
             
         }
@@ -90,11 +78,6 @@ public final class CTChat {
     
     public func registerVisitor(_ visitor: CTVisitior) {
         self.visitor = visitor
-        do {
-            try objectSaver.setObject(visitor, forKey: UserDefaultsKeys.visitor)
-        } catch {
-            print("CTChat: ", error.localizedDescription)
-        }
     }
     
     public func saveFCMToken(_ fcmToken: String) {

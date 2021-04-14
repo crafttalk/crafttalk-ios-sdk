@@ -27,7 +27,8 @@ public final class CTVisitior: Codable {
                 phone: String = "81234567890",
                 contract: String = "default_contract",
                 birthday: String = "01.01.1970",
-                uuid: String = UUID().uuidString.lowercased()) {
+                uuid: String = UUID().uuidString.lowercased(),
+                hash: String? = nil) {
         self.firstName = firstName
         self.lastName = lastName
         self.email = email
@@ -35,7 +36,7 @@ public final class CTVisitior: Codable {
         self.contract = contract
         self.birthday = birthday
         self.uuid = uuid
-        self.hash = CTVisitior.calculateHash(salt: CTChat.shared.salt,
+        self.hash = hash ?? CTVisitior.calculateHash(salt: CTChat.shared.salt,
                                              sourceString: "\(uuid)\(firstName)\(lastName)\(contract)\(phone)\(email)\(birthday)")
     }
     

@@ -15,6 +15,8 @@ public final class CTChatViewController: UIViewController {
     private var wkWebView: WKWebView!
     private var chatURL: URL!
     private var visitor: CTVisitior!
+    private var isKeyboardOpen: Bool = false
+    private let fileLoader: FileLoader = CTNetworkManager()
     
     // MARK: - Lifecycle
     
@@ -24,9 +26,19 @@ public final class CTChatViewController: UIViewController {
     
     public override func viewDidLoad() {
         super.viewDidLoad()
-        self.chatURL = CTChat.shared.webchatURL
-        self.visitor = CTChat.shared.visitor
-        self.setupWebView()
+        chatURL = CTChat.shared.webchatURL
+        visitor = CTChat.shared.visitor
+        setupWebView()
+    }
+    
+    public override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+    }
+    
+    public override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        
     }
     
     // MARK: - Methods
@@ -76,44 +88,32 @@ public final class CTChatViewController: UIViewController {
     /// Download the file from the given url and store it locally in the app's temp folder.
     /// - Parameter downloadUrl: File download url
     private func loadAndDisplayDocumentFrom(url downloadUrl : URL) {
-        let localFileURL: URL = FileManager.default.temporaryDirectory.appendingPathComponent(downloadUrl.lastPathComponent)
-        
         UIApplication.shared.isNetworkActivityIndicatorVisible = true
-        URLSession.shared.dataTask(with: downloadUrl) { [weak self] data, response, err in
-            guard let data = data, err == nil else {
-                debugPrint("Error while downloading document from url=\(downloadUrl.absoluteString): \(err.debugDescription)")
-                return
+        fileLoader.loadDocumentFrom(url: downloadUrl) { [weak self] (localFileURL) in
+            UIApplication.shared.isNetworkActivityIndicatorVisible = false
+            if let ctPreviewType = CTPreviewType(fileURL: localFileURL) {
+                self?.show(CTPreviewViewController.create(with: ctPreviewType), sender: nil)
+            } else {
+                let activityViewController = UIActivityViewController(activityItems: [localFileURL], applicationActivities: nil)
+                self?.present(activityViewController, animated: true, completion: nil)
             }
             
-            DispatchQueue.main.async {
-                UIApplication.shared.isNetworkActivityIndicatorVisible = false
-            }
-            
-            do {
-                try data.write(to: localFileURL, options: .atomic)
-                
-                DispatchQueue.main.async {
-                    
-                    if let ctPreviewType = CTPreviewType(fileURL: localFileURL) {
-                        self?.show(CTPreviewViewController.create(with: ctPreviewType), sender: nil)
-                    } else {
-                        let activityViewController = UIActivityViewController(activityItems: [localFileURL], applicationActivities: nil)
-                        self?.present(activityViewController, animated: true, completion: nil)
-                    }
-                    
-                }
-                
-            } catch {
-                debugPrint(error)
-                return
-            }
-        }.resume()
+        }
     }
     
     private func openURLInSafariViewController(_ url: URL) {
         let vc = SFSafariViewController(url: url)
         self.present(vc, animated: true)
     }
+    
+    private func setInputAttribute() {
+        let source: String = """
+            var inputElement = document.getElementById('webchat-file-input');
+            inputElement.setAttribute('accept', 'image/jpg,image/jpeg,image/gif,image/img,.doc,.docx,.pdf,.txt');
+            """
+        wkWebView.evaluateJavaScript(source)
+    }
+    
     
 }
 
@@ -131,8 +131,13 @@ extension CTChatViewController: WKNavigationDelegate, WKUIDelegate {
     }
     
     public func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
+        guard let url = navigationAction.request.url,
+              url.absoluteString.hasPrefix("https") else {
+            decisionHandler(.cancel)
+            return
+        }
         
-        guard let url = navigationAction.request.url, url != chatURL else {
+        guard url != chatURL else {
             decisionHandler(.allow)
             return
         }
@@ -191,14 +196,6 @@ extension CTChatViewController: WKNavigationDelegate, WKUIDelegate {
         let cert1 = NSData(bytes: data, length: size)
         
         return cert1.isEqual(to: cert2)
-    }
-    
-    private func setInputAttribute() {
-        let source: String = """
-            var inputElement = document.getElementById('webchat-file-input');
-            inputElement.setAttribute('accept', 'image/jpg,image/jpeg,image/gif,image/img,.doc,.docx,.pdf,.txt');
-            """
-        wkWebView.evaluateJavaScript(source)
     }
     
 }
