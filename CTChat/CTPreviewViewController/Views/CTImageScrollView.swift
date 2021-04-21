@@ -49,6 +49,7 @@ internal final class CTImageScrollView: UIScrollView {
     }
     
     internal func setupForCurrentDeviceOrientation() {
+        guard imageZoomView != nil else { return }
         self.setCurrentMaxAndMinZoomScale()
         self.zoomScale = self.minimumZoomScale
     }

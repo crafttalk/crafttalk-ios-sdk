@@ -44,10 +44,10 @@ public final class CTChat {
         return nil
     }()
     
+    internal let networkManager: CTNetworkManager = CTNetworkManager()
+    
     // MARK: - Private Properties
     private var fcmToken: String = ""
-    
-    private let networkManager: CTNetworkManager = CTNetworkManager()
     
     private let ctqueue = DispatchQueue(label: "crafttalk.chat.queue", qos: .utility, attributes: [.concurrent])
     

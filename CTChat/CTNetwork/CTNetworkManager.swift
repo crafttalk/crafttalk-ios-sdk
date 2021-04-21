@@ -18,7 +18,9 @@ internal final class CTNetworkManager: NSObject, FileLoader {
     private var namespace: String!
     
     private lazy var session: URLSession = {
-        return URLSession(configuration: .ephemeral, delegate: self, delegateQueue: nil)
+        let config = URLSessionConfiguration.ephemeral
+        config.tlsMinimumSupportedProtocol = .tlsProtocol12
+        return URLSession(configuration: config, delegate: self, delegateQueue: nil)
     }()
     
     private var receivedData: Data?
@@ -39,8 +41,9 @@ internal final class CTNetworkManager: NSObject, FileLoader {
     /// Download the file from the given url and store it locally in the app's temp folder.
     /// - Parameter downloadUrl: File download url
     internal func loadDocumentFrom(url downloadUrl : URL, completion: @escaping (URL)->()) {
-        receivedData = Data()
+        guard loadFileCompletion == nil else { return }
         loadFileCompletion = completion
+        receivedData = Data()
         session.dataTask(with: downloadUrl).resume()
     }
     
@@ -85,7 +88,7 @@ extension CTNetworkManager: URLSessionDelegate, URLSessionDataDelegate, URLSessi
             let localFileURL: URL = FileManager.default.temporaryDirectory.appendingPathComponent(task.currentRequest!.url!.lastPathComponent)
             
             do {
-                try data.write(to: localFileURL, options: .atomic)
+                try data.write(to: localFileURL, options: [.atomic, .completeFileProtection])
                 
                 DispatchQueue.main.async {
                     loadFileCompletion(localFileURL)

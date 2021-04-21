@@ -15,8 +15,7 @@ public final class CTChatViewController: UIViewController {
     private var wkWebView: WKWebView!
     private var chatURL: URL!
     private var visitor: CTVisitior!
-    private var isKeyboardOpen: Bool = false
-    private let fileLoader: FileLoader = CTNetworkManager()
+    private var fileLoader: FileLoader!
     
     // MARK: - Lifecycle
     
@@ -28,6 +27,7 @@ public final class CTChatViewController: UIViewController {
         super.viewDidLoad()
         chatURL = CTChat.shared.webchatURL
         visitor = CTChat.shared.visitor
+        fileLoader = CTChat.shared.networkManager
         setupWebView()
     }
     
@@ -81,6 +81,7 @@ public final class CTChatViewController: UIViewController {
         ])
         wkWebView.navigationDelegate = self
         wkWebView.uiDelegate = self
+        wkWebView.allowsLinkPreview = false
         wkWebView.load(URLRequest(url: chatURL))
         self.wkWebView = wkWebView
     }
@@ -88,6 +89,7 @@ public final class CTChatViewController: UIViewController {
     /// Download the file from the given url and store it locally in the app's temp folder.
     /// - Parameter downloadUrl: File download url
     private func loadAndDisplayDocumentFrom(url downloadUrl : URL) {
+        guard presentedViewController == nil && !(presentedViewController is CTPreviewViewController) && !(presentedViewController is UIActivityViewController) else { return }
         UIApplication.shared.isNetworkActivityIndicatorVisible = true
         fileLoader.loadDocumentFrom(url: downloadUrl) { [weak self] (localFileURL) in
             UIApplication.shared.isNetworkActivityIndicatorVisible = false
@@ -95,6 +97,9 @@ public final class CTChatViewController: UIViewController {
                 self?.show(CTPreviewViewController.create(with: ctPreviewType), sender: nil)
             } else {
                 let activityViewController = UIActivityViewController(activityItems: [localFileURL], applicationActivities: nil)
+                activityViewController.completionWithItemsHandler = { (activityType, completed, returnedItems:[Any]?, error: Error?) in
+                    try? FileManager.default.removeItem(at: localFileURL)
+                }
                 self?.present(activityViewController, animated: true, completion: nil)
             }
             
@@ -102,6 +107,8 @@ public final class CTChatViewController: UIViewController {
     }
     
     private func openURLInSafariViewController(_ url: URL) {
+        print(url.absoluteString)
+        guard UIApplication.shared.canOpenURL(url) else { return }
         let vc = SFSafariViewController(url: url)
         self.present(vc, animated: true)
     }
@@ -132,7 +139,8 @@ extension CTChatViewController: WKNavigationDelegate, WKUIDelegate {
     
     public func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
         guard let url = navigationAction.request.url,
-              url.absoluteString.hasPrefix("https") else {
+              url.absoluteString.hasPrefix("https"),
+              checkValidity(of: url) else {
             decisionHandler(.cancel)
             return
         }
@@ -196,6 +204,12 @@ extension CTChatViewController: WKNavigationDelegate, WKUIDelegate {
         let cert1 = NSData(bytes: data, length: size)
         
         return cert1.isEqual(to: cert2)
+    }
+    
+    private func checkValidity(of url: URL) -> Bool {
+        let string = url.absoluteString.replacingOccurrences(of: "https://", with: "", options: .caseInsensitive).replacingOccurrences(of: "/", with: "", options: .caseInsensitive)
+        let validIpAddressRegex = "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$"
+        return string.range(of: validIpAddressRegex, options: .regularExpression) == nil
     }
     
 }
