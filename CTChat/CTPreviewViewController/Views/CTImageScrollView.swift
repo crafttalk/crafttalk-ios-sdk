@@ -117,6 +117,7 @@ internal final class CTImageScrollView: UIScrollView {
         
         let toScale = maxScale
         let finalScale = (currectScale == minScale) ? toScale : minScale
+        guard finalScale != 0 else { return }
         let zoomRect = self.zoomRect(scale: finalScale, center: point)
         self.zoom(to: zoomRect, animated: animated)
     }

@@ -14,6 +14,8 @@ public final class CTChat {
     
     // MARK: - Internal Properties
     
+    internal var isConsoleEnabled = false
+    
     internal var salt: String = ""
     /// Webchat base url
     internal var baseURL: String = ""
@@ -22,7 +24,7 @@ public final class CTChat {
     
     internal var webchatURL: URL { URL(string: baseURL + "/webchat/" + namespace)! }
     
-    internal var visitor: CTVisitior!
+    internal var visitor: CTVisitor!
     
     internal lazy var certificate: Data? = {
         let certName = "CTCertificate"
@@ -40,7 +42,6 @@ public final class CTChat {
         if let certPath = certPath, let cert = FileManager.default.contents(atPath: certPath) {
             return cert
         }
-        print("CTChat: No certificate was provided")
         return nil
     }()
     
@@ -49,7 +50,7 @@ public final class CTChat {
     // MARK: - Private Properties
     private var fcmToken: String = ""
     
-    private let ctqueue = DispatchQueue(label: "crafttalk.chat.queue", qos: .utility, attributes: [.concurrent])
+    public let ctqueue = DispatchQueue(label: "crafttalk.chat.queue", qos: .utility, attributes: [.concurrent])
     
     // MARK: - Public methods
     public func configure() {
@@ -76,7 +77,7 @@ public final class CTChat {
         }
     }
     
-    public func registerVisitor(_ visitor: CTVisitior) {
+    public func registerVisitor(_ visitor: CTVisitor) {
         self.visitor = visitor
     }
     

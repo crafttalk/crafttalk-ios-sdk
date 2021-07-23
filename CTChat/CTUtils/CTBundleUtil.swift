@@ -11,7 +11,12 @@ import Foundation
 internal final class CTBundleUtil {
     
     static var relevantBundles: [Bundle] {
-        return [Bundle.main, Bundle(for: self)]
+        var bundles = [Bundle.main]
+        let currentBundle = Bundle(for: self)
+        if currentBundle != Bundle.main {
+            bundles.append(currentBundle)
+        }
+        return bundles
     }
     
     static func certificatePath(with resourceName: String, and fileType: String, in bundles: [Bundle]) -> String? {
@@ -22,5 +27,21 @@ internal final class CTBundleUtil {
         }
         return nil
     }
+    
+    static let externalURLSchemes: [String] = {
+        var result: [String] = []
+        for bundle in relevantBundles {
+            guard let urlTypes = bundle.infoDictionary?["CFBundleURLTypes"] as? [[String: Any]] else { continue }
+            
+            for urlTypeDictionary in urlTypes {
+                guard let urlSchemes = urlTypeDictionary["CFBundleURLSchemes"] as? [String] else { continue }
+                guard let externalURLScheme = urlSchemes.first else { continue }
+                result.append(externalURLScheme)
+            }
+            
+        }
+        
+        return result
+    }()
     
 }

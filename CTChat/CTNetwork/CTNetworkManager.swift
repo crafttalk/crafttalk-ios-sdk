@@ -7,7 +7,7 @@
 
 import Foundation
 
-internal protocol FileLoader: class {
+internal protocol FileLoader: AnyObject {
     func loadDocumentFrom(url downloadUrl : URL, completion: @escaping (URL)->())
 }
 
@@ -61,16 +61,6 @@ extension CTNetworkManager: URLSessionDelegate, URLSessionDataDelegate, URLSessi
     }
     
     func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive response: URLResponse, completionHandler: @escaping (URLSession.ResponseDisposition) -> Void) {
-        
-        if loadFileCompletion == nil {
-            let httpResponse = response as? HTTPURLResponse
-            if httpResponse?.statusCode == 200 {
-                print("CTChat: FCMToken registred successfully")
-            } else {
-                print("CTChat: Failed to register fcmToken")
-            }
-        }
-        
         completionHandler(.allow)
     }
     
@@ -79,10 +69,7 @@ extension CTNetworkManager: URLSessionDelegate, URLSessionDataDelegate, URLSessi
     }
     
     func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
-        guard error == nil else {
-            print("Download completed with error: \(error!.localizedDescription)")
-            return
-        }
+        guard error == nil else { return }
         
         if let data = receivedData, let loadFileCompletion = loadFileCompletion {
             let localFileURL: URL = FileManager.default.temporaryDirectory.appendingPathComponent(task.currentRequest!.url!.lastPathComponent)
@@ -94,10 +81,7 @@ extension CTNetworkManager: URLSessionDelegate, URLSessionDataDelegate, URLSessi
                     loadFileCompletion(localFileURL)
                 }
                 
-            } catch {
-                debugPrint(error)
-                return
-            }
+            } catch { }
             self.loadFileCompletion = nil
             self.receivedData = nil
         }

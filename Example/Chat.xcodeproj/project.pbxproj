@@ -16,13 +16,11 @@
 		CF4DAFB5250910C6007EF595 /* CTPushRegistationRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF4DAFB4250910C6007EF595 /* CTPushRegistationRequest.swift */; };
 		CF4DAFB925091150007EF595 /* CTNetworkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF4DAFB825091150007EF595 /* CTNetworkManager.swift */; };
 		CF4DAFBE250915FD007EF595 /* CTChat.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF4DAFBD250915FD007EF595 /* CTChat.swift */; };
+		CF7998F8268B1109006BF7AE /* RCValues.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF7998F7268B1109006BF7AE /* RCValues.swift */; };
 		CF823C3025D413E500A46E3F /* CTPreviewViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF823C2F25D413E500A46E3F /* CTPreviewViewController.swift */; };
 		CF8933B725D6C343002C49A7 /* URL+mimeType.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF8933B625D6C343002C49A7 /* URL+mimeType.swift */; };
 		CF8933BB25D6D365002C49A7 /* CTVideoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF8933BA25D6D365002C49A7 /* CTVideoView.swift */; };
 		CF97DB1425D6E3EA00E2C4A0 /* UIView+fillSuperview.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF97DB1325D6E3EA00E2C4A0 /* UIView+fillSuperview.swift */; };
-		CFA9C6F4253B18DC00CAABF3 /* CTObjectSavable.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFA9C6F3253B18DC00CAABF3 /* CTObjectSavable.swift */; };
-		CFA9C6F7253B194600CAABF3 /* CTObjectSavableError.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFA9C6F6253B194600CAABF3 /* CTObjectSavableError.swift */; };
-		CFA9C6FA253B19C700CAABF3 /* UserDefaultsExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFA9C6F9253B19C700CAABF3 /* UserDefaultsExtension.swift */; };
 		CFC04DF624E034CE0085352A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFC04DF524E034CE0085352A /* AppDelegate.swift */; };
 		CFC04DFD24E034CE0085352A /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CFC04DFB24E034CE0085352A /* Main.storyboard */; };
 		CFC04DFF24E034D10085352A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CFC04DFE24E034D10085352A /* Assets.xcassets */; };
@@ -43,13 +41,11 @@
 		CF4DAFB4250910C6007EF595 /* CTPushRegistationRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CTPushRegistationRequest.swift; sourceTree = "<group>"; };
 		CF4DAFB825091150007EF595 /* CTNetworkManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CTNetworkManager.swift; sourceTree = "<group>"; };
 		CF4DAFBD250915FD007EF595 /* CTChat.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CTChat.swift; sourceTree = "<group>"; };
+		CF7998F7268B1109006BF7AE /* RCValues.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RCValues.swift; sourceTree = "<group>"; };
 		CF823C2F25D413E500A46E3F /* CTPreviewViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CTPreviewViewController.swift; sourceTree = "<group>"; };
 		CF8933B625D6C343002C49A7 /* URL+mimeType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "URL+mimeType.swift"; sourceTree = "<group>"; };
 		CF8933BA25D6D365002C49A7 /* CTVideoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CTVideoView.swift; sourceTree = "<group>"; };
 		CF97DB1325D6E3EA00E2C4A0 /* UIView+fillSuperview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+fillSuperview.swift"; sourceTree = "<group>"; };
-		CFA9C6F3253B18DC00CAABF3 /* CTObjectSavable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CTObjectSavable.swift; sourceTree = "<group>"; };
-		CFA9C6F6253B194600CAABF3 /* CTObjectSavableError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CTObjectSavableError.swift; sourceTree = "<group>"; };
-		CFA9C6F9253B19C700CAABF3 /* UserDefaultsExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultsExtension.swift; sourceTree = "<group>"; };
 		CFC04DF224E034CE0085352A /* ChatExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ChatExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CFC04DF524E034CE0085352A /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		CFC04DFC24E034CE0085352A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -87,7 +83,6 @@
 			isa = PBXGroup;
 			children = (
 				CF4DAFBD250915FD007EF595 /* CTChat.swift */,
-				CFA9C6F2253B18B300CAABF3 /* CTObjectSavable */,
 				CF3F9008252887F300112653 /* CTModel */,
 				CF4DAFBC250915E3007EF595 /* CTChatViewController */,
 				CF823C2E25D413CB00A46E3F /* CTPreviewViewController */,
@@ -161,16 +156,6 @@
 			path = CTExtensions;
 			sourceTree = "<group>";
 		};
-		CFA9C6F2253B18B300CAABF3 /* CTObjectSavable */ = {
-			isa = PBXGroup;
-			children = (
-				CFA9C6F3253B18DC00CAABF3 /* CTObjectSavable.swift */,
-				CFA9C6F6253B194600CAABF3 /* CTObjectSavableError.swift */,
-				CFA9C6F9253B19C700CAABF3 /* UserDefaultsExtension.swift */,
-			);
-			path = CTObjectSavable;
-			sourceTree = "<group>";
-		};
 		CFC04DE924E034CE0085352A = {
 			isa = PBXGroup;
 			children = (
@@ -193,6 +178,7 @@
 			isa = PBXGroup;
 			children = (
 				CFC04DF524E034CE0085352A /* AppDelegate.swift */,
+				CF7998F7268B1109006BF7AE /* RCValues.swift */,
 				CFC04DFB24E034CE0085352A /* Main.storyboard */,
 				CF4950D725E3F64B007BEFEC /* README.md */,
 				CF2E69FE250229C6001072F0 /* CTChat */,
@@ -238,7 +224,7 @@
 				CFC04DEE24E034CE0085352A /* Sources */,
 				CFC04DEF24E034CE0085352A /* Frameworks */,
 				CFC04DF024E034CE0085352A /* Resources */,
-				44B05AE79CB0558FFFFCEB32 /* [CP] Embed Pods Frameworks */,
+				20DF903AF60C8E82671CC3C3 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -256,7 +242,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 1160;
-				LastUpgradeCheck = 1160;
+				LastUpgradeCheck = 1250;
 				ORGANIZATIONNAME = "Igor Bopp";
 				TargetAttributes = {
 					CFC04DF124E034CE0085352A = {
@@ -298,7 +284,7 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		44B05AE79CB0558FFFFCEB32 /* [CP] Embed Pods Frameworks */ = {
+		20DF903AF60C8E82671CC3C3 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -346,12 +332,10 @@
 			files = (
 				CFE2125E25D6946E005BF66A /* CTImageScrollView.swift in Sources */,
 				CF2E6A0025022A53001072F0 /* CTChatViewController.swift in Sources */,
+				CF7998F8268B1109006BF7AE /* RCValues.swift in Sources */,
 				CF3F900A2528880F00112653 /* CTVisitor.swift in Sources */,
 				CF823C3025D413E500A46E3F /* CTPreviewViewController.swift in Sources */,
-				CFA9C6FA253B19C700CAABF3 /* UserDefaultsExtension.swift in Sources */,
 				CF8933B725D6C343002C49A7 /* URL+mimeType.swift in Sources */,
-				CFA9C6F4253B18DC00CAABF3 /* CTObjectSavable.swift in Sources */,
-				CFA9C6F7253B194600CAABF3 /* CTObjectSavableError.swift in Sources */,
 				CFC04DF624E034CE0085352A /* AppDelegate.swift in Sources */,
 				CF4DAFB925091150007EF595 /* CTNetworkManager.swift in Sources */,
 				CF8933BB25D6D365002C49A7 /* CTVideoView.swift in Sources */,
@@ -410,6 +394,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
@@ -470,6 +455,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
@@ -506,7 +492,7 @@
 				CODE_SIGN_ENTITLEMENTS = Chat/Resources/Chat.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 7;
+				CURRENT_PROJECT_VERSION = 16;
 				DEVELOPMENT_TEAM = 9MKVZQGGKF;
 				INFOPLIST_FILE = Chat/Resources/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
@@ -531,7 +517,7 @@
 				CODE_SIGN_ENTITLEMENTS = Chat/Resources/Chat.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 7;
+				CURRENT_PROJECT_VERSION = 16;
 				DEVELOPMENT_TEAM = 9MKVZQGGKF;
 				INFOPLIST_FILE = Chat/Resources/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;

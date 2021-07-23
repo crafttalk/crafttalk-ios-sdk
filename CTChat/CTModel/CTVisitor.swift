@@ -8,27 +8,29 @@
 import Foundation
 import CommonCrypto
 
-public final class CTVisitior: Codable {
+public final class CTVisitor {
     
     // MARK: - Properties
-    let firstName: String
-    let lastName: String
+    let firstName: String?
+    let lastName: String?
     let uuid: String
-    let email: String
-    let phone: String
-    let contract: String
-    let birthday: String
+    let email: String?
+    let phone: String?
+    let contract: String?
+    let birthday: String?
     let hash: String
+    let customProperties: [String: Any]?
     
     // MARK: - Initialization
-    public init(firstName: String,
-                lastName: String,
-                email: String = "default_email@gmail.com",
-                phone: String = "81234567890",
-                contract: String = "default_contract",
-                birthday: String = "01.01.1970",
-                uuid: String = UUID().uuidString.lowercased(),
-                hash: String? = nil) {
+    public init(firstName: String? = nil,
+                lastName: String? = nil,
+                email: String? = nil,
+                phone: String? = nil,
+                contract: String? = nil,
+                birthday: String? = nil,
+                uuid: String,
+                hash: String? = nil,
+                customProperties: [String: Any]? = nil) {
         self.firstName = firstName
         self.lastName = lastName
         self.email = email
@@ -36,8 +38,9 @@ public final class CTVisitior: Codable {
         self.contract = contract
         self.birthday = birthday
         self.uuid = uuid
-        self.hash = hash ?? CTVisitior.calculateHash(salt: CTChat.shared.salt,
-                                             sourceString: "\(uuid)\(firstName)\(lastName)\(contract)\(phone)\(email)\(birthday)")
+        self.hash = hash ?? CTVisitor.calculateHash(salt: CTChat.shared.salt,
+                                             sourceString: "\(uuid)\(firstName ?? "")\(lastName ?? "")\(contract ?? "")\(phone ?? "")\(email ?? "")\(birthday ?? "")")
+        self.customProperties = customProperties
     }
     
     // MARK: - Methods
@@ -58,6 +61,34 @@ public final class CTVisitior: Codable {
             _ = CC_SHA256($0.baseAddress, CC_LONG($0.count), &hash)
         }
         return hash.map { String(format: "%02hhx", $0) }.joined()
+    }
+    
+    func toJSON() -> String? {
+        let jsonObject = NSMutableDictionary()
+        jsonObject.setValue(firstName, forKey: "first_name")
+        jsonObject.setValue(lastName, forKey: "last_name")
+        jsonObject.setValue(uuid, forKey: "uuid")
+        jsonObject.setValue(email, forKey: "email")
+        jsonObject.setValue(phone, forKey: "phone")
+        jsonObject.setValue(contract, forKey: "contract")
+        jsonObject.setValue(birthday, forKey: "birthday")
+        jsonObject.setValue(hash, forKey: "hash")
+        
+        if let customProperties = customProperties,
+           JSONSerialization.isValidJSONObject(customProperties) {
+            
+            customProperties.forEach { (arg) in
+                jsonObject.setValue(arg.value, forKey: arg.key)
+            }
+            
+        }
+        
+        guard let jsonData = try? JSONSerialization.data(withJSONObject: jsonObject, options: .prettyPrinted),
+            let jsonString = String(data: jsonData, encoding: .utf8) else {
+            return nil
+        }
+        
+        return jsonString
     }
     
 }

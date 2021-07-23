@@ -87,11 +87,7 @@ internal final class CTPreviewViewController: UIViewController, CTVideoViewDeleg
     }
     
     deinit {
-        do {
-            try FileManager.default.removeItem(at: localFileURL)
-        } catch {
-            print(error.localizedDescription)
-        }
+        try? FileManager.default.removeItem(at: localFileURL)
     }
     
     // MARK: - Methods
@@ -160,7 +156,7 @@ internal final class CTPreviewViewController: UIViewController, CTVideoViewDeleg
     }
     
     private func checkPermission(for previewType: CTPreviewType) -> Bool {
-        guard previewType == .image(fileURL: URL(string: "www.google.com")!) else { return true }
+        guard previewType == .image(fileURL: URL(string: "www.google.com")!) || previewType == .video(fileURL: URL(string: "www.google.com")!) else { return true }
         let status: PHAuthorizationStatus
         if #available(iOS 14, *) {
             status = PHPhotoLibrary.authorizationStatus(for: .addOnly)
@@ -169,15 +165,28 @@ internal final class CTPreviewViewController: UIViewController, CTVideoViewDeleg
         }
         switch status {
         case .denied, .restricted:
-            DispatchQueue.main.async {
-                let ac = UIAlertController(title: "Нет доступа к галерее", message: "Для сохранения фото необходим доступ к галерее", preferredStyle: .alert)
+            DispatchQueue.main.async { [weak self] in
+                let ac = UIAlertController(title: "Нет доступа к галерее", message: "Для сохранения фото/видео необходим доступ к галерее", preferredStyle: .alert)
                 let submitAction = UIAlertAction(title: "Перейти в настройки", style: .default) { _ in
                     UIApplication.shared.open(URL(string: UIApplication.openSettingsURLString)!, options: [:], completionHandler: nil)
                 }
                 let cancel = UIAlertAction(title: "Понятно", style: .cancel)
                 ac.addAction(submitAction)
                 ac.addAction(cancel)
-                self.present(ac, animated: true, completion: nil)
+                self?.present(ac, animated: true, completion: nil)
+            }
+            return false
+        case .notDetermined:
+            DispatchQueue.main.async { [weak self] in
+                if #available(iOS 14, *) {
+                    PHPhotoLibrary.requestAuthorization(for: .addOnly) { [weak self] (_) in
+                        self?.saveButtonPressed()
+                    }
+                } else {
+                    PHPhotoLibrary.requestAuthorization() { [weak self] (_) in
+                        self?.saveButtonPressed()
+                    }
+                }
             }
             return false
         default: return true
@@ -209,16 +218,25 @@ internal final class CTPreviewViewController: UIViewController, CTVideoViewDeleg
     // MARK: - Button handling
     @objc
     private func doneButtonPressed() {
-        DispatchQueue.main.async {
-            self.dismiss(animated: true, completion: nil)
+        DispatchQueue.main.async { [weak self] in
+            self?.dismiss(animated: true, completion: nil)
         }
     }
     
     @objc
     private func saveButtonPressed() {
         guard let localFileURL = localFileURL, FileManager.default.fileExists(atPath: localFileURL.path) && checkPermission(for: previewType) else { return }
+        let activityItems: [Any]
+        if case let CTPreviewType.image(imageURL) = previewType!,
+           let imageData = try? Data(contentsOf: imageURL),
+           let image = UIImage(data: imageData) {
+            activityItems = [image]
+        } else {
+            activityItems = [localFileURL]
+        }
+        
         DispatchQueue.main.async { [weak self] in
-            let activityViewController = UIActivityViewController(activityItems: [localFileURL], applicationActivities: nil)
+            let activityViewController = UIActivityViewController(activityItems: activityItems, applicationActivities: nil)
             self?.present(activityViewController, animated: true, completion: nil)
         }
     }

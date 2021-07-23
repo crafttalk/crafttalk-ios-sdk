@@ -17,12 +17,19 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         
-        CTChat.shared.configure()
-        if !UserDefaults.standard.bool(forKey: "visitorRegistered") {
-            CTChat.shared.registerVisitor(.init(firstName: "iOSExample", lastName: "hey"))
-            UserDefaults.standard.set(true, forKey: "visitorRegistered")
+        FirebaseApp.configure()
+        RCValues.shared.loadingDoneCallback = {
+            CTChat.shared.configure(baseURL: RCValues.shared.string(forKey: .webchatURL),
+                                    namespace: RCValues.shared.string(forKey: .namespace),
+                                    salt: RCValues.shared.string(forKey: .salt),
+                                    isConsoleEnabled: RCValues.shared.bool(forKey: .erudaToggle))
         }
+
+        let uuid = UserDefaults.standard.string(forKey: "uuid") ?? UUID().uuidString
+        UserDefaults.standard.set(uuid, forKey: "uuid")
+        let visitor = CTVisitor(firstName: "iOSExample", lastName: "", uuid: uuid, customProperties: ["custom" : "123"])
         
+        CTChat.shared.registerVisitor(visitor)
         
         registerAppForRemoteNotifications(application: application)
         
@@ -36,7 +43,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 extension AppDelegate: MessagingDelegate, UNUserNotificationCenterDelegate {
     
     private func registerAppForRemoteNotifications(application: UIApplication) {
-        FirebaseApp.configure()
         Messaging.messaging().delegate = self
         
         if #available(iOS 10.0, *) {
@@ -66,7 +72,8 @@ extension AppDelegate: MessagingDelegate, UNUserNotificationCenterDelegate {
     
     // MARK: - MessagingDelegate
     
-    func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String) {
+    func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String?) {
+        guard let fcmToken = fcmToken else { return }
         print("fcmToken: ", fcmToken)
         CTChat.shared.saveFCMToken(fcmToken)
     }
@@ -83,6 +90,19 @@ extension AppDelegate: MessagingDelegate, UNUserNotificationCenterDelegate {
         print(userInfo)
         
         completionHandler(UIBackgroundFetchResult.newData)
+    }
+    
+}
+
+extension CTChat {
+    
+    func configure(baseURL: String, namespace: String, salt: String, isConsoleEnabled: Bool) {
+        print(baseURL, namespace, salt, isConsoleEnabled)
+        self.baseURL = baseURL
+        self.salt = salt
+        self.namespace = namespace
+        self.isConsoleEnabled = isConsoleEnabled
+        self.networkManager.set(baseURL: baseURL, namespace: namespace)
     }
     
 }

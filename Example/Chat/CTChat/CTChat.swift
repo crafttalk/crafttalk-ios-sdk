@@ -9,14 +9,12 @@ import Foundation
 
 public final class CTChat {
     
-    private enum UserDefaultsKeys {
-        static let visitor = "CTChat.visitor"
-    }
-    
     // MARK: - Public Properties
     public static let shared: CTChat = CTChat()
     
     // MARK: - Internal Properties
+    
+    internal var isConsoleEnabled = false
     
     internal var salt: String = ""
     /// Webchat base url
@@ -26,7 +24,7 @@ public final class CTChat {
     
     internal var webchatURL: URL { URL(string: baseURL + "/webchat/" + namespace)! }
     
-    internal var visitor: CTVisitior!
+    internal var visitor: CTVisitor!
     
     internal lazy var certificate: Data? = {
         let certName = "CTCertificate"
@@ -44,18 +42,15 @@ public final class CTChat {
         if let certPath = certPath, let cert = FileManager.default.contents(atPath: certPath) {
             return cert
         }
-        print("CTChat: No certificate was provided")
         return nil
     }()
+    
+    internal let networkManager: CTNetworkManager = CTNetworkManager()
     
     // MARK: - Private Properties
     private var fcmToken: String = ""
     
-    private let networkManager: CTNetworkManager = CTNetworkManager()
-    
-    private let objectSaver: CTObjectSavable = UserDefaults.standard
-    
-    private let ctqueue = DispatchQueue(label: "crafttalk.chat.queue", qos: .utility, attributes: [.concurrent])
+    public let ctqueue = DispatchQueue(label: "crafttalk.chat.queue", qos: .utility, attributes: [.concurrent])
     
     // MARK: - Public methods
     public func configure() {
@@ -77,24 +72,13 @@ public final class CTChat {
             self.salt = salt
             self.namespace = namespace
             
-            do {
-                self.visitor = try self.objectSaver.getObject(forKey: UserDefaultsKeys.visitor, castTo: CTVisitior.self)
-            } catch {
-                print("CTChat: Visitor object not found")
-            }
-            
             self.networkManager.set(baseURL: baseURL, namespace: namespace)
             
         }
     }
     
-    public func registerVisitor(_ visitor: CTVisitior) {
+    public func registerVisitor(_ visitor: CTVisitor) {
         self.visitor = visitor
-        do {
-            try objectSaver.setObject(visitor, forKey: UserDefaultsKeys.visitor)
-        } catch {
-            print("CTChat: ", error.localizedDescription)
-        }
     }
     
     public func saveFCMToken(_ fcmToken: String) {

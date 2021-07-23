@@ -14,7 +14,7 @@ public final class CTChatViewController: UIViewController {
     // MARK: - Properties
     private var wkWebView: WKWebView!
     private var chatURL: URL!
-    private var visitor: CTVisitior!
+    private var visitor: CTVisitor!
     private var fileLoader: FileLoader!
     
     // MARK: - Lifecycle
@@ -52,10 +52,9 @@ public final class CTChatViewController: UIViewController {
             return WKUserScript(source: source, injectionTime: .atDocumentEnd, forMainFrameOnly: true)
         }
         func getUserAuthScript() -> WKUserScript {
-            let encoder = JSONEncoder()
-            encoder.keyEncodingStrategy = .convertToSnakeCase
-            let visitor = String(data: (try! encoder.encode(self.visitor)), encoding: .utf8)!
+            let visitor = self.visitor.toJSON() ?? ""
             let source: String = """
+                \( CTChat.shared.isConsoleEnabled ? "javascript:(function () { var script = document.createElement('script'); script.src=\"//cdn.jsdelivr.net/npm/eruda\"; document.body.appendChild(script); script.onload = function () { eruda.init() } })();" : "")
                 window.__WebchatUserCallback = function() {
                     webkit.messageHandlers.handler.postMessage("User registred");
                     return \(visitor);
@@ -107,18 +106,24 @@ public final class CTChatViewController: UIViewController {
     }
     
     private func openURLInSafariViewController(_ url: URL) {
-        print(url.absoluteString)
         guard UIApplication.shared.canOpenURL(url) else { return }
         let vc = SFSafariViewController(url: url)
         self.present(vc, animated: true)
     }
     
     private func setInputAttribute() {
-        let source: String = """
-            var inputElement = document.getElementById('webchat-file-input');
-            inputElement.setAttribute('accept', 'image/jpg,image/jpeg,image/gif,image/img,.doc,.docx,.pdf,.txt');
-            """
-        wkWebView.evaluateJavaScript(source)
+        DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(500)) { [weak self] in
+            let source: String = """
+                var inputElement = document.getElementById('webchat-file-input');
+                inputElement.setAttribute('accept', 'image/jpg,image/jpeg,image/gif,image/img,.doc,.docx,.pdf,.txt');
+                inputElement = Array.from( document.getElementsByClassName('webchat-userinput'));
+                inputElement.forEach(element => element.setAttribute('autocorrect', 'on'));
+                inputElement.forEach(element => element.setAttribute('spellcheck', 'true'));
+                inputElement.forEach(element => element.setAttribute('autocomplete', 'true'));
+                inputElement.forEach(element => element.setAttribute('autocapitalize', 'on'));
+                """
+            self?.wkWebView.evaluateJavaScript(source)
+        }
     }
     
     
@@ -127,15 +132,11 @@ public final class CTChatViewController: UIViewController {
 // MARK: - WKNavigationDelegate & WKUIDelegate
 extension CTChatViewController: WKNavigationDelegate, WKUIDelegate {
     
-    public func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
-        print(error.localizedDescription)
-    }
+    public func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {}
     
     public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) { }
     
-    public func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
-        print(error.localizedDescription)
-    }
+    public func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {}
     
     public func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
         guard let url = navigationAction.request.url,

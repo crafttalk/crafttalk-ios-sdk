@@ -8,7 +8,7 @@
 import UIKit
 import AVFoundation
 
-internal protocol CTVideoViewDelegate: class {
+internal protocol CTVideoViewDelegate: AnyObject {
     func videoStateChanged(isPlaying: Bool)
 }
 

@@ -56,9 +56,7 @@ internal struct CTPushRegistationRequest {
         if method == RequestHTTPMethod.post {
             do {
                 request.httpBody = try JSONSerialization.data(withJSONObject: body, options: JSONSerialization.WritingOptions.prettyPrinted)
-            } catch let error {
-                print("Request body parse error: \(error.localizedDescription)")
-            }
+            } catch { }
         }
         
         return request

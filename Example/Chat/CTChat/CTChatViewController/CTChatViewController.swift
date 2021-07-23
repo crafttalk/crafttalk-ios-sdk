@@ -14,7 +14,8 @@ public final class CTChatViewController: UIViewController {
     // MARK: - Properties
     private var wkWebView: WKWebView!
     private var chatURL: URL!
-    private var visitor: CTVisitior!
+    private var visitor: CTVisitor!
+    private var fileLoader: FileLoader!
     
     // MARK: - Lifecycle
     
@@ -24,11 +25,20 @@ public final class CTChatViewController: UIViewController {
     
     public override func viewDidLoad() {
         super.viewDidLoad()
-        self.chatURL = CTChat.shared.webchatURL
-        self.visitor = CTChat.shared.visitor
-        self.setupWebView()
+        chatURL = CTChat.shared.webchatURL
+        visitor = CTChat.shared.visitor
+        fileLoader = CTChat.shared.networkManager
+        setupWebView()
+    }
+    
+    public override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
         
-        NotificationCenter.default.addObserver(self, selector: #selector(scrollChatToBottom), name: UIResponder.keyboardWillShowNotification, object: nil)
+    }
+    
+    public override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        
     }
     
     // MARK: - Methods
@@ -42,10 +52,9 @@ public final class CTChatViewController: UIViewController {
             return WKUserScript(source: source, injectionTime: .atDocumentEnd, forMainFrameOnly: true)
         }
         func getUserAuthScript() -> WKUserScript {
-            let encoder = JSONEncoder()
-            encoder.keyEncodingStrategy = .convertToSnakeCase
-            let visitor = String(data: (try! encoder.encode(self.visitor)), encoding: .utf8)!
+            let visitor = self.visitor.toJSON() ?? ""
             let source: String = """
+                \( CTChat.shared.isConsoleEnabled ? "javascript:(function () { var script = document.createElement('script'); script.src=\"//cdn.jsdelivr.net/npm/eruda\"; document.body.appendChild(script); script.onload = function () { eruda.init() } })();" : "")
                 window.__WebchatUserCallback = function() {
                     webkit.messageHandlers.handler.postMessage("User registred");
                     return \(visitor);
@@ -71,6 +80,7 @@ public final class CTChatViewController: UIViewController {
         ])
         wkWebView.navigationDelegate = self
         wkWebView.uiDelegate = self
+        wkWebView.allowsLinkPreview = false
         wkWebView.load(URLRequest(url: chatURL))
         self.wkWebView = wkWebView
     }
@@ -78,80 +88,65 @@ public final class CTChatViewController: UIViewController {
     /// Download the file from the given url and store it locally in the app's temp folder.
     /// - Parameter downloadUrl: File download url
     private func loadAndDisplayDocumentFrom(url downloadUrl : URL) {
-        let localFileURL: URL = FileManager.default.temporaryDirectory.appendingPathComponent(downloadUrl.lastPathComponent)
-        
+        guard presentedViewController == nil && !(presentedViewController is CTPreviewViewController) && !(presentedViewController is UIActivityViewController) else { return }
         UIApplication.shared.isNetworkActivityIndicatorVisible = true
-        URLSession.shared.dataTask(with: downloadUrl) { [weak self] data, response, err in
-            guard let data = data, err == nil else {
-                debugPrint("Error while downloading document from url=\(downloadUrl.absoluteString): \(err.debugDescription)")
-                return
-            }
-            
-            DispatchQueue.main.async {
-                UIApplication.shared.isNetworkActivityIndicatorVisible = false
-            }
-            
-            do {
-                try data.write(to: localFileURL, options: .atomic)
-                
-                DispatchQueue.main.async {
-                    
-                    if let ctPreviewType = CTPreviewType(fileURL: localFileURL) {
-                        self?.show(CTPreviewViewController.create(with: ctPreviewType), sender: nil)
-                    } else {
-                        let activityViewController = UIActivityViewController(activityItems: [localFileURL], applicationActivities: nil)
-                        self?.present(activityViewController, animated: true, completion: nil)
-                    }
-                    
+        fileLoader.loadDocumentFrom(url: downloadUrl) { [weak self] (localFileURL) in
+            UIApplication.shared.isNetworkActivityIndicatorVisible = false
+            if let ctPreviewType = CTPreviewType(fileURL: localFileURL) {
+                self?.show(CTPreviewViewController.create(with: ctPreviewType), sender: nil)
+            } else {
+                let activityViewController = UIActivityViewController(activityItems: [localFileURL], applicationActivities: nil)
+                activityViewController.completionWithItemsHandler = { (activityType, completed, returnedItems:[Any]?, error: Error?) in
+                    try? FileManager.default.removeItem(at: localFileURL)
                 }
-                
-            } catch {
-                debugPrint(error)
-                return
+                self?.present(activityViewController, animated: true, completion: nil)
             }
-        }.resume()
+            
+        }
     }
     
     private func openURLInSafariViewController(_ url: URL) {
+        guard UIApplication.shared.canOpenURL(url) else { return }
         let vc = SFSafariViewController(url: url)
         self.present(vc, animated: true)
     }
     
     private func setInputAttribute() {
-        let source: String = """
-            var inputElement = document.getElementById('webchat-file-input');
-            inputElement.setAttribute('accept', 'image/jpg,image/jpeg,image/gif,image/img,.doc,.docx,.pdf,.txt');
-            """
-        wkWebView.evaluateJavaScript(source)
+        DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(500)) { [weak self] in
+            let source: String = """
+                var inputElement = document.getElementById('webchat-file-input');
+                inputElement.setAttribute('accept', 'image/jpg,image/jpeg,image/gif,image/img,.doc,.docx,.pdf,.txt');
+                inputElement = Array.from( document.getElementsByClassName('webchat-userinput'));
+                inputElement.forEach(element => element.setAttribute('autocorrect', 'on'));
+                inputElement.forEach(element => element.setAttribute('spellcheck', 'true'));
+                inputElement.forEach(element => element.setAttribute('autocomplete', 'true'));
+                inputElement.forEach(element => element.setAttribute('autocapitalize', 'on'));
+                """
+            self?.wkWebView.evaluateJavaScript(source)
+        }
     }
     
-    @objc
-    private func scrollChatToBottom(notification: Notification) {
-        let source: String = """
-            var element = document.getElementsByClassName('webchat-dialog')[0];
-            element.scrollTop = element.scrollHeight;
-            """
-        wkWebView.evaluateJavaScript(source)
-    }
     
 }
 
 // MARK: - WKNavigationDelegate & WKUIDelegate
 extension CTChatViewController: WKNavigationDelegate, WKUIDelegate {
     
-    public func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
-        print(error.localizedDescription)
-    }
+    public func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {}
     
     public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) { }
     
-    public func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
-        print(error.localizedDescription)
-    }
+    public func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {}
     
     public func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
+        guard let url = navigationAction.request.url,
+              url.absoluteString.hasPrefix("https"),
+              checkValidity(of: url) else {
+            decisionHandler(.cancel)
+            return
+        }
         
-        guard let url = navigationAction.request.url, url != chatURL else {
+        guard url != chatURL else {
             decisionHandler(.allow)
             return
         }
@@ -210,6 +205,12 @@ extension CTChatViewController: WKNavigationDelegate, WKUIDelegate {
         let cert1 = NSData(bytes: data, length: size)
         
         return cert1.isEqual(to: cert2)
+    }
+    
+    private func checkValidity(of url: URL) -> Bool {
+        let string = url.absoluteString.replacingOccurrences(of: "https://", with: "", options: .caseInsensitive).replacingOccurrences(of: "/", with: "", options: .caseInsensitive)
+        let validIpAddressRegex = "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$"
+        return string.range(of: validIpAddressRegex, options: .regularExpression) == nil
     }
     
 }

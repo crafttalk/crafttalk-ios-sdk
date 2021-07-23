@@ -8,11 +8,20 @@
 import Foundation
 import UIKit
 import PDFKit
+import Photos
 
-internal enum CTPreviewType {
+internal enum CTPreviewType: Equatable {
     case pdf(fileURL: URL)
     case image(fileURL: URL)
     case video(fileURL: URL)
+    
+    var name: String {
+        switch self {
+        case .pdf(_): return "PDF файл"
+        case .image(_): return "изображение"
+        case .video(_): return "видео"
+        }
+    }
     
     init?(fileURL: URL) {
         if fileURL.containsPDF {
@@ -23,6 +32,16 @@ internal enum CTPreviewType {
             self = .video(fileURL: fileURL)
         } else {
             return nil
+        }
+    }
+    
+    static func ==(lhs: CTPreviewType, rhs: CTPreviewType) -> Bool {
+        switch (lhs, rhs) {
+        case (.image(fileURL: _), .image(fileURL: _)): return true
+        case (.pdf(fileURL: _), .pdf(fileURL: _)): return true
+        case (.video(fileURL: _), .video(fileURL: _)): return true
+        default:
+            return false
         }
     }
 }
@@ -44,11 +63,12 @@ internal final class CTPreviewViewController: UIViewController, CTVideoViewDeleg
     }()
     
     private lazy var videoView: CTVideoView = {
-       return CTVideoView()
+        return CTVideoView()
     }()
     
     // MARK: - Properties
     private var previewType: CTPreviewType!
+    private var localFileURL: URL!
     
     // MARK: - Lifecycle
     internal override func viewDidLoad() {
@@ -64,6 +84,10 @@ internal final class CTPreviewViewController: UIViewController, CTVideoViewDeleg
         if case CTPreviewType.image(_) = previewType! {
             imageScrollView.setupForCurrentDeviceOrientation()
         }
+    }
+    
+    deinit {
+        try? FileManager.default.removeItem(at: localFileURL)
     }
     
     // MARK: - Methods
@@ -86,23 +110,26 @@ internal final class CTPreviewViewController: UIViewController, CTVideoViewDeleg
     private func setupNeededView(for previewType: CTPreviewType) {
         switch previewType {
         case .pdf(let fileURL):
+            localFileURL = fileURL
             setupPDFView(pdfURL: fileURL)
         case .image(let fileURL):
+            localFileURL = fileURL
             setupImagePreview(imageURL: fileURL)
         case .video(let fileURL):
+            localFileURL = fileURL
             setupVideoPreview(videoURL: fileURL)
         }
     }
     
     private func setupPDFView(pdfURL: URL) {
-        guard let document = PDFDocument(url: pdfURL) else { return }
+        guard let document = PDFDocument(url: pdfURL) else { showErrorAlert(); return }
         view.addSubview(pdfView)
         pdfView.fillSuperviewFromSafeAreaLayoutGuideTopAnchor()
         pdfView.document = document
     }
     
     private func setupImagePreview(imageURL: URL) {
-        guard let imageData = try? Data(contentsOf: imageURL), let image = UIImage(data: imageData) else { return }
+        guard let imageData = try? Data(contentsOf: imageURL), let image = UIImage(data: imageData) else { showErrorAlert(); return }
         view.addSubview(imageScrollView)
         imageScrollView.fillSuperviewFromSafeAreaLayoutGuideTopAnchor()
         imageScrollView.set(image: image)
@@ -128,6 +155,54 @@ internal final class CTPreviewViewController: UIViewController, CTVideoViewDeleg
         self.toolbarItems = items
     }
     
+    private func checkPermission(for previewType: CTPreviewType) -> Bool {
+        guard previewType == .image(fileURL: URL(string: "www.google.com")!) || previewType == .video(fileURL: URL(string: "www.google.com")!) else { return true }
+        let status: PHAuthorizationStatus
+        if #available(iOS 14, *) {
+            status = PHPhotoLibrary.authorizationStatus(for: .addOnly)
+        } else {
+            status = PHPhotoLibrary.authorizationStatus()
+        }
+        switch status {
+        case .denied, .restricted:
+            DispatchQueue.main.async { [weak self] in
+                let ac = UIAlertController(title: "Нет доступа к галерее", message: "Для сохранения фото/видео необходим доступ к галерее", preferredStyle: .alert)
+                let submitAction = UIAlertAction(title: "Перейти в настройки", style: .default) { _ in
+                    UIApplication.shared.open(URL(string: UIApplication.openSettingsURLString)!, options: [:], completionHandler: nil)
+                }
+                let cancel = UIAlertAction(title: "Понятно", style: .cancel)
+                ac.addAction(submitAction)
+                ac.addAction(cancel)
+                self?.present(ac, animated: true, completion: nil)
+            }
+            return false
+        case .notDetermined:
+            DispatchQueue.main.async { [weak self] in
+                if #available(iOS 14, *) {
+                    PHPhotoLibrary.requestAuthorization(for: .addOnly) { [weak self] (_) in
+                        self?.saveButtonPressed()
+                    }
+                } else {
+                    PHPhotoLibrary.requestAuthorization() { [weak self] (_) in
+                        self?.saveButtonPressed()
+                    }
+                }
+            }
+            return false
+        default: return true
+        }
+        
+    }
+    
+    private func showErrorAlert() {
+        let ac = UIAlertController(title: "Ошибка загрузки", message: "К сожалению, не удалось загрузить \(previewType.name)", preferredStyle: .alert)
+        let cancel = UIAlertAction(title: "Понятно", style: .cancel) { [weak self] _ in
+            self?.dismiss(animated: true, completion: nil)
+        }
+        ac.addAction(cancel)
+        self.present(ac, animated: true, completion: nil)
+    }
+    
     // MARK: - CTVideoViewDelegate
     
     func videoStateChanged(isPlaying: Bool) {
@@ -143,25 +218,25 @@ internal final class CTPreviewViewController: UIViewController, CTVideoViewDeleg
     // MARK: - Button handling
     @objc
     private func doneButtonPressed() {
-        DispatchQueue.main.async {
-            self.dismiss(animated: true, completion: nil)
+        DispatchQueue.main.async { [weak self] in
+            self?.dismiss(animated: true, completion: nil)
         }
     }
     
     @objc
     private func saveButtonPressed() {
-        guard let previewType = previewType else { return }
-        let localFileURL: URL
-        switch previewType {
-        case .pdf(let fileURL):
-            localFileURL = fileURL
-        case .image(let fileURL):
-            localFileURL = fileURL
-        case .video(let fileURL):
-            localFileURL = fileURL
+        guard let localFileURL = localFileURL, FileManager.default.fileExists(atPath: localFileURL.path) && checkPermission(for: previewType) else { return }
+        let activityItems: [Any]
+        if case let CTPreviewType.image(imageURL) = previewType!,
+           let imageData = try? Data(contentsOf: imageURL),
+           let image = UIImage(data: imageData) {
+            activityItems = [image]
+        } else {
+            activityItems = [localFileURL]
         }
+        
         DispatchQueue.main.async { [weak self] in
-            let activityViewController = UIActivityViewController(activityItems: [localFileURL], applicationActivities: nil)
+            let activityViewController = UIActivityViewController(activityItems: activityItems, applicationActivities: nil)
             self?.present(activityViewController, animated: true, completion: nil)
         }
     }
