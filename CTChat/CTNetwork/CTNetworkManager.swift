@@ -19,7 +19,6 @@ internal final class CTNetworkManager: NSObject, FileLoader {
     
     private lazy var session: URLSession = {
         let config = URLSessionConfiguration.ephemeral
-        config.tlsMinimumSupportedProtocol = .tlsProtocol12
         return URLSession(configuration: config, delegate: self, delegateQueue: nil)
     }()
     

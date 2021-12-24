@@ -15,6 +15,21 @@ internal enum CTPreviewType: Equatable {
     case image(fileURL: URL)
     case video(fileURL: URL)
     
+    var isPDF: Bool {
+        guard case .pdf = self else { return false }
+        return true
+    }
+    
+    var isImage: Bool {
+        guard case .image = self else { return false }
+        return true
+    }
+    
+    var isVideo: Bool {
+        guard case .video = self else { return false }
+        return true
+    }
+    
     var name: String {
         switch self {
         case .pdf(_): return "PDF файл"
@@ -156,7 +171,7 @@ internal final class CTPreviewViewController: UIViewController, CTVideoViewDeleg
     }
     
     private func checkPermission(for previewType: CTPreviewType) -> Bool {
-        guard previewType == .image(fileURL: URL(string: "www.google.com")!) || previewType == .video(fileURL: URL(string: "www.google.com")!) else { return true }
+        guard previewType.isVideo || previewType.isImage else { return true }
         let status: PHAuthorizationStatus
         if #available(iOS 14, *) {
             status = PHPhotoLibrary.authorizationStatus(for: .addOnly)

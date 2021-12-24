@@ -54,7 +54,6 @@ public final class CTChatViewController: UIViewController {
         func getUserAuthScript() -> WKUserScript {
             let visitor = self.visitor.toJSON() ?? ""
             let source: String = """
-                \( CTChat.shared.isConsoleEnabled ? "javascript:(function () { var script = document.createElement('script'); script.src=\"//cdn.jsdelivr.net/npm/eruda\"; document.body.appendChild(script); script.onload = function () { eruda.init() } })();" : "")
                 window.__WebchatUserCallback = function() {
                     webkit.messageHandlers.handler.postMessage("User registred");
                     return \(visitor);
@@ -139,13 +138,19 @@ extension CTChatViewController: WKNavigationDelegate, WKUIDelegate {
     public func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {}
     
     public func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
-        guard let url = navigationAction.request.url,
-              url.absoluteString.hasPrefix("https"),
-              checkValidity(of: url) else {
+        guard let url = navigationAction.request.url, !url.absoluteString.contains("about:blank") else {
+            decisionHandler(.allow)
+            return
+        }
+        guard url.absoluteString.hasPrefix("https") else {
+            makeACallIfNeeded(usingURL: url)
             decisionHandler(.cancel)
             return
         }
-        
+        guard checkValidity(of: url) else {
+            decisionHandler(.cancel)
+            return
+        }
         guard url != chatURL else {
             decisionHandler(.allow)
             return
@@ -213,6 +218,14 @@ extension CTChatViewController: WKNavigationDelegate, WKUIDelegate {
         return string.range(of: validIpAddressRegex, options: .regularExpression) == nil
     }
     
+    private func makeACallIfNeeded(usingURL url: URL) {
+        let string = url.absoluteString
+        guard string.hasPrefix("tel:"),
+              let phoneURL = URL(string: "tel://\(string.digits))"),
+              UIApplication.shared.canOpenURL(phoneURL)
+        else { return }
+        UIApplication.shared.open(url)
+    }
 }
 
 // MARK: - WKScriptMessageHandler
@@ -223,3 +236,9 @@ extension CTChatViewController: WKScriptMessageHandler {
     }
 }
 
+// MARK: String extension
+private extension String {
+    var digits: String {
+        components(separatedBy: CharacterSet.decimalDigits.inverted).joined()
+    }
+}

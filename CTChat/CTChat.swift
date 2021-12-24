@@ -11,21 +11,15 @@ public final class CTChat {
     
     // MARK: - Public Properties
     public static let shared: CTChat = CTChat()
+    public let ctqueue = DispatchQueue(label: "crafttalk.chat.queue", qos: .utility, attributes: [.concurrent])
     
     // MARK: - Internal Properties
-    
     internal var isConsoleEnabled = false
-    
     internal var salt: String = ""
-    /// Webchat base url
     internal var baseURL: String = ""
-    
     internal var namespace: String = ""
-    
     internal var webchatURL: URL { URL(string: baseURL + "/webchat/" + namespace)! }
-    
     internal var visitor: CTVisitor!
-    
     internal lazy var certificate: Data? = {
         let certName = "CTCertificate"
         let certTypes = ["der", "cer", "crt"]
@@ -44,13 +38,10 @@ public final class CTChat {
         }
         return nil
     }()
-    
     internal let networkManager: CTNetworkManager = CTNetworkManager()
     
     // MARK: - Private Properties
     private var fcmToken: String = ""
-    
-    public let ctqueue = DispatchQueue(label: "crafttalk.chat.queue", qos: .utility, attributes: [.concurrent])
     
     // MARK: - Public methods
     public func configure() {
