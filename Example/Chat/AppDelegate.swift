@@ -18,13 +18,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         
         FirebaseApp.configure()
-        RCValues.shared.loadingDoneCallback = {
-            CTChat.shared.configure(baseURL: RCValues.shared.string(forKey: .webchatURL),
-                                    namespace: RCValues.shared.string(forKey: .namespace),
-                                    salt: RCValues.shared.string(forKey: .salt),
-                                    isConsoleEnabled: RCValues.shared.bool(forKey: .erudaToggle))
-        }
-
+        CTChat.shared.configure()
         let uuid = UserDefaults.standard.string(forKey: "uuid") ?? UUID().uuidString
         UserDefaults.standard.set(uuid, forKey: "uuid")
         let visitor = CTVisitor(firstName: "iOSExample", lastName: "", uuid: uuid, customProperties: ["custom" : "123"])
