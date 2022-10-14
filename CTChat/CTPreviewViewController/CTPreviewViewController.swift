@@ -73,13 +73,9 @@ internal final class CTPreviewViewController: UIViewController, CTVideoViewDeleg
         return pdfView
     }()
     
-    private lazy var imageScrollView: CTImageScrollView = {
-        return CTImageScrollView(frame: view.frame)
-    }()
-    
-    private lazy var videoView: CTVideoView = {
-        return CTVideoView()
-    }()
+    private lazy var imageScrollView = CTImageScrollView(frame: view.frame)
+    private lazy var videoView = CTVideoView()
+  
     
     // MARK: - Properties
     private var previewType: CTPreviewType!
@@ -96,7 +92,7 @@ internal final class CTPreviewViewController: UIViewController, CTVideoViewDeleg
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        if case CTPreviewType.image(_) = previewType! {
+        if case .image(_) = previewType {
             imageScrollView.setupForCurrentDeviceOrientation()
         }
     }
@@ -110,16 +106,56 @@ internal final class CTPreviewViewController: UIViewController, CTVideoViewDeleg
         let previewViewController = CTPreviewViewController()
         previewViewController.previewType = previewType
         
-        return UINavigationController(rootViewController: previewViewController)
+        let navigationController = UINavigationController(rootViewController: previewViewController)
+        
+        switch previewType {
+        case .image(_), .video(_):
+            navigationController.modalPresentationStyle = .fullScreen
+        default:
+            break
+        }
+        
+        return navigationController
     }
     
     // MARK: - Setup subviews
     private func setupNavigationBarButtonItems() {
-        let doneButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(doneButtonPressed))
-        navigationItem.setRightBarButton(doneButton, animated: false)
+        let doneButton = { () -> UIBarButtonItem in
+            if case .pdf(_) = previewType  {
+                return UIBarButtonItem(
+                    image: UIImage.cross(),
+                    style: .done,
+                    target: self,
+                    action: #selector(doneButtonPressed)
+                )
+            }
+            else {
+                return UIBarButtonItem(
+                    title: NSLocalizedString(
+                        "Закрыть",
+                        comment: "Close button"
+                    ),
+                    style: .done,
+                    target: self,
+                    action: #selector(doneButtonPressed)
+                )
+            }
+        }()
+        navigationItem.setLeftBarButton(
+            doneButton,
+            animated: false
+        )
         
-        let saveButton = UIBarButtonItem(barButtonSystemItem: .save, target: self, action: #selector(saveButtonPressed))
-        navigationItem.setLeftBarButton(saveButton, animated: false)
+        let saveButton = UIBarButtonItem(
+            image: UIImage.share(),
+            style: .done,
+            target: self,
+            action: #selector(saveButtonPressed)
+        )
+        navigationItem.setRightBarButton(
+            saveButton,
+            animated: false
+        )
     }
     
     private func setupNeededView(for previewType: CTPreviewType) {
@@ -227,14 +263,14 @@ internal final class CTPreviewViewController: UIViewController, CTVideoViewDeleg
         } else {
             items[2] = UIBarButtonItem(barButtonSystemItem: .play, target: self, action: #selector(playButtonPressed))
         }
-        self.toolbarItems = items
+        toolbarItems = items
     }
     
     // MARK: - Button handling
     @objc
     private func doneButtonPressed() {
-        DispatchQueue.main.async { [weak self] in
-            self?.dismiss(animated: true, completion: nil)
+        DispatchQueue.main.async {
+            self.dismiss(animated: true)
         }
     }
     

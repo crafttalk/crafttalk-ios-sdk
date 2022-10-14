@@ -33,12 +33,16 @@ public final class CTChatViewController: UIViewController {
     
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        
+        openWebchat()
     }
     
     public override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        
+    }
+    
+    public override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        closeWebchat()
     }
     
     // MARK: - Methods
@@ -54,11 +58,29 @@ public final class CTChatViewController: UIViewController {
         func getUserAuthScript() -> WKUserScript {
             let visitor = self.visitor.toJSON() ?? ""
             let source: String = """
+                \( CTChat.shared.isConsoleEnabled ? "javascript:(function () { var script = document.createElement('script'); script.src=\"//cdn.jsdelivr.net/npm/eruda\"; document.body.appendChild(script); script.onload = function () { eruda.init() } })();" : "")
                 window.__WebchatUserCallback = function() {
                     webkit.messageHandlers.handler.postMessage("User registred");
                     return \(visitor);
                 };
+                
                 """
+            return WKUserScript(source: source, injectionTime: .atDocumentEnd, forMainFrameOnly: true)
+        }
+        func getExternalControlScript() -> WKUserScript {
+            let source = """
+            var webchatOpenEvent = new Event("webchat_open");
+            var webchatCloseEvent = new Event("webchat_close");
+            
+            window.getWebChatCraftTalkExternalControl = (externalControl) => {
+                document.addEventListener("webchat_open", () => {
+                    externalControl.openWidget();
+                });
+                document.addEventListener("webchat_close", () => {
+                    externalControl.closeWidget();
+                });
+            };
+            """
             return WKUserScript(source: source, injectionTime: .atDocumentEnd, forMainFrameOnly: true)
         }
         
@@ -66,6 +88,7 @@ public final class CTChatViewController: UIViewController {
         wkWebViewConfig.preferences.javaScriptEnabled = true
         wkWebViewConfig.userContentController.addUserScript(getZoomDisableScript())
         wkWebViewConfig.userContentController.addUserScript(getUserAuthScript())
+        wkWebViewConfig.userContentController.addUserScript(getExternalControlScript())
         wkWebViewConfig.userContentController.add(self, name: "handler")
         
         let wkWebView = WKWebView(frame: self.view.frame, configuration: wkWebViewConfig)
@@ -89,18 +112,28 @@ public final class CTChatViewController: UIViewController {
     private func loadAndDisplayDocumentFrom(url downloadUrl : URL) {
         guard presentedViewController == nil && !(presentedViewController is CTPreviewViewController) && !(presentedViewController is UIActivityViewController) else { return }
         UIApplication.shared.isNetworkActivityIndicatorVisible = true
+        
         fileLoader.loadDocumentFrom(url: downloadUrl) { [weak self] (localFileURL) in
             UIApplication.shared.isNetworkActivityIndicatorVisible = false
             if let ctPreviewType = CTPreviewType(fileURL: localFileURL) {
-                self?.show(CTPreviewViewController.create(with: ctPreviewType), sender: nil)
-            } else {
-                let activityViewController = UIActivityViewController(activityItems: [localFileURL], applicationActivities: nil)
+                self?.present(
+                    CTPreviewViewController.create(with: ctPreviewType),
+                    animated: true
+                )
+            }
+            else {
+                let activityViewController = UIActivityViewController(
+                    activityItems: [localFileURL],
+                    applicationActivities: nil
+                )
                 activityViewController.completionWithItemsHandler = { (activityType, completed, returnedItems:[Any]?, error: Error?) in
                     try? FileManager.default.removeItem(at: localFileURL)
                 }
-                self?.present(activityViewController, animated: true, completion: nil)
+                self?.present(
+                    activityViewController,
+                    animated: true
+                )
             }
-            
         }
     }
     
@@ -125,7 +158,19 @@ public final class CTChatViewController: UIViewController {
         }
     }
     
+    private func openWebchat() {
+        let source = """
+        document.dispatchEvent(webchatOpenEvent);
+        """
+        wkWebView.evaluateJavaScript(source)
+    }
     
+    private func closeWebchat() {
+        let source = """
+        document.dispatchEvent(webchatCloseEvent);
+        """
+        wkWebView.evaluateJavaScript(source)
+    }
 }
 
 // MARK: - WKNavigationDelegate & WKUIDelegate
