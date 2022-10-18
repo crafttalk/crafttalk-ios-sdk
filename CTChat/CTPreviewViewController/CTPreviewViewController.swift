@@ -177,6 +177,9 @@ internal final class CTPreviewViewController: UIViewController, CTVideoViewDeleg
         view.addSubview(pdfView)
         pdfView.fillSuperviewFromSafeAreaLayoutGuideTopAnchor()
         pdfView.document = document
+        pdfView.layoutIfNeeded()
+        pdfView.maxScaleFactor = 4.0
+        pdfView.minScaleFactor = pdfView.scaleFactorForSizeToFit
     }
     
     private func setupImagePreview(imageURL: URL) {
