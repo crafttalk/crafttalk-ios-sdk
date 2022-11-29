@@ -75,3 +75,5 @@ iOS 9.0
 - Privacy - Camera Usage Description
 - Privacy - Photo Library Additions Usage Description
 - Privacy - Photo Library Usage Description
+
+9. При создании и отображении класса CTChatViewController убедиться, что другие классы ссылаются на него по слабой ссылке или не ссылаются вовсе, так как при наличии в памяти нескольких CTChatViewController каждый экземпляр чата отправляет /start при открытии CTChatViewController
