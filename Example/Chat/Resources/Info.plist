@@ -38,9 +38,9 @@
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>CTChatBaseURL</key>
-	<string>https://google.com</string>
+	<string>https://cloud-stage.craft-talk.com</string>
 	<key>CTChatNamespace</key>
-	<string>namespace</string>
+	<string>channel_14d550</string>
 	<key>CTSalt</key>
 	<string>123</string>
 	<key>ITSAppUsesNonExemptEncryption</key>

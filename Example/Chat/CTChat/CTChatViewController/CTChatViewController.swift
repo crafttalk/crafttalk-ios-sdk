@@ -9,15 +9,21 @@ import UIKit
 import WebKit
 import SafariServices
 
+//Данный класс используется в конструкторе storyboard, он нужен для отабражения веб-интерфейса с виджетом чата
+@available(iOS 13.0, *)
 public final class CTChatViewController: UIViewController {
     
     // MARK: - Properties
+    // Определяем переменные внутри класса
     private var wkWebView: WKWebView!
     private var chatURL: URL!
     private var visitor: CTVisitor!
     private var fileLoader: FileLoader!
+    private var currentUserID: Int!
+
     
     // MARK: - Lifecycle
+    
     
     convenience init() {
         self.init(nibName: nil, bundle: nil)
@@ -26,9 +32,24 @@ public final class CTChatViewController: UIViewController {
     public override func viewDidLoad() {
         super.viewDidLoad()
         chatURL = CTChat.shared.webchatURL
-        visitor = CTChat.shared.visitor
+        currentUserID = CTChat.shared.currentUserID
+        visitor = CTChat.shared.userList[currentUserID]
         fileLoader = CTChat.shared.networkManager
         setupWebView()
+        print("Chat scene loaded!")
+    }
+    
+    public override func viewDidAppear(_ animated: Bool) {
+        print ("window reopen!")
+        if currentUserID != CTChat.shared.currentUserID{
+            print("user was chanched!")
+            currentUserID = CTChat.shared.currentUserID
+            visitor = CTChat.shared.userList[currentUserID]
+            wkWebView = nil
+            setupWebView()
+            
+        }
+        
     }
     
     public override func viewWillAppear(_ animated: Bool) {
@@ -38,10 +59,22 @@ public final class CTChatViewController: UIViewController {
     
     public override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
+        print("окно скрыто")
+        if CTChat.shared.lowMemMode == true {
+            wkWebView = nil
+            print("ecomode work")
+        }
         
     }
     
     // MARK: - Methods
+    ///перезагрузить страницу с новыми параметрами
+    public func reloadpage(){
+        currentUserID = CTChat.shared.currentUserID
+        visitor = CTChat.shared.userList[currentUserID]
+        
+        
+    }
     
     private func setupWebView() {
         func getZoomDisableScript() -> WKUserScript {
@@ -125,18 +158,18 @@ public final class CTChatViewController: UIViewController {
             self?.wkWebView.evaluateJavaScript(source)
         }
     }
-    
-    
 }
 
 // MARK: - WKNavigationDelegate & WKUIDelegate
+@available(iOS 13.0, *)
 extension CTChatViewController: WKNavigationDelegate, WKUIDelegate {
     
     public func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {}
     
     public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) { }
     
-    public func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {}
+    public func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
+    }
     
     public func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
         guard let url = navigationAction.request.url,
@@ -216,10 +249,16 @@ extension CTChatViewController: WKNavigationDelegate, WKUIDelegate {
 }
 
 // MARK: - WKScriptMessageHandler
+@available(iOS 13.0, *)
 extension CTChatViewController: WKScriptMessageHandler {
     public func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
         setInputAttribute()
         CTChat.shared.registerPushNotifications()
     }
 }
+
+//MARK: - ButtonAction
+
+
+
 
