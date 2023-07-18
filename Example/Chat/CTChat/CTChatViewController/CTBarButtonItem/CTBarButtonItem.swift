@@ -10,6 +10,9 @@ import Foundation
 import UIKit
 
 @available(iOS 13.0, *)
+
 public final class CTChatBarButtonController: UIBarButtonItem {
-    
+    @IBAction func barbutton(_ sender: Any) {
+        print("Buttonpress")
+    }
     }

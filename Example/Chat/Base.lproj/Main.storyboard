@@ -27,7 +27,6 @@
                         <segue destination="OaH-Kc-dmv" kind="relationship" relationship="viewControllers" id="JQH-3g-bAY"/>
                         <segue destination="kbN-3b-9OX" kind="relationship" relationship="viewControllers" id="uPp-Vl-zqx"/>
                         <segue destination="bXx-Yk-3mb" kind="relationship" relationship="viewControllers" id="FlK-ie-92s"/>
-                        <segue destination="T1W-aK-Ogn" kind="relationship" relationship="viewControllers" id="05q-tx-CV6"/>
                     </connections>
                 </tabBarController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="jBx-yN-pP9" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -119,12 +118,13 @@
                     <navigationItem key="navigationItem" title="Chat" id="nLR-aY-q5v">
                         <barButtonItem key="leftBarButtonItem" title="Item" image="menu" changesSelectionAsPrimaryAction="YES" id="vgO-Je-esy" customClass="CTChatBarButtonController" customModule="ChatExample" customModuleProvider="target">
                             <connections>
-                                <action selector="sss:" destination="C6m-xl-sf8" id="dTo-pn-rRw"/>
+                                <action selector="barbutton:" destination="cMO-F7-Hx0" id="T0S-IU-kaK"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="JVF-07-gag" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+                <exit id="cMO-F7-Hx0" userLabel="Exit" sceneMemberID="exit"/>
             </objects>
             <point key="canvasLocation" x="1517" y="1492"/>
         </scene>
@@ -280,127 +280,6 @@
             </objects>
             <point key="canvasLocation" x="1516" y="2813.3433283358322"/>
         </scene>
-        <!--Cheat Menu-->
-        <scene sceneID="6OJ-7u-3Mf">
-            <objects>
-                <navigationController id="T1W-aK-Ogn" sceneMemberID="viewController">
-                    <tabBarItem key="tabBarItem" title="Cheat Menu" image="book" catalog="system" id="5TA-H1-iPn"/>
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="0lC-KB-Lds">
-                        <rect key="frame" x="0.0" y="20" width="375" height="44"/>
-                        <autoresizingMask key="autoresizingMask"/>
-                    </navigationBar>
-                    <connections>
-                        <segue destination="DAf-2H-jya" kind="relationship" relationship="rootViewController" id="uCp-vu-vKH"/>
-                    </connections>
-                </navigationController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="NRO-1v-fYW" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="630" y="3494"/>
-        </scene>
-        <!--Debug View Controller-->
-        <scene sceneID="SGF-qQ-cIZ">
-            <objects>
-                <viewController id="DAf-2H-jya" customClass="DebugViewController" customModule="ChatExample" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" contentMode="scaleToFill" id="9pY-om-lhh">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <subviews>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Debug Pro Scene" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Tkz-pv-oeh">
-                                <rect key="frame" x="31" y="64" width="261" height="42"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="35"/>
-                                <color key="textColor" systemColor="systemGrayColor"/>
-                                <nil key="highlightedColor"/>
-                            </label>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Programmer mode" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="nNN-DK-h1y">
-                                <rect key="frame" x="105" y="114" width="240" height="36"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="30"/>
-                                <color key="textColor" red="0.62737006750000002" green="0.62737006750000002" blue="0.62737006750000002" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                <nil key="highlightedColor"/>
-                            </label>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="xx4-NJ-I8b">
-                                <rect key="frame" x="31" y="184" width="75" height="35"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <state key="normal" title="Button"/>
-                                <buttonConfiguration key="configuration" style="gray" title="Button">
-                                    <color key="baseForegroundColor" systemColor="labelColor"/>
-                                </buttonConfiguration>
-                                <connections>
-                                    <action selector="printAllUser:" destination="DAf-2H-jya" eventType="touchUpInside" id="IuW-za-ZyO"/>
-                                </connections>
-                            </button>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Print All users" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="F79-Gd-Cpi">
-                                <rect key="frame" x="135" y="190" width="105" height="21"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                <color key="textColor" systemColor="opaqueSeparatorColor"/>
-                                <nil key="highlightedColor"/>
-                            </label>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="vuK-LW-ZP5">
-                                <rect key="frame" x="31" y="227" width="75" height="35"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <state key="normal" title="Button"/>
-                                <buttonConfiguration key="configuration" style="gray" title="Button">
-                                    <color key="baseForegroundColor" systemColor="labelColor"/>
-                                </buttonConfiguration>
-                                <connections>
-                                    <action selector="CloseChatWindow:" destination="DAf-2H-jya" eventType="touchUpInside" id="j9e-p7-6i9"/>
-                                </connections>
-                            </button>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="LF5-P2-Ixo">
-                                <rect key="frame" x="31" y="270" width="75" height="35"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <state key="normal" title="Button"/>
-                                <buttonConfiguration key="configuration" style="gray" title="Button">
-                                    <color key="baseForegroundColor" systemColor="labelColor"/>
-                                </buttonConfiguration>
-                                <connections>
-                                    <action selector="ChangeUser:" destination="DAf-2H-jya" eventType="touchUpInside" id="oWT-hu-CGn"/>
-                                </connections>
-                            </button>
-                            <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="248" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="line" textAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="dpa-K5-dEf">
-                                <rect key="frame" x="124" y="271" width="221" height="34"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                <textInputTraits key="textInputTraits" keyboardType="numberPad" returnKeyType="done"/>
-                            </textField>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="XQR-D8-hGA">
-                                <rect key="frame" x="31" y="316" width="75" height="35"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <state key="normal" title="Button"/>
-                                <buttonConfiguration key="configuration" style="gray" title="Button">
-                                    <color key="baseForegroundColor" systemColor="labelColor"/>
-                                </buttonConfiguration>
-                                <connections>
-                                    <action selector="DeleteAllUser:" destination="DAf-2H-jya" eventType="touchUpInside" id="4oa-Uk-Cod"/>
-                                </connections>
-                            </button>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Delete All Users" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="jkJ-q1-jjT">
-                                <rect key="frame" x="135" y="323" width="121" height="21"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                <color key="textColor" systemColor="opaqueSeparatorColor"/>
-                                <nil key="highlightedColor"/>
-                            </label>
-                        </subviews>
-                        <viewLayoutGuide key="safeArea" id="owU-IU-wDJ"/>
-                        <color key="backgroundColor" red="0.86372768756040597" green="0.86372768756040597" blue="0.86372768756040597" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                    </view>
-                    <navigationItem key="navigationItem" id="L5U-0f-t6R"/>
-                    <connections>
-                        <outlet property="AcceptChangeUser" destination="LF5-P2-Ixo" id="3P8-6P-N1L"/>
-                        <outlet property="ChangeUserField" destination="dpa-K5-dEf" id="6co-rB-4gw"/>
-                        <outlet property="CloseWebChatWindow" destination="vuK-LW-ZP5" id="KuV-5i-8WI"/>
-                        <outlet property="DeleteAllUser" destination="XQR-D8-hGA" id="4uE-em-wfm"/>
-                        <outlet property="UserNumberField" destination="dpa-K5-dEf" id="o3x-AE-ncv"/>
-                        <outlet property="printAllUser" destination="xx4-NJ-I8b" id="aOf-go-OQL"/>
-                    </connections>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="Kun-gt-IPa" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="1516" y="3494.3028485757122"/>
-        </scene>
         <!--History-->
         <scene sceneID="aNU-z1-UAF">
             <objects>
@@ -502,7 +381,6 @@
     </scenes>
     <color key="tintColor" red="0.019607843140000001" green="0.0" blue="0.14901960780000001" alpha="1" colorSpace="calibratedRGB"/>
     <resources>
-        <image name="book" catalog="system" width="128" height="99"/>
         <image name="chatbubble" width="26" height="26"/>
         <image name="historyImage" width="80" height="108"/>
         <image name="home" width="26" height="26"/>
@@ -513,20 +391,11 @@
         <image name="rectangle.and.pencil.and.ellipsis" catalog="system" width="128" height="80"/>
         <image name="time" width="26" height="26"/>
         <image name="wallet" width="26" height="26"/>
-        <systemColor name="labelColor">
-            <color red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-        </systemColor>
         <systemColor name="linkColor">
             <color red="0.0" green="0.47843137254901963" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
-        <systemColor name="opaqueSeparatorColor">
-            <color red="0.77647058823529413" green="0.77647058823529413" blue="0.78431372549019607" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-        </systemColor>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-        </systemColor>
-        <systemColor name="systemGrayColor">
-            <color red="0.55686274509803924" green="0.55686274509803924" blue="0.57647058823529407" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>
