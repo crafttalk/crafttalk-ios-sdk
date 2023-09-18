@@ -21,8 +21,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         FirebaseApp.configure()
         CTChat.shared.configure()
-        
-        if UserDefaults.standard.object(forKey: "userListData") != nil {
+        //условие ниже не работает при первом запуске программы, его нужно исправить!
+        if UserDefaults.standard.object(forKey: "userListData") == nil {
             // Данные по указанному ключу уже сохранены
             //CTChat.shared.currentUserID = 0 //если программа не запускается из-за ошибки логина первого пользователя
             print("Данные уже сохранены")
@@ -33,6 +33,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             let uuid =  UUID().uuidString
             let visitor = CTVisitor(firstName: "Anonymous", lastName: "", uuid: uuid, customProperties: ["custom" : "123"])
             CTChat.shared.registerVisitor(visitor)
+            
             
         }
             

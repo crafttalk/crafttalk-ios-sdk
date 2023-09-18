@@ -22,8 +22,8 @@ public final class CTChat {
     ///
     ///На данный момнт при её активации окно с чатом при закрытии будет выгружатся из памяти
     internal var lowMemMode = true
-    
-    internal var isConsoleEnabled = false
+    ///Включение консоли для JS библиотеки eruda,
+    internal var isConsoleEnabled = true
     
     internal var salt: String = ""
     /// Webchat base url
@@ -177,6 +177,10 @@ public final class CTChat {
     }
     
     // MARK: - Internal methods
+    
+    ///регистрирует токен push-уведомлений на сервере
+    ///
+    ///Функция сначала проверяет, пуст ли токен fcmToken. Если он пуст, функция возвращает ничего. Если токен fcmToken не пуст, функция создает локальную копию токена и идентификатора пользователя. Функция затем использует библиотеку ctqueue для планирования задачи, которая должна быть выполнена через 5 секунд. Задача состоит в вызове функции networkManager.registerFCMToken(localFCMToken, uuid: localUUID), которая регистрирует токен push-уведомлений на сервере.
     internal func registerPushNotifications() {
         guard !fcmToken.isEmpty else { return }
         let localFCMToken = fcmToken

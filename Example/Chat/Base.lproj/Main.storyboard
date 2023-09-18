@@ -116,15 +116,18 @@
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     </view>
                     <navigationItem key="navigationItem" title="Chat" id="nLR-aY-q5v">
-                        <barButtonItem key="leftBarButtonItem" title="Item" image="menu" changesSelectionAsPrimaryAction="YES" id="vgO-Je-esy" customClass="CTChatBarButtonController" customModule="ChatExample" customModuleProvider="target">
+                        <barButtonItem key="leftBarButtonItem" title="Item" id="sF1-8O-ITr">
                             <connections>
-                                <action selector="barbutton:" destination="cMO-F7-Hx0" id="T0S-IU-kaK"/>
+                                <action selector="leftButtonPressed:" destination="C6m-xl-sf8" id="g8p-Tw-0Q4"/>
                             </connections>
                         </barButtonItem>
+                        <barButtonItem key="rightBarButtonItem" title="Item" id="ncq-3o-47k"/>
                     </navigationItem>
+                    <connections>
+                        <outlet property="leftbutton" destination="sF1-8O-ITr" id="Jts-8j-khQ"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="JVF-07-gag" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
-                <exit id="cMO-F7-Hx0" userLabel="Exit" sceneMemberID="exit"/>
             </objects>
             <point key="canvasLocation" x="1517" y="1492"/>
         </scene>

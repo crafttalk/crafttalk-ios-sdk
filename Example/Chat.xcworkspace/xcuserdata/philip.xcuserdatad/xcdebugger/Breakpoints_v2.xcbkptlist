@@ -100,5 +100,289 @@
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "0F2278C9-12C9-4638-B140-EFF1D8A17F00"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Chat/AppDelegate.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "31"
+            endingLineNumber = "31"
+            landmarkName = "application(_:didFinishLaunchingWithOptions:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "BFA6B0E7-CF32-4401-AF59-291F82693240"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Chat/AppDelegate.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "33"
+            endingLineNumber = "33"
+            landmarkName = "application(_:didFinishLaunchingWithOptions:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "6B83B9A8-7B1A-4032-9352-C3AC5AA7FD56"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Chat/AppDelegate.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "32"
+            endingLineNumber = "32"
+            landmarkName = "application(_:didFinishLaunchingWithOptions:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "860DCF15-D5EA-4139-915E-775BA7889F76"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Chat/AppDelegate.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "26"
+            endingLineNumber = "26"
+            landmarkName = "application(_:didFinishLaunchingWithOptions:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "2BB5B0F4-E75E-4737-A14D-9BD14242873A"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Chat/CTChat/CTChatViewController/CTBarButtonItem/CTBarButtonItem.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "13"
+            endingLineNumber = "13"
+            landmarkName = "CTBarButtonItem"
+            landmarkType = "3">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "06B95E88-482E-4054-90C0-5C318AC3D968"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Chat/CTChat/CTChatViewController/CTChatViewController.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "105"
+            endingLineNumber = "105"
+            landmarkName = "getUserAuthScript()"
+            landmarkType = "9">
+            <Locations>
+               <Location
+                  uuid = "06B95E88-482E-4054-90C0-5C318AC3D968 - b008cfa26d593daf"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "getUserAuthScript() -&gt; __C.WKUserScript"
+                  moduleName = "ChatExample"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/philip/Desktop/crafttalk-ios-sdk-master/Example/Chat/CTChat/CTChatViewController/CTChatViewController.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "101"
+                  endingLineNumber = "101"
+                  offsetFromSymbolStart = "468">
+               </Location>
+               <Location
+                  uuid = "06B95E88-482E-4054-90C0-5C318AC3D968 - b008cfa26d593daf"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "getUserAuthScript() -&gt; __C.WKUserScript"
+                  moduleName = "ChatExample"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/philip/Desktop/crafttalk-ios-sdk-master/Example/Chat/CTChat/CTChatViewController/CTChatViewController.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "101"
+                  endingLineNumber = "101"
+                  offsetFromSymbolStart = "478">
+               </Location>
+               <Location
+                  uuid = "06B95E88-482E-4054-90C0-5C318AC3D968 - b008cfa26d593daf"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "getUserAuthScript() -&gt; __C.WKUserScript"
+                  moduleName = "ChatExample"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/philip/Desktop/crafttalk-ios-sdk-master/Example/Chat/CTChat/CTChatViewController/CTChatViewController.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "101"
+                  endingLineNumber = "101"
+                  offsetFromSymbolStart = "485">
+               </Location>
+               <Location
+                  uuid = "06B95E88-482E-4054-90C0-5C318AC3D968 - b008cfa26d593e86"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "getUserAuthScript() -&gt; __C.WKUserScript"
+                  moduleName = "ChatExample"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/philip/Desktop/crafttalk-ios-sdk-master/Example/Chat/CTChat/CTChatViewController/CTChatViewController.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "110"
+                  endingLineNumber = "110"
+                  offsetFromSymbolStart = "468">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "E12E02EE-9FD5-4DAC-AEBD-559557476D79"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Chat/CTChat/CTChatViewController/CTChatViewController.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "111"
+            endingLineNumber = "111"
+            landmarkName = "getUserAuthScript()"
+            landmarkType = "9">
+            <Locations>
+               <Location
+                  uuid = "E12E02EE-9FD5-4DAC-AEBD-559557476D79 - b008cfa26d593d44"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "getUserAuthScript() -&gt; __C.WKUserScript"
+                  moduleName = "ChatExample"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/philip/Desktop/crafttalk-ios-sdk-master/Example/Chat/CTChat/CTChatViewController/CTChatViewController.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "108"
+                  endingLineNumber = "108"
+                  offsetFromSymbolStart = "1112">
+               </Location>
+               <Location
+                  uuid = "E12E02EE-9FD5-4DAC-AEBD-559557476D79 - b008cfa26d593d44"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "getUserAuthScript() -&gt; __C.WKUserScript"
+                  moduleName = "ChatExample"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/philip/Desktop/crafttalk-ios-sdk-master/Example/Chat/CTChat/CTChatViewController/CTChatViewController.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "108"
+                  endingLineNumber = "108"
+                  offsetFromSymbolStart = "952">
+               </Location>
+               <Location
+                  uuid = "E12E02EE-9FD5-4DAC-AEBD-559557476D79 - b008cfa26d593d65"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "getUserAuthScript() -&gt; __C.WKUserScript"
+                  moduleName = "ChatExample"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/philip/Desktop/crafttalk-ios-sdk-master/Example/Chat/CTChat/CTChatViewController/CTChatViewController.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "107"
+                  endingLineNumber = "107"
+                  offsetFromSymbolStart = "773">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "521158E9-CA3A-48E3-B4C6-AFEAF4DA063D"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Chat/CTChat/CTChatViewController/CTChatViewController.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "28"
+            endingLineNumber = "28"
+            landmarkName = "leftButtonPressed(_:)"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "521158E9-CA3A-48E3-B4C6-AFEAF4DA063D - c660c5fe54e5e2d7"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "ChatExample.CTChatViewController.leftButtonPressed(Any) -&gt; ()"
+                  moduleName = "ChatExample"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/philip/Desktop/crafttalk-ios-sdk-master/Example/Chat/CTChat/CTChatViewController/CTChatViewController.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "28"
+                  endingLineNumber = "28"
+                  offsetFromSymbolStart = "288">
+               </Location>
+               <Location
+                  uuid = "521158E9-CA3A-48E3-B4C6-AFEAF4DA063D - c660c5fe54e5e2d7"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "ChatExample.CTChatViewController.leftButtonPressed(Any) -&gt; ()"
+                  moduleName = "ChatExample"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/philip/Desktop/crafttalk-ios-sdk-master/Example/Chat/CTChat/CTChatViewController/CTChatViewController.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "28"
+                  endingLineNumber = "28"
+                  offsetFromSymbolStart = "330">
+               </Location>
+               <Location
+                  uuid = "521158E9-CA3A-48E3-B4C6-AFEAF4DA063D - b505a938319ce229"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #1 (Swift.Optional&lt;Any&gt;, Swift.Optional&lt;Swift.Error&gt;) -&gt; () in ChatExample.CTChatViewController.leftButtonPressed(Any) -&gt; ()"
+                  moduleName = "ChatExample"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/philip/Desktop/crafttalk-ios-sdk-master/Example/Chat/CTChat/CTChatViewController/CTChatViewController.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "29"
+                  endingLineNumber = "29"
+                  offsetFromSymbolStart = "85">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
    </Breakpoints>
 </Bucket>

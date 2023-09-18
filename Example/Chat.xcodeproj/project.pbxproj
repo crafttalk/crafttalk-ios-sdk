@@ -27,7 +27,6 @@
 		CFC04E0D24E03E880085352A /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CFC04E0C24E03E880085352A /* WebKit.framework */; };
 		CFD536B425E693E600B82A7F /* CTBundleUtil.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFD536B325E693E600B82A7F /* CTBundleUtil.swift */; };
 		CFE2125E25D6946E005BF66A /* CTImageScrollView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFE2125D25D6946E005BF66A /* CTImageScrollView.swift */; };
-		D418453D2A583ECC00B4F5DC /* CTBarButtonItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = D418453C2A583ECC00B4F5DC /* CTBarButtonItem.swift */; };
 		D44B5B202A558EA9005CDED8 /* SwiftUIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D44B5B1F2A558EA9005CDED8 /* SwiftUIView.swift */; };
 		D44B5B222A559016005CDED8 /* userlist.swift in Sources */ = {isa = PBXBuildFile; fileRef = D44B5B212A559016005CDED8 /* userlist.swift */; };
 		D44B5B242A5590A4005CDED8 /* registration.swift in Sources */ = {isa = PBXBuildFile; fileRef = D44B5B232A5590A4005CDED8 /* registration.swift */; };
@@ -62,7 +61,6 @@
 		CFD536B325E693E600B82A7F /* CTBundleUtil.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CTBundleUtil.swift; sourceTree = "<group>"; };
 		CFE2125D25D6946E005BF66A /* CTImageScrollView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CTImageScrollView.swift; sourceTree = "<group>"; };
 		CFE652AD24ED5C0E00C7D695 /* Chat.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Chat.entitlements; sourceTree = "<group>"; };
-		D418453C2A583ECC00B4F5DC /* CTBarButtonItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CTBarButtonItem.swift; sourceTree = "<group>"; };
 		D44B5B1F2A558EA9005CDED8 /* SwiftUIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftUIView.swift; sourceTree = "<group>"; };
 		D44B5B212A559016005CDED8 /* userlist.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = userlist.swift; sourceTree = "<group>"; };
 		D44B5B232A5590A4005CDED8 /* registration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = registration.swift; sourceTree = "<group>"; };
@@ -150,7 +148,6 @@
 		CF4DAFBC250915E3007EF595 /* CTChatViewController */ = {
 			isa = PBXGroup;
 			children = (
-				D4A548832A5818EC00636802 /* CTBarButtonItem */,
 				CF2E69FF25022A53001072F0 /* CTChatViewController.swift */,
 			);
 			path = CTChatViewController;
@@ -248,14 +245,6 @@
 				D4820C342A5C0B9B00E9054D /* CTViewControllerRegistration.swift */,
 			);
 			path = CTRegistration;
-			sourceTree = "<group>";
-		};
-		D4A548832A5818EC00636802 /* CTBarButtonItem */ = {
-			isa = PBXGroup;
-			children = (
-				D418453C2A583ECC00B4F5DC /* CTBarButtonItem.swift */,
-			);
-			path = CTBarButtonItem;
 			sourceTree = "<group>";
 		};
 		D4A60AAB2A5EDC1400CF19F5 /* CTDebugView */ = {
@@ -389,7 +378,6 @@
 				CF7998F8268B1109006BF7AE /* RCValues.swift in Sources */,
 				CF3F900A2528880F00112653 /* CTVisitor.swift in Sources */,
 				D4A60AAF2A602BE800CF19F5 /* UserListViewController.swift in Sources */,
-				D418453D2A583ECC00B4F5DC /* CTBarButtonItem.swift in Sources */,
 				CF823C3025D413E500A46E3F /* CTPreviewViewController.swift in Sources */,
 				D4820C352A5C0B9B00E9054D /* CTViewControllerRegistration.swift in Sources */,
 				CF8933B725D6C343002C49A7 /* URL+mimeType.swift in Sources */,
