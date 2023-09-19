@@ -42,11 +42,6 @@ class CTViewControllerRegistration: UIViewController {
             CTChat.shared.userList.remove(at: 0)
         }
         CTChat.shared.saveUserList()
-        CTChat.shared.showAllUser()
-        
-        
-        
-
     }
     
     @IBAction func confirmLogIn(_ sender: Any) {

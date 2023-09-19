@@ -75,6 +75,7 @@ class UserListViewController: UIViewController, UITableViewDataSource, UITableVi
                 
                 present(alertController, animated: true, completion: nil)
         CTChat.shared.currentUserID = indexPath.row
+        CTChat.shared.switchUserChanger()
         print(CTChat.shared.currentUserID)
             // Здесь вы можете выполнить дополнительные действия при нажатии на ячейку
         }

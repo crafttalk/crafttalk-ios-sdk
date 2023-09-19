@@ -121,10 +121,15 @@
                                 <action selector="leftButtonPressed:" destination="C6m-xl-sf8" id="g8p-Tw-0Q4"/>
                             </connections>
                         </barButtonItem>
-                        <barButtonItem key="rightBarButtonItem" title="Item" id="ncq-3o-47k"/>
+                        <barButtonItem key="rightBarButtonItem" title="Item" id="ncq-3o-47k">
+                            <connections>
+                                <action selector="rightButtonPressed:" destination="C6m-xl-sf8" id="Cdi-ke-SUc"/>
+                            </connections>
+                        </barButtonItem>
                     </navigationItem>
                     <connections>
                         <outlet property="leftbutton" destination="sF1-8O-ITr" id="Jts-8j-khQ"/>
+                        <outlet property="rightButon" destination="ncq-3o-47k" id="665-x6-CZl"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="JVF-07-gag" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>

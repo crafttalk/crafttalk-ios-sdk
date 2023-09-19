@@ -15,14 +15,17 @@ public final class CTChat {
     // MARK: - Public Properties
     public static let shared: CTChat = CTChat()
     
-    
-    
     // MARK: - Internal Properties
     ///переменная отвечатет за включение экономного режима использования памяти
     ///
     ///На данный момнт при её активации окно с чатом при закрытии будет выгружатся из памяти
     internal var lowMemMode = true
-    ///Включение консоли для JS библиотеки eruda,
+    
+    internal var userChanged = false
+    public func switchUserChanger(){
+        if userChanged == true {userChanged = false} else {userChanged = true}
+    }
+    ///Включение веб консоли для JS из библиотеки eruda,
     internal var isConsoleEnabled = true
     
     internal var salt: String = ""
@@ -33,12 +36,12 @@ public final class CTChat {
     
     internal var webchatURL: URL { URL(string: baseURL + "/webchat/" + namespace)! }
     
-    //internal var visitor: CTVisitor! //старая переменная пользователя, легаси код все дела
+    //internal var visitor: CTVisitor! //старая переменная пользователя
     
     ///Список всех пользователей
     internal var userList: [CTVisitor] = []
     
-    ///номер активного пользователя, нулевой пользователь это анонимус. но во время работы программы это можно поменять
+    ///номер активного пользователя, нулевой пользователь по умолчанию это анонимус. 
     internal var currentUserID = 0 //
     
     internal lazy var certificate: Data? = {
@@ -124,24 +127,17 @@ public final class CTChat {
         
         userList.remove(at: position)
         if currentUserID + 1 > userList.count{
-            print("КРИТИЧЕСКАЯ ОШИБКА, ССЫЛАЕМСЯ НА НЕСУЩЕСТВУЮЩЕГО ПОЛЬЗОВАТЕЛЯ!!!!!!!1111!!!111")
+            print("ошибка пользователя не существует")
             currentUserID = currentUserID - 1
         }
+        //проверяем что список пользователей не пустой
         if userList.isEmpty {
-            print("КРИТИЧЕСКАЯ ОШИБКА, ПОЛЬЗОВАТЕЛЬ УДАЛИЛ ВСЕХ!!!!!!!1111!!!111")
+            print("внимание, пользователь удалил всех")
             let uuid =  UUID().uuidString
             let visitor = CTVisitor(firstName: "Anonymous", lastName: "", uuid: uuid, customProperties: ["custom" : "123"])
             registerVisitor(visitor)
             currentUserID = 0
         }
-    }
-    
-    ///Выводит в консоль имена и айди всех пользователей из списка
-    public func showAllUser(){
-        for element in userList{
-            print(element.firstName! , element.uuid)
-        }
-        print(userList.count)
     }
     ///Возвращает имя пользователя, в качестве параметра задаётся номер в списке
     ///
@@ -170,8 +166,7 @@ public final class CTChat {
         }
         
     }
-    
-    
+        
     public func saveFCMToken(_ fcmToken: String) {
         self.fcmToken = fcmToken
     }

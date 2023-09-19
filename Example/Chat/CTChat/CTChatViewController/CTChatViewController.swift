@@ -9,10 +9,10 @@ import UIKit
 import WebKit
 import SafariServices
 
-//Данный класс используется в конструкторе storyboard, он нужен для отабражения веб-интерфейса с виджетом чата
+//Данный класс используется в конструкторе storyboard, он нужен для отабражения веб-интерфейса с виджетом чата. также в этом классе хранятся методы управления виджетом через externalApi
 @available(iOS 13.0, *)
-public final class CTChatViewController: UIViewController {
-    
+public final class CTChatViewController: UIViewController, WKScriptMessageHandler {
+    public static let shared: CTChatViewController = CTChatViewController()
     // MARK: - Properties
     // Определяем переменные внутри класса
     private var wkWebView: WKWebView!
@@ -21,23 +21,95 @@ public final class CTChatViewController: UIViewController {
     private var fileLoader: FileLoader!
     private var currentUserID: Int!
 
+    @IBOutlet weak var rightButon: UIBarButtonItem!
+    @IBAction func rightButtonPressed(_ sender: Any) {
+        print("cordinate sending")
+        sendCordinate(52.9646392, 36.0447363)
+    }
     @IBOutlet weak var leftbutton: UIBarButtonItem!
     @IBAction func leftButtonPressed(_ sender: Any) {
         print("Left button pressed!")
-        CTChat.shared.switchUser(0)
-        wkWebView.evaluateJavaScript("userData.uuid = '2cadfd06-e8a6-4ccd-ad38-855271015671'; loginUserAction()") { (result, error) in
+        ratedialog5()
+    }
+    
+    
+    // MARK: - Lifecycle
+    /// функция для авторизации пользовотеля
+    ///
+    /// выполняет js запрос в браузере и передаёт данные из программы в виджет чата
+    public func loginUser(_ visitor: CTVisitor) {
+        let visitorJSON = visitor.toJSON() ?? ""
+        wkWebView.evaluateJavaScript("userData = \(visitorJSON); loginUserAction()") { (result, error) in
             if let error = error {
                 print(error.localizedDescription)
             } else {
                 print(result)
             }
         }
-        
-        
     }
     
+    public func ratedialog5(){
+        wkWebView.evaluateJavaScript("sendDialogScore5Action()") { (result, error) in
+            if let error = error {
+                print(error.localizedDescription)
+            } else {
+                print(result)
+            }
+        }
+    }
     
-    // MARK: - Lifecycle
+    public func ratedialog4(){
+        wkWebView.evaluateJavaScript("sendDialogScore4Action()") { (result, error) in
+            if let error = error {
+                print(error.localizedDescription)
+            } else {
+                print(result)
+            }
+        }
+    }
+    
+    public func ratedialog3(){
+        wkWebView.evaluateJavaScript("sendDialogScore3Action()") { (result, error) in
+            if let error = error {
+                print(error.localizedDescription)
+            } else {
+                print(result)
+            }
+        }
+    }
+    
+    public func ratedialog2(){
+        wkWebView.evaluateJavaScript("sendDialogScore2Action()") { (result, error) in
+            if let error = error {
+                print(error.localizedDescription)
+            } else {
+                print(result)
+            }
+        }
+    }
+    
+    public func ratedialog1(){
+        wkWebView.evaluateJavaScript("sendDialogScore1Action()") { (result, error) in
+            if let error = error {
+                print(error.localizedDescription)
+            } else {
+                print(result)
+            }
+        }
+    }
+    
+    public func sendCordinate(_ lat: Float, _ lon: Float){
+        let latString = "\(lat)"
+        let lonString = "\(lon)"
+        wkWebView.evaluateJavaScript("cordinate.lat = \(latString); cordinate.lon = \(lonString); sendCordinateAction()") { (result, error) in
+            if let error = error {
+                print(error.localizedDescription)
+            } else {
+                print(result)
+            }
+        }
+
+    }
     
     
     convenience init() {
@@ -56,15 +128,11 @@ public final class CTChatViewController: UIViewController {
     
     public override func viewDidAppear(_ animated: Bool) {
         print ("window reopen!")
-        if currentUserID != CTChat.shared.currentUserID{
-            print("user was chanched!")
-            currentUserID = CTChat.shared.currentUserID
-            visitor = CTChat.shared.userList[currentUserID]
-            wkWebView = nil
-            setupWebView()
-            
+        if CTChat.shared.userChanged == true {
+            CTChat.shared.switchUserChanger()
+            let currentUserID = CTChat.shared.currentUserID
+            loginUser(CTChat.shared.userList[currentUserID])
         }
-        
     }
     
     public override func viewWillAppear(_ animated: Bool) {
@@ -76,8 +144,8 @@ public final class CTChatViewController: UIViewController {
         super.viewWillDisappear(animated)
         print("окно скрыто")
         if CTChat.shared.lowMemMode == true {
-            wkWebView = nil
-            print("ecomode work")
+             //wkWebView = nil
+            //print("ecomode work")
         }
         
     }
@@ -181,7 +249,7 @@ public final class CTChatViewController: UIViewController {
             let visitor = self.visitor.toJSON() ?? ""
             let source: String = """
             var element8 = document.createElement('script');
-            element8.textContent = "const sendLocationButton = document.getElementById('sendLocation'); sendLocationButton.style.display = 'none'; function sendCordinateAction(){const sendLocationButton = document.getElementById('sendLocation'); sendLocationButton.click();}; const sendVisitorMessageButton = document.getElementById('sendVisitorMessage'); sendVisitorMessageButton.style.display = 'none';  let visitorMessageText = 'SAMPLE: hello i am visitor! code:phi249'; function sendVisitorMessage(){const sendVisitorMessageButton = document.getElementById('sendVisitorMessage'); sendVisitorMessageButton.click();}; const sendDialogScore1Button = document.getElementById('sendDialogScore1'); const sendDialogScore2Button = document.getElementById('sendDialogScore2'); const sendDialogScore3Button = document.getElementById('sendDialogScore3'); const sendDialogScore4Button = document.getElementById('sendDialogScore4'); const sendDialogScore5Button = document.getElementById('sendDialogScore5'); sendDialogScore1Button.style.display = 'none'; sendDialogScore2Button.style.display = 'none'; sendDialogScore3Button.style.display = 'none'; sendDialogScore4Button.style.display = 'none'; sendDialogScore5Button.style.display = 'none'; function sendDialogScore1Action(){const sendDialogScore1Button = document.getElementById('sendDialogScore1'); sendDialogScore1Button.click();}; function sendDialogScore2Action(){ const sendDialogScore2Button = document.getElementById('sendDialogScore2'); sendDialogScore2Button.click();}; function sendDialogScore3Action(){const sendDialogScore3Button = document.getElementById('sendDialogScore3');sendDialogScore3Button.click();}; function sendDialogScore4Action(){const sendDialogScore4Button = document.getElementById('sendDialogScore4'); sendDialogScore4Button.click();}; function sendDialogScore5Action(){const sendDialogScore5Button = document.getElementById('sendDialogScore5'); sendDialogScore5Button.click();}; let userData = { uuid: '', first_name: '', last_name: '', contract: ''}; const loginUserButton = document.getElementById('loginUser'); loginUserButton.style.display = 'none'; function loginUserAction(){ const loginUserButton = document.getElementById('loginUser'); loginUserButton.click();} window.getWebChatCraftTalkExternalControl = (externalControl) => {const sendLocationButton = document.getElementById('sendLocation'); const sendVisitorMessageButton = document.getElementById('sendVisitorMessage'); const text = {lat: 52.9646392,lon: 36.0447363}; sendLocationButton.addEventListener('click', () => {externalControl.sendMessage(JSON.stringify(text), 10); }); sendVisitorMessageButton.addEventListener('click', () =>{externalControl.sendMessage(JSON.stringify(visitorMessageText), 1); }); sendDialogScore1Button.addEventListener('click', () =>{externalControl.sendDialogScore(1); }); sendDialogScore2Button.addEventListener('click', () =>{externalControl.sendDialogScore(2); }); sendDialogScore3Button.addEventListener('click', () =>{ externalControl.sendDialogScore(3);}); sendDialogScore4Button.addEventListener('click', () =>{ externalControl.sendDialogScore(4);}); sendDialogScore5Button.addEventListener('click', () =>{externalControl.sendDialogScore(5);}); loginUserButton.addEventListener('click', () =>{ setTimeout(() => { externalControl.logout(); externalControl.closeWidget(); const newUser = userData; window.__WebchatUserCallback = function () { return newUser;};externalControl.login();}, 1333);}); externalControl.on('webchatOpened', function () {console.log('Чат был открыт, успех! func extapi2 включена и работает!');}); externalControl.on('messageReceived', function () {console.log('ПОЛУЧЕНО СООБЩЕНИЕ ДЛЯ ПОЛЬЗОВАТЕЛЯ');});}";
+            element8.textContent = "let cordinate = {lat: 52.9646392, lon: 36.0447363}; const sendLocationButton = document.getElementById('sendLocation'); sendLocationButton.style.display = 'none'; function sendCordinateAction(){const sendLocationButton = document.getElementById('sendLocation'); sendLocationButton.click();}; const sendVisitorMessageButton = document.getElementById('sendVisitorMessage'); sendVisitorMessageButton.style.display = 'none';  let visitorMessageText = 'SAMPLE'; function sendVisitorMessage(){const sendVisitorMessageButton = document.getElementById('sendVisitorMessage'); sendVisitorMessageButton.click();}; const sendDialogScore1Button = document.getElementById('sendDialogScore1'); const sendDialogScore2Button = document.getElementById('sendDialogScore2'); const sendDialogScore3Button = document.getElementById('sendDialogScore3'); const sendDialogScore4Button = document.getElementById('sendDialogScore4'); const sendDialogScore5Button = document.getElementById('sendDialogScore5'); sendDialogScore1Button.style.display = 'none'; sendDialogScore2Button.style.display = 'none'; sendDialogScore3Button.style.display = 'none'; sendDialogScore4Button.style.display = 'none'; sendDialogScore5Button.style.display = 'none'; function sendDialogScore1Action(){const sendDialogScore1Button = document.getElementById('sendDialogScore1'); sendDialogScore1Button.click();}; function sendDialogScore2Action(){ const sendDialogScore2Button = document.getElementById('sendDialogScore2'); sendDialogScore2Button.click();}; function sendDialogScore3Action(){const sendDialogScore3Button = document.getElementById('sendDialogScore3');sendDialogScore3Button.click();}; function sendDialogScore4Action(){const sendDialogScore4Button = document.getElementById('sendDialogScore4'); sendDialogScore4Button.click();}; function sendDialogScore5Action(){const sendDialogScore5Button = document.getElementById('sendDialogScore5'); sendDialogScore5Button.click();}; let userData = {first_name: '', last_name: '', uuid: '', email: '', phone: '', contarct: '', birthday: '', hash: '', customProperties: ''}; const loginUserButton = document.getElementById('loginUser'); loginUserButton.style.display = 'none'; function loginUserAction(){ const loginUserButton = document.getElementById('loginUser'); loginUserButton.click();} window.getWebChatCraftTalkExternalControl = (externalControl) => {const sendLocationButton = document.getElementById('sendLocation'); const sendVisitorMessageButton = document.getElementById('sendVisitorMessage'); const text = cordinate; sendLocationButton.addEventListener('click', () => {externalControl.sendMessage(JSON.stringify(text), 10); }); sendVisitorMessageButton.addEventListener('click', () =>{externalControl.sendMessage(JSON.stringify(visitorMessageText), 1); }); sendDialogScore1Button.addEventListener('click', () =>{externalControl.sendDialogScore(1); }); sendDialogScore2Button.addEventListener('click', () =>{externalControl.sendDialogScore(2); }); sendDialogScore3Button.addEventListener('click', () =>{ externalControl.sendDialogScore(3);}); sendDialogScore4Button.addEventListener('click', () =>{ externalControl.sendDialogScore(4);}); sendDialogScore5Button.addEventListener('click', () =>{externalControl.sendDialogScore(5);}); loginUserButton.addEventListener('click', () =>{ setTimeout(() => { externalControl.logout(); externalControl.closeWidget(); const newUser = userData; window.__WebchatUserCallback = function () { return newUser;};externalControl.login();}, 650);}); externalControl.on('webchatOpened', function () {console.log('Чат был открыт, успех! func extapi2 включена и работает!');}); externalControl.on('messageReceived', function () {console.log('ПОЛУЧЕНО СООБЩЕНИЕ ДЛЯ ПОЛЬЗОВАТЕЛЯ'); var message = 'this message send from web'; window.webkit.messageHandlers.observer.postMessage(message);});}";
             document.body.appendChild(element8);
             """
             return WKUserScript(source: source, injectionTime: .atDocumentEnd, forMainFrameOnly: true)

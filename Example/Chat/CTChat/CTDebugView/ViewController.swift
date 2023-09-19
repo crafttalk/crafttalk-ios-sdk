@@ -35,7 +35,6 @@ class DebugViewController: UIViewController {
     }
     
     @IBAction func printAllUser(_ sender: Any) {
-        CTChat.shared.showAllUser()
     }
     
     @IBAction func CloseChatWindow(_ sender: Any) {
