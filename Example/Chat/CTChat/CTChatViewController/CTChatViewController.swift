@@ -9,108 +9,15 @@ import UIKit
 import WebKit
 import SafariServices
 
-//Данный класс используется в конструкторе storyboard, он нужен для отабражения веб-интерфейса с виджетом чата. также в этом классе хранятся методы управления виджетом через externalApi
-@available(iOS 13.0, *)
-public final class CTChatViewController: UIViewController, WKScriptMessageHandler {
-    public static let shared: CTChatViewController = CTChatViewController()
+public final class CTChatViewController: UIViewController {
+    
     // MARK: - Properties
-    // Определяем переменные внутри класса
     private var wkWebView: WKWebView!
     private var chatURL: URL!
     private var visitor: CTVisitor!
     private var fileLoader: FileLoader!
-    private var currentUserID: Int!
-
-    @IBOutlet weak var rightButon: UIBarButtonItem!
-    @IBAction func rightButtonPressed(_ sender: Any) {
-        print("cordinate sending")
-        sendCordinate(52.9646392, 36.0447363)
-    }
-    @IBOutlet weak var leftbutton: UIBarButtonItem!
-    @IBAction func leftButtonPressed(_ sender: Any) {
-        print("Left button pressed!")
-        ratedialog5()
-    }
-    
     
     // MARK: - Lifecycle
-    /// функция для авторизации пользовотеля
-    ///
-    /// выполняет js запрос в браузере и передаёт данные из программы в виджет чата
-    public func loginUser(_ visitor: CTVisitor) {
-        let visitorJSON = visitor.toJSON() ?? ""
-        wkWebView.evaluateJavaScript("userData = \(visitorJSON); loginUserAction()") { (result, error) in
-            if let error = error {
-                print(error.localizedDescription)
-            } else {
-                print(result)
-            }
-        }
-    }
-    
-    public func ratedialog5(){
-        wkWebView.evaluateJavaScript("sendDialogScore5Action()") { (result, error) in
-            if let error = error {
-                print(error.localizedDescription)
-            } else {
-                print(result)
-            }
-        }
-    }
-    
-    public func ratedialog4(){
-        wkWebView.evaluateJavaScript("sendDialogScore4Action()") { (result, error) in
-            if let error = error {
-                print(error.localizedDescription)
-            } else {
-                print(result)
-            }
-        }
-    }
-    
-    public func ratedialog3(){
-        wkWebView.evaluateJavaScript("sendDialogScore3Action()") { (result, error) in
-            if let error = error {
-                print(error.localizedDescription)
-            } else {
-                print(result)
-            }
-        }
-    }
-    
-    public func ratedialog2(){
-        wkWebView.evaluateJavaScript("sendDialogScore2Action()") { (result, error) in
-            if let error = error {
-                print(error.localizedDescription)
-            } else {
-                print(result)
-            }
-        }
-    }
-    
-    public func ratedialog1(){
-        wkWebView.evaluateJavaScript("sendDialogScore1Action()") { (result, error) in
-            if let error = error {
-                print(error.localizedDescription)
-            } else {
-                print(result)
-            }
-        }
-    }
-    
-    public func sendCordinate(_ lat: Float, _ lon: Float){
-        let latString = "\(lat)"
-        let lonString = "\(lon)"
-        wkWebView.evaluateJavaScript("cordinate.lat = \(latString); cordinate.lon = \(lonString); sendCordinateAction()") { (result, error) in
-            if let error = error {
-                print(error.localizedDescription)
-            } else {
-                print(result)
-            }
-        }
-
-    }
-    
     
     convenience init() {
         self.init(nibName: nil, bundle: nil)
@@ -119,20 +26,9 @@ public final class CTChatViewController: UIViewController, WKScriptMessageHandle
     public override func viewDidLoad() {
         super.viewDidLoad()
         chatURL = CTChat.shared.webchatURL
-        currentUserID = CTChat.shared.currentUserID
-        visitor = CTChat.shared.userList[currentUserID]
+        visitor = CTChat.shared.visitor
         fileLoader = CTChat.shared.networkManager
         setupWebView()
-        print("Chat scene loaded!")
-    }
-    
-    public override func viewDidAppear(_ animated: Bool) {
-        print ("window reopen!")
-        if CTChat.shared.userChanged == true {
-            CTChat.shared.switchUserChanger()
-            let currentUserID = CTChat.shared.currentUserID
-            loginUser(CTChat.shared.userList[currentUserID])
-        }
     }
     
     public override func viewWillAppear(_ animated: Bool) {
@@ -142,24 +38,12 @@ public final class CTChatViewController: UIViewController, WKScriptMessageHandle
     
     public override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        print("окно скрыто")
-        if CTChat.shared.lowMemMode == true {
-             //wkWebView = nil
-            //print("ecomode work")
-        }
         
     }
     
     // MARK: - Methods
-    ///перезагрузить страницу с новыми параметрами
-    public func reloadpage(){
-        currentUserID = CTChat.shared.currentUserID
-        visitor = CTChat.shared.userList[currentUserID]
-    }
     
-    ///функция настройки веб вида, отключает масштабирование окна и регестрирует нового пользователя
     private func setupWebView() {
-        ///Отключает масштабирование в окне/виджете чата
         func getZoomDisableScript() -> WKUserScript {
             let source: String = "var meta = document.createElement('meta');" +
                 "meta.name = 'viewport';" +
@@ -167,10 +51,10 @@ public final class CTChatViewController: UIViewController, WKScriptMessageHandle
                 "var head = document.getElementsByTagName('head')[0];" + "head.appendChild(meta);"
             return WKUserScript(source: source, injectionTime: .atDocumentEnd, forMainFrameOnly: true)
         }
-        ///Авторизует пользователя в чате окна/виджета и загружает script eruda для консоли в браузере
         func getUserAuthScript() -> WKUserScript {
             let visitor = self.visitor.toJSON() ?? ""
             let source: String = """
+                \( CTChat.shared.isConsoleEnabled ? "javascript:(function () { var script = document.createElement('script'); script.src=\"//cdn.jsdelivr.net/npm/eruda\"; document.body.appendChild(script); script.onload = function () { eruda.init() } })();" : "")
                 window.__WebchatUserCallback = function() {
                     webkit.messageHandlers.handler.postMessage("User registred");
                     return \(visitor);
@@ -178,108 +62,12 @@ public final class CTChatViewController: UIViewController, WKScriptMessageHandle
                 """
             return WKUserScript(source: source, injectionTime: .atDocumentEnd, forMainFrameOnly: true)
         }
-        ///включает консоль в браузере
-        ///
-        ///в ctchat переменная isConsoleEnabled должна быть true
-        func debugWebConsole() -> WKUserScript {
-            let source: String = """
-                \( CTChat.shared.isConsoleEnabled ? "javascript:(function () { var script = document.createElement('script'); script.src=\"//cdn.jsdelivr.net/npm/eruda\"; document.body.appendChild(script); script.onload = function () { eruda.init() } })();" : "")
-            """
-            return WKUserScript(source: source, injectionTime: .atDocumentEnd, forMainFrameOnly: true)
-        }
-        
-        func testScript1() -> WKUserScript {
-            let source: String = """
-            var element = document.createElement('script');
-            element.textContent = "window.getWebChatCraftTalkExternalControl = (externalControl) => {console.log('ОНО РАБОТАЕТ АААААААААААААААААААААААА');}";
-            document.body.appendChild(element);
-            """
-            return WKUserScript(source: source, injectionTime: .atDocumentEnd, forMainFrameOnly: true)
-        }
-        ///добавить кнопки для управления externalApi
-        ///
-        ///сами кнопки не используются они нужны для активации команд externalapi, к кнопкам применяется параметр .style.display = "none"
-        ///по сути костыль
-        func invisibleButtonExternalApi() -> WKUserScript {
-            let source: String = """
-            var element = document.createElement('button');
-            element.setAttribute("id", "sendLocation");
-            element.textContent = 'sendCordinate';
-            document.body.appendChild(element);
-            
-            var element1 = document.createElement('button');
-            element1.setAttribute("id", "sendVisitorMessage");
-            element1.textContent = 'sendMessage';
-            document.body.appendChild(element1);
-            
-            var element2 = document.createElement('button');
-            element2.setAttribute("id", "sendDialogScore1");
-            element2.textContent = 'score1';
-            document.body.appendChild(element2);
-            
-            var element3 = document.createElement('button');
-            element3.setAttribute("id", "sendDialogScore2");
-            element3.textContent = 'score2';
-            document.body.appendChild(element3);
-            
-            var element4 = document.createElement('button');
-            element4.setAttribute("id", "sendDialogScore3");
-            element4.textContent = 'score3';
-            document.body.appendChild(element4);
-            
-            var element5 = document.createElement('button');
-            element5.setAttribute("id", "sendDialogScore4");
-            element5.textContent = 'score4';
-            document.body.appendChild(element5);
-            
-            var element6 = document.createElement('button');
-            element6.setAttribute("id", "sendDialogScore5");
-            element6.textContent = 'score5';
-            document.body.appendChild(element6);
-            
-            var element7 = document.createElement('button');
-            element7.setAttribute("id", "loginUser");
-            element7.textContent = 'login';
-            document.body.appendChild(element7);
-            """
-            return WKUserScript(source: source, injectionTime: .atDocumentEnd, forMainFrameOnly: true)
-        }
-        //вторая часть externalApi скрывает отображение кнопок и биндить функции на них
-        func invisibleButtonExternalApi2() -> WKUserScript {
-            let visitor = self.visitor.toJSON() ?? ""
-            let source: String = """
-            var element8 = document.createElement('script');
-            element8.textContent = "let cordinate = {lat: 52.9646392, lon: 36.0447363}; const sendLocationButton = document.getElementById('sendLocation'); sendLocationButton.style.display = 'none'; function sendCordinateAction(){const sendLocationButton = document.getElementById('sendLocation'); sendLocationButton.click();}; const sendVisitorMessageButton = document.getElementById('sendVisitorMessage'); sendVisitorMessageButton.style.display = 'none';  let visitorMessageText = 'SAMPLE'; function sendVisitorMessage(){const sendVisitorMessageButton = document.getElementById('sendVisitorMessage'); sendVisitorMessageButton.click();}; const sendDialogScore1Button = document.getElementById('sendDialogScore1'); const sendDialogScore2Button = document.getElementById('sendDialogScore2'); const sendDialogScore3Button = document.getElementById('sendDialogScore3'); const sendDialogScore4Button = document.getElementById('sendDialogScore4'); const sendDialogScore5Button = document.getElementById('sendDialogScore5'); sendDialogScore1Button.style.display = 'none'; sendDialogScore2Button.style.display = 'none'; sendDialogScore3Button.style.display = 'none'; sendDialogScore4Button.style.display = 'none'; sendDialogScore5Button.style.display = 'none'; function sendDialogScore1Action(){const sendDialogScore1Button = document.getElementById('sendDialogScore1'); sendDialogScore1Button.click();}; function sendDialogScore2Action(){ const sendDialogScore2Button = document.getElementById('sendDialogScore2'); sendDialogScore2Button.click();}; function sendDialogScore3Action(){const sendDialogScore3Button = document.getElementById('sendDialogScore3');sendDialogScore3Button.click();}; function sendDialogScore4Action(){const sendDialogScore4Button = document.getElementById('sendDialogScore4'); sendDialogScore4Button.click();}; function sendDialogScore5Action(){const sendDialogScore5Button = document.getElementById('sendDialogScore5'); sendDialogScore5Button.click();}; let userData = {first_name: '', last_name: '', uuid: '', email: '', phone: '', contarct: '', birthday: '', hash: '', customProperties: ''}; const loginUserButton = document.getElementById('loginUser'); loginUserButton.style.display = 'none'; function loginUserAction(){ const loginUserButton = document.getElementById('loginUser'); loginUserButton.click();} window.getWebChatCraftTalkExternalControl = (externalControl) => {const sendLocationButton = document.getElementById('sendLocation'); const sendVisitorMessageButton = document.getElementById('sendVisitorMessage'); const text = cordinate; sendLocationButton.addEventListener('click', () => {externalControl.sendMessage(JSON.stringify(text), 10); }); sendVisitorMessageButton.addEventListener('click', () =>{externalControl.sendMessage(JSON.stringify(visitorMessageText), 1); }); sendDialogScore1Button.addEventListener('click', () =>{externalControl.sendDialogScore(1); }); sendDialogScore2Button.addEventListener('click', () =>{externalControl.sendDialogScore(2); }); sendDialogScore3Button.addEventListener('click', () =>{ externalControl.sendDialogScore(3);}); sendDialogScore4Button.addEventListener('click', () =>{ externalControl.sendDialogScore(4);}); sendDialogScore5Button.addEventListener('click', () =>{externalControl.sendDialogScore(5);}); loginUserButton.addEventListener('click', () =>{ setTimeout(() => { externalControl.logout(); externalControl.closeWidget(); const newUser = userData; window.__WebchatUserCallback = function () { return newUser;};externalControl.login();}, 650);}); externalControl.on('webchatOpened', function () {console.log('Чат был открыт, успех! func extapi2 включена и работает!');}); externalControl.on('messageReceived', function () {console.log('ПОЛУЧЕНО СООБЩЕНИЕ ДЛЯ ПОЛЬЗОВАТЕЛЯ'); var message = 'this message send from web'; window.webkit.messageHandlers.observer.postMessage(message);});}";
-            document.body.appendChild(element8);
-            """
-            return WKUserScript(source: source, injectionTime: .atDocumentEnd, forMainFrameOnly: true)
-        }
-        ///третья часть с самим externalApi
-        func invisibleButtonExternalApi3() -> WKUserScript {
-            let source: String = """
-            var element9 = document.createElement('script');
-            element9.textContent = "window.getWebChatCraftTalkExternalControl = (externalControl) => {const sendLocationButton = document.getElementById('sendLocation'); const sendVisitorMessageButton = document.getElementById('sendVisitorMessage'); const text = {lat: 52.9646392,lon: 36.0447363}; sendLocationButton.addEventListener('click', () => {externalControl.sendMessage(JSON.stringify(text), 10); }); ";
-            document.body.appendChild(element9);
-            """
-            return WKUserScript(source: source, injectionTime: .atDocumentEnd, forMainFrameOnly: true)
-        }
         
         let wkWebViewConfig = WKWebViewConfiguration()
         wkWebViewConfig.preferences.javaScriptEnabled = true
-        //добавляем пользовательские скрипты
         wkWebViewConfig.userContentController.addUserScript(getZoomDisableScript())
         wkWebViewConfig.userContentController.addUserScript(getUserAuthScript())
-        wkWebViewConfig.userContentController.addUserScript(debugWebConsole())
-        
-        wkWebViewConfig.userContentController.addUserScript(testScript1())
-        wkWebViewConfig.userContentController.addUserScript(invisibleButtonExternalApi())
-        wkWebViewConfig.userContentController.addUserScript(invisibleButtonExternalApi2())
-        
-        
-        
         wkWebViewConfig.userContentController.add(self, name: "handler")
-        //тестовая функция ниже
-     
         
         let wkWebView = WKWebView(frame: self.view.frame, configuration: wkWebViewConfig)
         wkWebView.translatesAutoresizingMaskIntoConstraints = false
@@ -337,18 +125,18 @@ public final class CTChatViewController: UIViewController, WKScriptMessageHandle
             self?.wkWebView.evaluateJavaScript(source)
         }
     }
+    
+    
 }
 
 // MARK: - WKNavigationDelegate & WKUIDelegate
-@available(iOS 13.0, *)
 extension CTChatViewController: WKNavigationDelegate, WKUIDelegate {
     
     public func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {}
     
     public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) { }
     
-    public func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
-    }
+    public func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {}
     
     public func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
         guard let url = navigationAction.request.url,
@@ -428,10 +216,10 @@ extension CTChatViewController: WKNavigationDelegate, WKUIDelegate {
 }
 
 // MARK: - WKScriptMessageHandler
-@available(iOS 13.0, *)
 extension CTChatViewController: WKScriptMessageHandler {
     public func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
         setInputAttribute()
         CTChat.shared.registerPushNotifications()
     }
 }
+

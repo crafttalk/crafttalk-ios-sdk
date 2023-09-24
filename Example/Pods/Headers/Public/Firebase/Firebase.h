@@ -1,5 +1,1 @@
-XSym
-0045
-6fbd6697962c20866afae4182ff97335
 ../../../Firebase/CoreOnly/Sources/Firebase.h
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  

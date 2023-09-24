@@ -8,7 +8,7 @@
 import Foundation
 import CommonCrypto
 
-public final class CTVisitor: Codable {
+public final class CTVisitor {
     
     // MARK: - Properties
     let firstName: String?
@@ -19,7 +19,7 @@ public final class CTVisitor: Codable {
     let contract: String?
     let birthday: String?
     let hash: String
-    let customProperties: [String: String]? //let customProperties: [String: Any]? было изменено для возможности сохранения в памяти телефона
+    let customProperties: [String: Any]?
     
     // MARK: - Initialization
     public init(firstName: String? = nil,
@@ -30,7 +30,7 @@ public final class CTVisitor: Codable {
                 birthday: String? = nil,
                 uuid: String,
                 hash: String? = nil,
-                customProperties: [String: String]? = nil) {//было изменено для возможности сохранения в памяти телефона
+                customProperties: [String: Any]? = nil) {
         self.firstName = firstName
         self.lastName = lastName
         self.email = email
@@ -85,7 +85,7 @@ public final class CTVisitor: Codable {
         
         guard let jsonData = try? JSONSerialization.data(withJSONObject: jsonObject, options: .prettyPrinted),
             let jsonString = String(data: jsonData, encoding: .utf8) else {
-            return ""
+            return nil
         }
         
         return jsonString

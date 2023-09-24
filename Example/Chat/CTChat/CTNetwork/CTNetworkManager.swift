@@ -31,9 +31,7 @@ internal final class CTNetworkManager: NSObject, FileLoader {
         self.baseURL = baseURL
         self.namespace = namespace
     }
-    ///регистрирует токен push-уведомлений на сервере.
-    ///
-    ///Функция registerFCMToken(_:uuid:) принимает токен push-уведомлений и идентификатор пользователя в качестве входных параметров и возвращает Void. Функция сначала создает экземпляр класса CTPushRegistationRequest с токеном push-уведомлений, идентификатором пользователя, базовым URL-адресом и пространством имен. Затем функция создает экземпляр класса URLSessionDataTask с запросом CTPushRegistationRequest и запускает задачу. Задача отправляет запрос на сервер и возвращает ответ сервера.
+    
     internal func registerFCMToken(_ fcmToken: String, uuid: String) {
         let request = CTPushRegistationRequest(baseURL: baseURL, namespace: namespace, fcmToken: fcmToken, uuid: uuid)
         let task = session.dataTask(with: request.urlRequest())
