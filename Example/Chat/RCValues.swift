@@ -1,6 +1,8 @@
 import Foundation
 import Firebase
 
+
+//перечисляемый тип
 enum ValueKey: String {
     case webchatURL = "webchat_url"
     case namespace = "namespace"
@@ -8,6 +10,8 @@ enum ValueKey: String {
     case erudaToggle = "eruda_toggle"
 }
 
+
+//Этот код представляет класс RCValues, который используется для работы с Remote Config - сервисом Firebase, предназначенным для динамической настройки приложения без его повторной сборки и обновления.
 final class RCValues {
     
     static let shared = RCValues()
