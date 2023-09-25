@@ -11,6 +11,7 @@ import FirebaseCore
 import FirebaseMessaging
 
 @UIApplicationMain
+/// Этот код предназначен для конфигурации CTChat и FirebaseApp, а также для регистрации пользователя и получения уведомлений Push в приложении iOS.
 class AppDelegate: UIResponder, UIApplicationDelegate {
     
     var window: UIWindow?
@@ -19,26 +20,19 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         FirebaseApp.configure()
         CTChat.shared.configure()
-        let uuid = UserDefaults.standard.string(forKey: "uuid") ?? UUID().uuidString
-        UserDefaults.standard.set(uuid, forKey: "uuid")
-        let visitor = CTVisitor(firstName: "iOSExample", lastName: "", uuid: uuid, customProperties: ["custom" : "123"])
-        
+        let uuid =  UUID().uuidString
+        let visitor = CTVisitor(firstName: "Anonymous", lastName: "", uuid: uuid, customProperties: ["custom" : "123"])
         CTChat.shared.registerVisitor(visitor)
         
         registerAppForRemoteNotifications(application: application)
-        
         return true
     }
-    
-    
 }
 
 // Push notifications
 extension AppDelegate: MessagingDelegate, UNUserNotificationCenterDelegate {
-    
     private func registerAppForRemoteNotifications(application: UIApplication) {
         Messaging.messaging().delegate = self
-        
         if #available(iOS 10.0, *) {
             UNUserNotificationCenter.current().delegate = self
             UNUserNotificationCenter.current().requestAuthorization(
@@ -88,8 +82,8 @@ extension AppDelegate: MessagingDelegate, UNUserNotificationCenterDelegate {
     
 }
 
+//этот метод позволяет настроить различные параметры для объекта CTChat, такие как базовый URL, пространство имен, соль и флаг включения/отключения консоли.
 extension CTChat {
-    
     func configure(baseURL: String, namespace: String, salt: String, isConsoleEnabled: Bool) {
         print(baseURL, namespace, salt, isConsoleEnabled)
         self.baseURL = baseURL
