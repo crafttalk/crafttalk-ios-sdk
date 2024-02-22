@@ -7,8 +7,8 @@
 
 import UIKit
 import UserNotifications
-import FirebaseCore
-import FirebaseMessaging
+//import FirebaseCore
+//import FirebaseMessaging
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -17,7 +17,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         
-        FirebaseApp.configure()
+        //FirebaseApp.configure()
         CTChat.shared.configure()
         let uuid = UserDefaults.standard.string(forKey: "uuid") ?? UUID().uuidString
         UserDefaults.standard.set(uuid, forKey: "uuid")
@@ -25,7 +25,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         CTChat.shared.registerVisitor(visitor)
         
-        registerAppForRemoteNotifications(application: application)
+        //registerAppForRemoteNotifications(application: application)
         
         return true
     }
@@ -34,7 +34,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 }
 
 // Push notifications
-extension AppDelegate: MessagingDelegate, UNUserNotificationCenterDelegate {
+/*extension AppDelegate: MessagingDelegate, UNUserNotificationCenterDelegate {
     
     private func registerAppForRemoteNotifications(application: UIApplication) {
         Messaging.messaging().delegate = self
@@ -87,7 +87,7 @@ extension AppDelegate: MessagingDelegate, UNUserNotificationCenterDelegate {
     }
     
 }
-
+*/
 extension CTChat {
     
     func configure(baseURL: String, namespace: String, salt: String, isConsoleEnabled: Bool) {
