@@ -250,7 +250,7 @@ extension CTChatViewController: WKNavigationDelegate, WKUIDelegate {
     
     public func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
         guard let url = navigationAction.request.url,
-              url.absoluteString.hasPrefix("https") || url.absoluteString.hasPrefix("blob") ,
+              url.absoluteString.hasPrefix("https") || url.absoluteString.hasPrefix("blob") || url.absoluteString.hasPrefix("http") || url.absoluteString.hasPrefix("tel:") ,
               checkValidity(of: url) else {
             decisionHandler(.cancel)
             return
@@ -258,6 +258,12 @@ extension CTChatViewController: WKNavigationDelegate, WKUIDelegate {
         
         guard url != chatURL else {
             decisionHandler(.allow)
+            return
+        }
+        
+        if url.absoluteString.hasPrefix("tel:"){
+            UIApplication.shared.open(url)
+            decisionHandler(.cancel)
             return
         }
         
@@ -275,15 +281,17 @@ extension CTChatViewController: WKNavigationDelegate, WKUIDelegate {
             if (philip == 1){
                 wkWebView.configuration.userContentController.add(self, name: "readBlob")
                 philip = philip - 1
+                
+                //decisionHandler(.cancel)
             }
-            
-            
-                decisionHandler(.cancel)
+            decisionHandler(.cancel)
             return
         } else {
-            //openURLInSafariViewController(url)
+            openURLInSafariViewController(url)
             decisionHandler(.cancel)
+            return
         }
+        decisionHandler(.cancel)
 
 /*
         
@@ -292,7 +300,7 @@ extension CTChatViewController: WKNavigationDelegate, WKUIDelegate {
         } else {
             openURLInSafariViewController(url)
         }*/
-        decisionHandler(.cancel)
+        
         
     }
     
@@ -362,13 +370,21 @@ extension CTChatViewController: WKNavigationDelegate, WKUIDelegate {
                          
         let backButtonFrame = CGRect(x: 20, y: 10, width: 50, height: 50)
         let backButton = UIButton(frame: backButtonFrame)
-        backButton.setImage(UIImage(systemName: "arrow.left"), for: .normal)
+        if #available(iOS 13.0, *) {
+            backButton.setImage(UIImage(systemName: "arrow.left"), for: .normal)
+        } else {
+            // Fallback on earlier versions
+        }
         backButton.addTarget(self, action: #selector(goBack(_:)), for: .touchUpInside)
         customView.addSubview(backButton)
         
         let shareFrame = CGRect(x: customViewFrame.width - 100, y: 10, width: 50, height: 50)
         let shareButton = UIButton(frame: shareFrame)
-        shareButton.setImage(UIImage(systemName: "square.and.arrow.up"), for: .normal)
+        if #available(iOS 13.0, *) {
+            shareButton.setImage(UIImage(systemName: "square.and.arrow.up"), for: .normal)
+        } else {
+            // Fallback on earlier versions
+        }
         shareButton.addTarget(self, action: #selector(share(_:)), for: .touchUpInside)
         customView.addSubview(shareButton)
                          
@@ -410,7 +426,7 @@ extension CTChatViewController: WKNavigationDelegate, WKUIDelegate {
         
         let data = Data(base64Encoded: String(dataSplits[1]))
           
-        let dataDecoded = Data(base64Encoded: String(dataSplits[1]))
+        _ = Data(base64Encoded: String(dataSplits[1]))
      
         if (data == nil) {
             debugPrint("Could not construct data from base64")
