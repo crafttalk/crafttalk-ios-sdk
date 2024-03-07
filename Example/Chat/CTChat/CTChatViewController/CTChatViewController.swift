@@ -364,11 +364,11 @@ extension CTChatViewController: WKNavigationDelegate, WKUIDelegate {
         let customView = UIView(frame: customViewFrame)
         customView.backgroundColor = .white
         let wkWebViewConfig = WKWebViewConfiguration()
-        let wkWViewFrame = CGRect(x: 0, y: 100, width: view.bounds.width, height: view.bounds.height - 100)
+        let wkWViewFrame = CGRect(x: 0, y: 50, width: view.bounds.width, height: view.bounds.height - 25)
         let wkWView = WKWebView(frame: wkWViewFrame, configuration: wkWebViewConfig)
         customView.addSubview(wkWView)
                          
-        let backButtonFrame = CGRect(x: 20, y: 10, width: 50, height: 50)
+        let backButtonFrame = CGRect(x: 5, y: 0, width: 50, height: 50)
         let backButton = UIButton(frame: backButtonFrame)
         if #available(iOS 13.0, *) {
             backButton.setImage(UIImage(systemName: "arrow.left"), for: .normal)
@@ -378,7 +378,7 @@ extension CTChatViewController: WKNavigationDelegate, WKUIDelegate {
         backButton.addTarget(self, action: #selector(goBack(_:)), for: .touchUpInside)
         customView.addSubview(backButton)
         
-        let shareFrame = CGRect(x: customViewFrame.width - 100, y: 10, width: 50, height: 50)
+        let shareFrame = CGRect(x: customViewFrame.width - 55, y: 0, width: 50, height: 50)
         let shareButton = UIButton(frame: shareFrame)
         if #available(iOS 13.0, *) {
             shareButton.setImage(UIImage(systemName: "square.and.arrow.up"), for: .normal)
