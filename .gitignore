@@ -3,3 +3,5 @@
 */xcuserdata/*
 */xcshareddata/*
 UserInterfaceState.xcuserstate
+.swiftpm
+DerivedData
