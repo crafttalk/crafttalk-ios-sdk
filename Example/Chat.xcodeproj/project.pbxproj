@@ -27,6 +27,8 @@
 		CFC04E0D24E03E880085352A /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CFC04E0C24E03E880085352A /* WebKit.framework */; };
 		CFD536B425E693E600B82A7F /* CTBundleUtil.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFD536B325E693E600B82A7F /* CTBundleUtil.swift */; };
 		CFE2125E25D6946E005BF66A /* CTImageScrollView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFE2125D25D6946E005BF66A /* CTImageScrollView.swift */; };
+		D4820C352A5C0B9B00E9054D /* CTViewControllerRegistration.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4820C342A5C0B9B00E9054D /* CTViewControllerRegistration.swift */; };
+		D4A60AAF2A602BE800CF19F5 /* UserListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4A60AAE2A602BE800CF19F5 /* UserListViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -55,6 +57,8 @@
 		CFD536B325E693E600B82A7F /* CTBundleUtil.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CTBundleUtil.swift; sourceTree = "<group>"; };
 		CFE2125D25D6946E005BF66A /* CTImageScrollView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CTImageScrollView.swift; sourceTree = "<group>"; };
 		CFE652AD24ED5C0E00C7D695 /* Chat.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Chat.entitlements; sourceTree = "<group>"; };
+		D4820C342A5C0B9B00E9054D /* CTViewControllerRegistration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CTViewControllerRegistration.swift; sourceTree = "<group>"; };
+		D4A60AAE2A602BE800CF19F5 /* UserListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserListViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -82,6 +86,8 @@
 		CF2E69FE250229C6001072F0 /* CTChat */ = {
 			isa = PBXGroup;
 			children = (
+				D47D32652AB9C26A003EABA2 /* CTUserListViewController_ */,
+				D4820C332A5C0AA800E9054D /* CTRegistration */,
 				CF4DAFBD250915FD007EF595 /* CTChat.swift */,
 				CF3F9008252887F300112653 /* CTModel */,
 				CF4DAFBC250915E3007EF595 /* CTChatViewController */,
@@ -213,6 +219,22 @@
 			path = CTUtils;
 			sourceTree = "<group>";
 		};
+		D47D32652AB9C26A003EABA2 /* CTUserListViewController_ */ = {
+			isa = PBXGroup;
+			children = (
+				D4A60AAE2A602BE800CF19F5 /* UserListViewController.swift */,
+			);
+			path = CTUserListViewController_;
+			sourceTree = "<group>";
+		};
+		D4820C332A5C0AA800E9054D /* CTRegistration */ = {
+			isa = PBXGroup;
+			children = (
+				D4820C342A5C0B9B00E9054D /* CTViewControllerRegistration.swift */,
+			);
+			path = CTRegistration;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -334,7 +356,9 @@
 				CF2E6A0025022A53001072F0 /* CTChatViewController.swift in Sources */,
 				CF7998F8268B1109006BF7AE /* RCValues.swift in Sources */,
 				CF3F900A2528880F00112653 /* CTVisitor.swift in Sources */,
+				D4A60AAF2A602BE800CF19F5 /* UserListViewController.swift in Sources */,
 				CF823C3025D413E500A46E3F /* CTPreviewViewController.swift in Sources */,
+				D4820C352A5C0B9B00E9054D /* CTViewControllerRegistration.swift in Sources */,
 				CF8933B725D6C343002C49A7 /* URL+mimeType.swift in Sources */,
 				CFC04DF624E034CE0085352A /* AppDelegate.swift in Sources */,
 				CF4DAFB925091150007EF595 /* CTNetworkManager.swift in Sources */,
