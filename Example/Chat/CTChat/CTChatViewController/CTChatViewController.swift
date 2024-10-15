@@ -153,6 +153,9 @@ public final class CTChatViewController: UIViewController {
     
     // MARK: - Methods
     var philip = 1
+    
+    var tapStatusSwift: Int = 0
+    
     private func setupWebView() {
         func getZoomDisableScript() -> WKUserScript {
             let source: String = "var meta = document.createElement('meta');" +
@@ -173,10 +176,39 @@ public final class CTChatViewController: UIViewController {
             return WKUserScript(source: source, injectionTime: .atDocumentEnd, forMainFrameOnly: true)
         }
         
+        func setupWebViewLongPressure() -> WKUserScript {
+            let source: String = """
+            let longTapTimeout;
+            let longtapTimeoutRest;
+            const longTapThreshold = 350;
+            const longTapThresholdRestTime = 200;
+            var tapPressureStatus = false;
+
+            function onTouchStart(event) {
+              longTapTimeout = setTimeout(() => {
+                console.log("Long tap detected!");
+                tapPressureStatus = true;
+              }, longTapThreshold);
+            };
+            function onTouchEnd(event) {
+                longtapTimeoutRest = setTimeout(() => {
+                    clearTimeout(longTapTimeout);
+                    console.log("Long tap Rest!");
+                    tapPressureStatus = false;
+                }, longTapThresholdRestTime);
+            };
+            document.addEventListener("touchstart", onTouchStart);
+            document.addEventListener("touchend", onTouchEnd);
+            """
+            return WKUserScript(source: source, injectionTime: .atDocumentEnd, forMainFrameOnly: true)
+        }
+       
+        
         let wkWebViewConfig = WKWebViewConfiguration()
         wkWebViewConfig.preferences.javaScriptEnabled = true
         wkWebViewConfig.userContentController.addUserScript(getZoomDisableScript())
         wkWebViewConfig.userContentController.addUserScript(getUserAuthScript())
+        wkWebViewConfig.userContentController.addUserScript(setupWebViewLongPressure())
         wkWebViewConfig.userContentController.add(self, name: "handler")
         
         let wkWebView = WKWebView(frame: self.view.frame, configuration: wkWebViewConfig)
@@ -242,6 +274,8 @@ public final class CTChatViewController: UIViewController {
 // MARK: - WKNavigationDelegate & WKUIDelegate
 extension CTChatViewController: WKNavigationDelegate, WKUIDelegate {
     
+
+    
     public func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {}
     
     public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) { }
@@ -250,7 +284,8 @@ extension CTChatViewController: WKNavigationDelegate, WKUIDelegate {
     
     public func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
         guard let url = navigationAction.request.url,
-              url.absoluteString.hasPrefix("https") || url.absoluteString.hasPrefix("blob") || url.absoluteString.hasPrefix("http") || url.absoluteString.hasPrefix("tel:") ,
+              url.absoluteString.hasPrefix("https") || url.absoluteString.hasPrefix("blob") || url.absoluteString.hasPrefix("http") || url.absoluteString.hasPrefix("tel:")  ||
+                url.absoluteString.hasPrefix("mailto:"),
               checkValidity(of: url) else {
             decisionHandler(.cancel)
             return
@@ -258,6 +293,12 @@ extension CTChatViewController: WKNavigationDelegate, WKUIDelegate {
         
         guard url != chatURL else {
             decisionHandler(.allow)
+            return
+        }
+        
+        if url.absoluteString.hasPrefix("mailto:"){
+            UIApplication.shared.open(url, options: [:], completionHandler: nil)
+            decisionHandler(.cancel)
             return
         }
         
@@ -287,7 +328,30 @@ extension CTChatViewController: WKNavigationDelegate, WKUIDelegate {
             decisionHandler(.cancel)
             return
         } else {
-            openURLInSafariViewController(url)
+            var tapCheck =
+        """
+        function sendPressure(){
+          return tapPressureStatus;
+        }
+        sendPressure();
+        """
+            webView.evaluateJavaScript(tapCheck) { (result, error) in
+                if let error = error{
+                    print(error)
+                    return
+                }
+                if let result = result as? Bool {
+                    print(result)
+                    if (result == false){
+                        self.openURLInSafariViewController(url)
+                    }
+                } else {
+                    print(type(of: result),"not a boolean value")
+                }
+            }
+            //Тут добавить проверку долго нажатия на клавиатуру
+            //print(tapStatusSwift)
+            //openURLInSafariViewController(url)
             decisionHandler(.cancel)
             return
         }
