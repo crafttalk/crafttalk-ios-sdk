@@ -7,78 +7,47 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "BFE5714F-74C4-44B7-9124-456473B2F582"
+            uuid = "235EDADA-7BE9-4B25-B5B5-521A7FBBD572"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "Chat/CTChat/CTChat.swift"
+            filePath = "Chat/CTChat/CTPreviewViewController/CTPreviewViewController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "25"
-            endingLineNumber = "25"
-            landmarkName = "CTChat"
-            landmarkType = "3">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "566D2991-35EE-4D2B-A718-992688701D46"
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "Chat/CTChat/CTChatViewController/CTChatViewController.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "290"
-            endingLineNumber = "290"
-            landmarkName = "webView(_:decidePolicyFor:decisionHandler:)"
+            startingLineNumber = "228"
+            endingLineNumber = "228"
+            landmarkName = "saveButtonPressed()"
             landmarkType = "7">
             <Locations>
                <Location
-                  uuid = "566D2991-35EE-4D2B-A718-992688701D46 - c044256dd1278e06"
+                  uuid = "235EDADA-7BE9-4B25-B5B5-521A7FBBD572 - c86b56924d156967"
                   shouldBeEnabled = "Yes"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
-                  symbolName = "ChatExample.CTChatViewController.webView(_: __C.WKWebView, decidePolicyFor: __C.WKNavigationAction, decisionHandler: (__C.WKNavigationActionPolicy) -&gt; ()) -&gt; ()"
+                  symbolName = "ChatExample.CTPreviewViewController.saveButtonPressed() -&gt; ()"
                   moduleName = "ChatExample"
                   usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/goodday/Desktop/secondtest/Example/Chat/CTChat/CTChatViewController/CTChatViewController.swift"
+                  urlString = "file:///Users/goodday/Desktop/secondtest/Example/Chat/CTChat/CTPreviewViewController/CTPreviewViewController.swift"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "299"
-                  endingLineNumber = "299"
-                  offsetFromSymbolStart = "5456">
+                  startingLineNumber = "228"
+                  endingLineNumber = "228"
+                  offsetFromSymbolStart = "732">
                </Location>
                <Location
-                  uuid = "566D2991-35EE-4D2B-A718-992688701D46 - c044256dd1278db9"
+                  uuid = "235EDADA-7BE9-4B25-B5B5-521A7FBBD572 - c86b56924d156967"
                   shouldBeEnabled = "Yes"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
-                  symbolName = "ChatExample.CTChatViewController.webView(_: __C.WKWebView, decidePolicyFor: __C.WKNavigationAction, decisionHandler: (__C.WKNavigationActionPolicy) -&gt; ()) -&gt; ()"
+                  symbolName = "ChatExample.CTPreviewViewController.saveButtonPressed() -&gt; ()"
                   moduleName = "ChatExample"
                   usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/goodday/Desktop/secondtest/Example/Chat/CTChat/CTChatViewController/CTChatViewController.swift"
+                  urlString = "file:///Users/goodday/Desktop/secondtest/Example/Chat/CTChat/CTPreviewViewController/CTPreviewViewController.swift"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "288"
-                  endingLineNumber = "288"
-                  offsetFromSymbolStart = "6152">
-               </Location>
-               <Location
-                  uuid = "566D2991-35EE-4D2B-A718-992688701D46 - c044256dd1278d7f"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "ChatExample.CTChatViewController.webView(_: __C.WKWebView, decidePolicyFor: __C.WKNavigationAction, decisionHandler: (__C.WKNavigationActionPolicy) -&gt; ()) -&gt; ()"
-                  moduleName = "ChatExample"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/goodday/Desktop/secondtest/Example/Chat/CTChat/CTChatViewController/CTChatViewController.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "290"
-                  endingLineNumber = "290"
-                  offsetFromSymbolStart = "6220">
+                  startingLineNumber = "228"
+                  endingLineNumber = "228"
+                  offsetFromSymbolStart = "2904">
                </Location>
             </Locations>
          </BreakpointContent>
@@ -86,20 +55,148 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "D043D5DC-CEA0-4D6E-8B36-D6118AA948C3"
+            uuid = "F6A86DD8-B7BF-4B84-8E0B-8F057F22CF6F"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Chat/CTChat/CTPreviewViewController/CTPreviewViewController.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "159"
+            endingLineNumber = "159"
+            landmarkName = "checkPermission(for:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "094834D6-0074-4D3C-8682-0DD59D44BF06"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Chat/CTChat/CTPreviewViewController/CTPreviewViewController.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "167"
+            endingLineNumber = "167"
+            landmarkName = "checkPermission(for:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "84C9C333-80EF-44F4-8211-DF3031D7499B"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Chat/CTChat/CTPreviewViewController/CTPreviewViewController.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "166"
+            endingLineNumber = "166"
+            landmarkName = "checkPermission(for:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "9EB681EC-7098-44BC-815B-C5BD758A5F8A"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Chat/CTChat/CTPreviewViewController/CTPreviewViewController.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "198"
+            endingLineNumber = "198"
+            landmarkName = "showErrorAlert()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "32B7412D-AFBC-465D-8C52-69DC1CDB6E4E"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Chat/CTChat/CTPreviewViewController/CTPreviewViewController.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "169"
+            endingLineNumber = "169"
+            landmarkName = "checkPermission(for:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "C9CE13D2-4B6E-4FAE-AC56-2C7183DCBE5E"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Chat/CTChat/CTPreviewViewController/CTPreviewViewController.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "171"
+            endingLineNumber = "171"
+            landmarkName = "checkPermission(for:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "059D4E4B-2362-41E0-BE67-EA198430DFAE"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Chat/CTChat/CTPreviewViewController/CTPreviewViewController.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "174"
+            endingLineNumber = "174"
+            landmarkName = "checkPermission(for:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "1DEF5BCE-5E52-4E15-8D14-940F64056571"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Chat/CTChat/CTPreviewViewController/CTPreviewViewController.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "173"
+            endingLineNumber = "173"
+            landmarkName = "checkPermission(for:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "B244B904-83FD-4AA4-8D56-C8B5D9F9FC25"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Chat/CTChat/CTChatViewController/CTChatViewController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "294"
-            endingLineNumber = "294"
+            startingLineNumber = "305"
+            endingLineNumber = "305"
             landmarkName = "webView(_:decidePolicyFor:decisionHandler:)"
             landmarkType = "7">
             <Locations>
                <Location
-                  uuid = "D043D5DC-CEA0-4D6E-8B36-D6118AA948C3 - c044256dd1278e67"
+                  uuid = "B244B904-83FD-4AA4-8D56-C8B5D9F9FC25 - c044256dd12792a0"
                   shouldBeEnabled = "Yes"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
@@ -109,12 +206,12 @@
                   urlString = "file:///Users/goodday/Desktop/secondtest/Example/Chat/CTChat/CTChatViewController/CTChatViewController.swift"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "298"
-                  endingLineNumber = "298"
-                  offsetFromSymbolStart = "4928">
+                  startingLineNumber = "265"
+                  endingLineNumber = "265"
+                  offsetFromSymbolStart = "3236">
                </Location>
                <Location
-                  uuid = "D043D5DC-CEA0-4D6E-8B36-D6118AA948C3 - c044256dd1278e06"
+                  uuid = "B244B904-83FD-4AA4-8D56-C8B5D9F9FC25 - c044256dd12792a0"
                   shouldBeEnabled = "Yes"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
@@ -124,24 +221,9 @@
                   urlString = "file:///Users/goodday/Desktop/secondtest/Example/Chat/CTChat/CTChatViewController/CTChatViewController.swift"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "299"
-                  endingLineNumber = "299"
-                  offsetFromSymbolStart = "5088">
-               </Location>
-               <Location
-                  uuid = "D043D5DC-CEA0-4D6E-8B36-D6118AA948C3 - c044256dd1278e06"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "ChatExample.CTChatViewController.webView(_: __C.WKWebView, decidePolicyFor: __C.WKNavigationAction, decisionHandler: (__C.WKNavigationActionPolicy) -&gt; ()) -&gt; ()"
-                  moduleName = "ChatExample"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/goodday/Desktop/secondtest/Example/Chat/CTChat/CTChatViewController/CTChatViewController.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "299"
-                  endingLineNumber = "299"
-                  offsetFromSymbolStart = "5456">
+                  startingLineNumber = "265"
+                  endingLineNumber = "265"
+                  offsetFromSymbolStart = "3424">
                </Location>
             </Locations>
          </BreakpointContent>
@@ -149,134 +231,8 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "A06A0647-D207-4BB6-938C-205F58CCBBBF"
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "Chat/CTChat/CTChatViewController/CTChatViewController.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "270"
-            endingLineNumber = "270"
-            landmarkName = "webView(_:decidePolicyFor:decisionHandler:)"
-            landmarkType = "7">
-            <Locations>
-               <Location
-                  uuid = "A06A0647-D207-4BB6-938C-205F58CCBBBF - c044256dd1279205"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "ChatExample.CTChatViewController.webView(_: __C.WKWebView, decidePolicyFor: __C.WKNavigationAction, decisionHandler: (__C.WKNavigationActionPolicy) -&gt; ()) -&gt; ()"
-                  moduleName = "ChatExample"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/goodday/Desktop/secondtest/Example/Chat/CTChat/CTChatViewController/CTChatViewController.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "268"
-                  endingLineNumber = "268"
-                  offsetFromSymbolStart = "2940">
-               </Location>
-               <Location
-                  uuid = "A06A0647-D207-4BB6-938C-205F58CCBBBF - c044256dd1279205"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "ChatExample.CTChatViewController.webView(_: __C.WKWebView, decidePolicyFor: __C.WKNavigationAction, decisionHandler: (__C.WKNavigationActionPolicy) -&gt; ()) -&gt; ()"
-                  moduleName = "ChatExample"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/goodday/Desktop/secondtest/Example/Chat/CTChat/CTChatViewController/CTChatViewController.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "268"
-                  endingLineNumber = "268"
-                  offsetFromSymbolStart = "3620">
-               </Location>
-               <Location
-                  uuid = "A06A0647-D207-4BB6-938C-205F58CCBBBF - c044256dd12793cb"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "ChatExample.CTChatViewController.webView(_: __C.WKWebView, decidePolicyFor: __C.WKNavigationAction, decisionHandler: (__C.WKNavigationActionPolicy) -&gt; ()) -&gt; ()"
-                  moduleName = "ChatExample"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/goodday/Desktop/secondtest/Example/Chat/CTChat/CTChatViewController/CTChatViewController.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "270"
-                  endingLineNumber = "270"
-                  offsetFromSymbolStart = "3688">
-               </Location>
-            </Locations>
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "3AC12CA5-8827-42DE-8F5E-F5E10DEE906B"
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "Chat/CTChat/CTChatViewController/CTChatViewController.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "253"
-            endingLineNumber = "253"
-            landmarkName = "webView(_:decidePolicyFor:decisionHandler:)"
-            landmarkType = "7">
-            <Locations>
-               <Location
-                  uuid = "3AC12CA5-8827-42DE-8F5E-F5E10DEE906B - c044256dd1279034"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "ChatExample.CTChatViewController.webView(_: __C.WKWebView, decidePolicyFor: __C.WKNavigationAction, decisionHandler: (__C.WKNavigationActionPolicy) -&gt; ()) -&gt; ()"
-                  moduleName = "ChatExample"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/goodday/Desktop/secondtest/Example/Chat/CTChat/CTChatViewController/CTChatViewController.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "253"
-                  endingLineNumber = "253"
-                  offsetFromSymbolStart = "1040">
-               </Location>
-               <Location
-                  uuid = "3AC12CA5-8827-42DE-8F5E-F5E10DEE906B - c044256dd1279034"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "ChatExample.CTChatViewController.webView(_: __C.WKWebView, decidePolicyFor: __C.WKNavigationAction, decisionHandler: (__C.WKNavigationActionPolicy) -&gt; ()) -&gt; ()"
-                  moduleName = "ChatExample"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/goodday/Desktop/secondtest/Example/Chat/CTChat/CTChatViewController/CTChatViewController.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "253"
-                  endingLineNumber = "253"
-                  offsetFromSymbolStart = "1072">
-               </Location>
-               <Location
-                  uuid = "3AC12CA5-8827-42DE-8F5E-F5E10DEE906B - c044256dd1279034"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "ChatExample.CTChatViewController.webView(_: __C.WKWebView, decidePolicyFor: __C.WKNavigationAction, decisionHandler: (__C.WKNavigationActionPolicy) -&gt; ()) -&gt; ()"
-                  moduleName = "ChatExample"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/goodday/Desktop/secondtest/Example/Chat/CTChat/CTChatViewController/CTChatViewController.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "253"
-                  endingLineNumber = "253"
-                  offsetFromSymbolStart = "1124">
-               </Location>
-            </Locations>
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "0B61CFDE-DC4C-4665-823E-A74D9F77B056"
-            shouldBeEnabled = "Yes"
+            uuid = "FDB2BD70-3DC7-413C-96CC-81DA07C2DD3D"
+            shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Chat/CTChat/CTChatViewController/CTChatViewController.swift"
@@ -286,9 +242,25 @@
             endingLineNumber = "287"
             landmarkName = "webView(_:decidePolicyFor:decisionHandler:)"
             landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "E412D0DA-8C31-4F3D-B9AE-0FA6697FA4BD"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Chat/CTChat/CTChatViewController/CTChatViewController.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "286"
+            endingLineNumber = "286"
+            landmarkName = "webView(_:decidePolicyFor:decisionHandler:)"
+            landmarkType = "7">
             <Locations>
                <Location
-                  uuid = "0B61CFDE-DC4C-4665-823E-A74D9F77B056 - c044256dd1278dd4"
+                  uuid = "E412D0DA-8C31-4F3D-B9AE-0FA6697FA4BD - c044256dd1279015"
                   shouldBeEnabled = "Yes"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
@@ -298,12 +270,12 @@
                   urlString = "file:///Users/goodday/Desktop/secondtest/Example/Chat/CTChat/CTChatViewController/CTChatViewController.swift"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "285"
-                  endingLineNumber = "285"
-                  offsetFromSymbolStart = "5212">
+                  startingLineNumber = "252"
+                  endingLineNumber = "252"
+                  offsetFromSymbolStart = "740">
                </Location>
                <Location
-                  uuid = "0B61CFDE-DC4C-4665-823E-A74D9F77B056 - c044256dd1278dd4"
+                  uuid = "E412D0DA-8C31-4F3D-B9AE-0FA6697FA4BD - c044256dd1279015"
                   shouldBeEnabled = "Yes"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
@@ -313,24 +285,9 @@
                   urlString = "file:///Users/goodday/Desktop/secondtest/Example/Chat/CTChat/CTChatViewController/CTChatViewController.swift"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "285"
-                  endingLineNumber = "285"
-                  offsetFromSymbolStart = "6064">
-               </Location>
-               <Location
-                  uuid = "0B61CFDE-DC4C-4665-823E-A74D9F77B056 - c044256dd1278d9a"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "ChatExample.CTChatViewController.webView(_: __C.WKWebView, decidePolicyFor: __C.WKNavigationAction, decisionHandler: (__C.WKNavigationActionPolicy) -&gt; ()) -&gt; ()"
-                  moduleName = "ChatExample"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/goodday/Desktop/secondtest/Example/Chat/CTChat/CTChatViewController/CTChatViewController.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "287"
-                  endingLineNumber = "287"
-                  offsetFromSymbolStart = "6132">
+                  startingLineNumber = "252"
+                  endingLineNumber = "252"
+                  offsetFromSymbolStart = "772">
                </Location>
             </Locations>
          </BreakpointContent>
@@ -338,20 +295,20 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "01E30968-F059-4DA7-98B2-D1D8D74E2A68"
-            shouldBeEnabled = "Yes"
+            uuid = "AA43B3D3-21B1-473C-831D-D5EFF13EC9F7"
+            shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Chat/CTChat/CTChatViewController/CTChatViewController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "285"
-            endingLineNumber = "285"
+            startingLineNumber = "300"
+            endingLineNumber = "300"
             landmarkName = "webView(_:decidePolicyFor:decisionHandler:)"
             landmarkType = "7">
             <Locations>
                <Location
-                  uuid = "01E30968-F059-4DA7-98B2-D1D8D74E2A68 - c044256dd1278c35"
+                  uuid = "AA43B3D3-21B1-473C-831D-D5EFF13EC9F7 - c044256dd1278e25"
                   shouldBeEnabled = "Yes"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
@@ -361,12 +318,12 @@
                   urlString = "file:///Users/goodday/Desktop/secondtest/Example/Chat/CTChat/CTChatViewController/CTChatViewController.swift"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "284"
-                  endingLineNumber = "284"
-                  offsetFromSymbolStart = "5200">
+                  startingLineNumber = "300"
+                  endingLineNumber = "300"
+                  offsetFromSymbolStart = "2900">
                </Location>
                <Location
-                  uuid = "01E30968-F059-4DA7-98B2-D1D8D74E2A68 - c044256dd1278c35"
+                  uuid = "AA43B3D3-21B1-473C-831D-D5EFF13EC9F7 - c044256dd1278e25"
                   shouldBeEnabled = "Yes"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
@@ -376,24 +333,9 @@
                   urlString = "file:///Users/goodday/Desktop/secondtest/Example/Chat/CTChat/CTChatViewController/CTChatViewController.swift"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "284"
-                  endingLineNumber = "284"
-                  offsetFromSymbolStart = "6048">
-               </Location>
-               <Location
-                  uuid = "01E30968-F059-4DA7-98B2-D1D8D74E2A68 - c044256dd1278dfb"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "ChatExample.CTChatViewController.webView(_: __C.WKWebView, decidePolicyFor: __C.WKNavigationAction, decisionHandler: (__C.WKNavigationActionPolicy) -&gt; ()) -&gt; ()"
-                  moduleName = "ChatExample"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/goodday/Desktop/secondtest/Example/Chat/CTChat/CTChatViewController/CTChatViewController.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "286"
-                  endingLineNumber = "286"
-                  offsetFromSymbolStart = "6116">
+                  startingLineNumber = "300"
+                  endingLineNumber = "300"
+                  offsetFromSymbolStart = "2652">
                </Location>
             </Locations>
          </BreakpointContent>
@@ -401,68 +343,20 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "4354160D-B59B-4821-A6CE-3F42BFBFE346"
-            shouldBeEnabled = "Yes"
+            uuid = "CE3A9823-94D2-45AA-868B-BC544EF0A38D"
+            shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Chat/CTChat/CTChatViewController/CTChatViewController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "247"
-            endingLineNumber = "247"
-            landmarkName = "CTChatViewController"
-            landmarkType = "21">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "F30522AA-1200-4436-B4C7-AEEF0C9FD71A"
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "Chat/CTChat/CTChatViewController/CTChatViewController.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "249"
-            endingLineNumber = "249"
-            landmarkName = "CTChatViewController"
-            landmarkType = "21">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "691C70A8-7F3D-48F7-AA45-4ED0B3700DD3"
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "Chat/CTChat/CTChatViewController/CTChatViewController.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "245"
-            endingLineNumber = "245"
-            landmarkName = "CTChatViewController"
-            landmarkType = "21">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "98067CB4-6986-4D73-9F59-75EEC326751F"
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "Chat/CTChat/CTChatViewController/CTChatViewController.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "264"
-            endingLineNumber = "264"
+            startingLineNumber = "354"
+            endingLineNumber = "354"
             landmarkName = "webView(_:decidePolicyFor:decisionHandler:)"
             landmarkType = "7">
             <Locations>
                <Location
-                  uuid = "98067CB4-6986-4D73-9F59-75EEC326751F - c044256dd1279281"
+                  uuid = "CE3A9823-94D2-45AA-868B-BC544EF0A38D - c044256dd1278b2e"
                   shouldBeEnabled = "Yes"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
@@ -472,12 +366,12 @@
                   urlString = "file:///Users/goodday/Desktop/secondtest/Example/Chat/CTChat/CTChatViewController/CTChatViewController.swift"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "264"
-                  endingLineNumber = "264"
-                  offsetFromSymbolStart = "2668">
+                  startingLineNumber = "339"
+                  endingLineNumber = "339"
+                  offsetFromSymbolStart = "7476">
                </Location>
                <Location
-                  uuid = "98067CB4-6986-4D73-9F59-75EEC326751F - c044256dd1279281"
+                  uuid = "CE3A9823-94D2-45AA-868B-BC544EF0A38D - c044256dd1278b49"
                   shouldBeEnabled = "Yes"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
@@ -487,9 +381,87 @@
                   urlString = "file:///Users/goodday/Desktop/secondtest/Example/Chat/CTChat/CTChatViewController/CTChatViewController.swift"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "264"
-                  endingLineNumber = "264"
-                  offsetFromSymbolStart = "3056">
+                  startingLineNumber = "336"
+                  endingLineNumber = "336"
+                  offsetFromSymbolStart = "7700">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "B2548C1B-4AAD-451A-9770-CBCE29FD4FC2"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Chat/CTChat/CTChatViewController/CTChatViewController.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "338"
+            endingLineNumber = "338"
+            landmarkName = "webView(_:decidePolicyFor:decisionHandler:)"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "B2548C1B-4AAD-451A-9770-CBCE29FD4FC2 - 8905da6a57896b08"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #1 (Swift.Optional&lt;Any&gt;, Swift.Optional&lt;Swift.Error&gt;) -&gt; () in ChatExample.CTChatViewController.webView(_: __C.WKWebView, decidePolicyFor: __C.WKNavigationAction, decisionHandler: (__C.WKNavigationActionPolicy) -&gt; ()) -&gt; ()"
+                  moduleName = "ChatExample"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/goodday/Desktop/secondtest/Example/Chat/CTChat/CTChatViewController/CTChatViewController.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "347"
+                  endingLineNumber = "347"
+                  offsetFromSymbolStart = "96">
+               </Location>
+               <Location
+                  uuid = "B2548C1B-4AAD-451A-9770-CBCE29FD4FC2 - c044256dd12785d6"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "ChatExample.CTChatViewController.webView(_: __C.WKWebView, decidePolicyFor: __C.WKNavigationAction, decisionHandler: (__C.WKNavigationActionPolicy) -&gt; ()) -&gt; ()"
+                  moduleName = "ChatExample"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/goodday/Desktop/secondtest/Example/Chat/CTChat/CTChatViewController/CTChatViewController.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "347"
+                  endingLineNumber = "347"
+                  offsetFromSymbolStart = "5452">
+               </Location>
+               <Location
+                  uuid = "B2548C1B-4AAD-451A-9770-CBCE29FD4FC2 - 8905da6a57896b2b"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #1 (Swift.Optional&lt;Any&gt;, Swift.Optional&lt;Swift.Error&gt;) -&gt; () in ChatExample.CTChatViewController.webView(_: __C.WKWebView, decidePolicyFor: __C.WKNavigationAction, decisionHandler: (__C.WKNavigationActionPolicy) -&gt; ()) -&gt; ()"
+                  moduleName = "ChatExample"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/goodday/Desktop/secondtest/Example/Chat/CTChat/CTChatViewController/CTChatViewController.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "348"
+                  endingLineNumber = "348"
+                  offsetFromSymbolStart = "96">
+               </Location>
+               <Location
+                  uuid = "B2548C1B-4AAD-451A-9770-CBCE29FD4FC2 - c044256dd12785d6"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "ChatExample.CTChatViewController.webView(_: __C.WKWebView, decidePolicyFor: __C.WKNavigationAction, decisionHandler: (__C.WKNavigationActionPolicy) -&gt; ()) -&gt; ()"
+                  moduleName = "ChatExample"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/goodday/Desktop/secondtest/Example/Chat/CTChat/CTChatViewController/CTChatViewController.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "347"
+                  endingLineNumber = "347"
+                  offsetFromSymbolStart = "5364">
                </Location>
             </Locations>
          </BreakpointContent>
