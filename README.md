@@ -1,78 +1,103 @@
-**SDK для подключения виджета чата CraftTalk для iOS:**
+**SDK для подключения виджета чата CraftTalk для iOS**
 
 **Поддерживаемая минимальная версия**
 
-iOS 9.0
+Исторически заявлена iOS 9.0; текущая доработка не повышает минимальную версию.
+Запуск проверялся на iOS 18.6 и 27.2; совместимость с iOS 9 не подтверждена.
 
 **Шаг 1. Установление зависимости**
 
-На данный момент SDK необходимо добавлять в проект "вручную".
-    
+Добавьте каталог `CTChat` исходниками в target приложения либо подключите пакет
+через Swift Package Manager, продукт `CraftTalk` (`import CraftTalk`).
+
 **Шаг 2. Использование**
-1. Организуется web-страница с подключенным виджетом веб-чата и, при необходимости, с передачей данных пользователя в виджет. Информация о подключении виджета и возможностях его настройки доступна в "Техническом описании" платформы CraftTalk.
+
+1. Организуйте web-страницу с подключённым виджетом веб-чата. Информация о подключении
+   и настройке виджета доступна в «Техническом описании» платформы CraftTalk.
 
 2. Push notifications
-    
-    Для пуш-уведомлений используется сервис Firebase, его необходимо подключить в хост-приложение, а также не забыть добавить соответствующие capabilities.
-    После настройки Firebase в методе messaging(:_didReceiveRegistrationToken) нужно добавить следующую строку:
-    
-     ```
-     func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String) {
-         CTChat.shared.saveFCMToken(fcmToken) <--- Необходимо добавить
-     }
-    
-3. Настройка URL и других параметров
 
-    В Info.plist приложения хоста добавить следующие параметры:
-    ```
-    <key>CTChatBaseURL</key>
-    <string>ссылка</string>
-    <key>CTChatNamespace</key>
-    <string>namespace</string>
-    <key>CTSalt</key>
-    <string>соль</string>
+   Для пуш-уведомлений используется сервис Firebase, его необходимо подключить
+   в хост-приложение, а также не забыть добавить соответствующие capabilities.
+   После настройки Firebase в метод `messaging(_:didReceiveRegistrationToken:)`
+   нужно добавить вызов `CTChat.shared.saveFCMToken(fcmToken)`:
+
+   ```swift
+   func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String) {
+       CTChat.shared.saveFCMToken(fcmToken)
+   }
    ```
-   
-    CTChatBaseURL - ссылка на хост.
-    CTChatNamespace - namespace или идентификатор канала.
-    CTSalt - соль для хэширования пользователя.
-    
-4. Инициализация библиотеки
-    
-    В метод application(_:didFinishLaunchingWithOptions:) класса AppDelegate добавить:
-    ```
-    CTChat.shared.configure()
-    
-5. Создание пользователя
-    
-    Приложению хосту нужно предоставить объект CTVisitor до показа чата, чтобы пользователь зарегистрировался в системе.
-    ```
-    CTChat.shared.registerVisitor(.init(firstName: "Имя", lastName: "Фамилия"))
 
-6. Использование в storyboard:
+3. В `Info.plist` приложения добавьте адрес сервера, namespace канала и соль:
 
-    ```
-    Для созданного UIViewController в storyboard указать в Identity inspector класс CTChatViewController. Никаких дополнительных view добавлять не нужно.
-    
-7. Инициализация CTChatViewController через код:
-    
-    CTViewController можно инициализовать через код 
+   ```xml
+   <key>CTChatBaseURL</key>
+   <string>https://chat.example.com</string>
+   <key>CTChatNamespace</key>
+   <string>channel-id</string>
+   <key>CTSalt</key>
+   <string>your-salt</string>
+   ```
 
-    ```
-    CTChatViewController()
-    
-8.  Для работы SSL Pinning необходимо добавить сертификат с именем **CTCertificate** с расширением **.crt**, **.der** или **.cer** в main bundle приложения. 
+   `CTChatBaseURL` — ссылка на хост.
+   `CTChatNamespace` — namespace или идентификатор канала.
+   `CTSalt` — соль для хэширования пользователя.
 
-9. При создании и отображении класса CTChatViewController убедиться, что другие классы ссылаются на него по слабой ссылке или не ссылаются вовсе, так как при наличии в памяти нескольких CTChatViewController каждый экземпляр чата отправляет /start при открытии CTChatViewController
+4. В `application(_:didFinishLaunchingWithOptions:)` настройте SDK:
+
+   ```swift
+   CTChat.shared.configure()
+   ```
+
+5. До показа чата зарегистрируйте посетителя с постоянным идентификатором:
+
+   ```swift
+   CTChat.shared.registerVisitor(CTVisitor(firstName: "Имя", lastName: "Фамилия", uuid: "visitor-id"))
+   ```
+
+   Инициализация остаётся асинхронной; гонка `configure()` и ошибка чтения `CTSalt`
+   пока не исправлены. [Подробнее об ограничениях](docs/security-configuration.md#ограничения-инициализации).
+
+6. В storyboard задайте контроллеру класс `CTChatViewController` в Identity inspector.
+   Дополнительные view не нужны. Для создания через код:
+
+   ```swift
+   let chat = CTChatViewController(nibName: nil, bundle: nil)
+   ```
+
+7. В старом режиме `configure()` для pinning добавьте в bundle приложения серверный
+   сертификат `CTCertificate.cer`, `.der` или `.crt` в бинарном формате DER.
+   Он сравнивается с сертификатом сервера; это не добавление доверенного корня.
+
+8. Не удерживайте несколько экземпляров `CTChatViewController`: каждый запускает
+   собственный веб-чат и отправляет `/start` при открытии.
+
+**Дополнительные корневые сертификаты и редиректы**
+
+Вместо `configure()` можно явно выбрать новый режим:
+
+```swift
+let security = CTSecurityConfiguration(
+    trustedRootsByHost: ["chat.example.com": [rootDER]],
+    allowedRedirectHosts: ["chat.example.com"]
+)
+try CTChat.shared.configure(security: security)
+```
+
+`rootDER` — данные корневого CA из ресурсов приложения. Системное доверие сохраняется;
+корни и разрешённые переходы настраиваются независимо. Пустая конфигурация использует
+только системные корни. Новый режим не применяет `CTCertificate`.
+
+[Загрузка сертификата, обработка ошибок и ограничения](docs/security-configuration.md).
 
 **Пример приложения**
 
-Пример находится в Example
+Откройте `Example/Chat.xcworkspace`. Пример использует новый режим с системным доверием.
 
 **Permission**
 
-Для работы с файлами необходимо приложению-хосту установить следующие разрешения и запросить соответствующие:
+Для работы с файлами приложению нужны описания разрешений и запрос доступа:
 
-- Privacy - Camera Usage Description
-- Privacy - Photo Library Additions Usage Description
-- Privacy - Photo Library Usage Description
+- Privacy — Camera Usage Description (`NSCameraUsageDescription`)
+- Privacy — Photo Library Additions Usage Description (`NSPhotoLibraryAddUsageDescription`)
+- Privacy — Photo Library Usage Description (`NSPhotoLibraryUsageDescription`)

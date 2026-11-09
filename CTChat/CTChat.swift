@@ -11,10 +11,13 @@ public final class CTChat {
     
     // MARK: - Public Properties
     public static let shared: CTChat = CTChat()
+    /// Loading, trust and navigation errors, delivered on the main queue.
+    public var onError: ((Error) -> Void)?
     
     // MARK: - Internal Properties
     
     internal var isConsoleEnabled = false
+    internal private(set) var securityPolicy: CTSecurityPolicy?
     
     internal var salt: String = ""
     /// Webchat base url
@@ -54,6 +57,20 @@ public final class CTChat {
     
     // MARK: - Public methods
     public func configure() {
+        securityPolicy = nil
+        configureFromInfoPlist()
+    }
+
+    /// Validates synchronously. An invalid configuration leaves the previous policy intact.
+    /// Info.plist initialization remains asynchronous, just as in configure().
+    public func configure(security: CTSecurityConfiguration) throws {
+        let url = (Bundle.main.object(forInfoDictionaryKey: "CTChatBaseURL") as? String).flatMap(URL.init(string:))
+        let policy = try CTSecurityPolicy(configuration: security, baseURL: url)
+        securityPolicy = policy
+        configureFromInfoPlist()
+    }
+
+    private func configureFromInfoPlist() {
         ctqueue.async {
             guard let baseURL = Bundle.main.object(forInfoDictionaryKey: "CTChatBaseURL") as? String else {
                 fatalError("CTChat: No CTChatBaseURL in Info.plist")
@@ -86,6 +103,10 @@ public final class CTChat {
     }
     
     // MARK: - Internal methods
+    internal func report(_ error: CTChatError) {
+        DispatchQueue.main.async { self.onError?(error) }
+    }
+
     internal func registerPushNotifications() {
         guard !fcmToken.isEmpty else { return }
         let localFCMToken = fcmToken
