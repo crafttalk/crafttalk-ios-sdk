@@ -18,7 +18,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         
         //FirebaseApp.configure()
-        CTChat.shared.configure()
+        CTChat.shared.onError = { error in
+            // CTChatError contains only stage, host, domain and code.
+            print(error.localizedDescription)
+        }
+        do {
+            // Empty configuration uses system roots. See docs/security-configuration.md for additional roots.
+            let security = CTSecurityConfiguration()
+            try CTChat.shared.configure(security: security)
+        } catch {
+            print(error.localizedDescription)
+            return false
+        }
         let uuid = UserDefaults.standard.string(forKey: "uuid") ?? UUID().uuidString
         UserDefaults.standard.set(uuid, forKey: "uuid")
         let visitor = CTVisitor(firstName: "iOSExample", lastName: "", uuid: uuid, customProperties: ["custom" : "123"])
