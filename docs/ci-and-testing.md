@@ -4,13 +4,18 @@
 
 Workflow `CI` запускается для каждого pull request, push в `master` и вручную
 через `workflow_dispatch`. Устаревший запуск для той же ветки/PR отменяется.
-Три независимые проверки:
+Четыре независимые проверки:
 
 | Проверка | Окружение | Действия |
 | --- | --- | --- |
-| SDK copies | Ubuntu 24.04, Python 3 | Сравнение двух копий Swift-исходников |
-| SPM build and tests | macos-15-intel, Xcode 16.4 | Сборка `CraftTalk`, XCTest на iPhone 16 / iOS 18.6 |
-| Example build | macos-15-intel, Xcode 16.4 | Debug-сборка схемы `Chat` для устройства без подписи |
+| Check SDK matches its copy in Example | Ubuntu 24.04, Python 3 | Совпадение 1:1 путей и содержимого всех `.swift` в `CTChat/` и `Example/Chat/CTChat/` |
+| Build SDK | macos-15-intel, Xcode 16.4 | Сборка пакета `CraftTalk` для iOS Simulator |
+| Test SDK | macos-15-intel, Xcode 16.4 | XCTest на iPhone 16 / iOS 18.6 |
+| Build Example app | macos-15-intel, Xcode 16.4 | Debug-сборка схемы `Chat` для устройства без подписи |
+
+Сборка SDK и тесты отображаются отдельными статусами в PR. Тестовая job сама
+собирает пакет и тестовый bundle через `xcodebuild test`; артефакты сборки
+между jobs не передаются.
 
 Xcode и runtime выбраны явно; отсутствие окружения завершает проверку ошибкой,
 а не переключает её незаметно на другую версию. Состав образа может меняться:

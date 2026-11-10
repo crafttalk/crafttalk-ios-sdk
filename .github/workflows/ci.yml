@@ -15,14 +15,14 @@ concurrency:
 
 jobs:
   sdk-sync:
-    name: SDK copies
+    name: Check SDK matches its copy in Example
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           persist-credentials: false
-      - name: Check SDK copies
+      - name: Compare CTChat with Example/Chat/CTChat
         shell: bash
         run: |
           mkdir -p artifacts/ci
@@ -36,8 +36,30 @@ jobs:
           retention-days: 14
           if-no-files-found: warn
 
-  spm:
-    name: SPM build and tests
+  build-sdk:
+    name: Build SDK
+    runs-on: macos-15-intel
+    timeout-minutes: 30
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_16.4.app/Contents/Developer
+      EXPECTED_XCODE_VERSION: '16.4'
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - name: Build SDK for iOS Simulator
+        run: bash scripts/ci.sh build-spm
+      - name: Upload diagnostics
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: sdk-build-${{ github.run_attempt }}
+          path: artifacts/ci/
+          retention-days: 14
+          if-no-files-found: warn
+
+  test-sdk:
+    name: Test SDK
     runs-on: macos-15-intel
     timeout-minutes: 30
     env:
@@ -49,21 +71,19 @@ jobs:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           persist-credentials: false
-      - name: Build SPM
-        run: bash scripts/ci.sh build-spm
-      - name: Run XCTest
+      - name: Run SDK tests on iOS Simulator
         run: bash scripts/ci.sh test-spm
       - name: Upload diagnostics
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: spm-${{ github.run_attempt }}
+          name: sdk-tests-${{ github.run_attempt }}
           path: artifacts/ci/
           retention-days: 14
           if-no-files-found: warn
 
   example:
-    name: Example build
+    name: Build Example app
     runs-on: macos-15-intel
     timeout-minutes: 30
     env:
