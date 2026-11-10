@@ -16,6 +16,10 @@ let package = Package(
         .target(
             name: "CraftTalk",
             path: "CTChat"
+        ),
+        .testTarget(
+            name: "CraftTalkTests",
+            dependencies: ["CraftTalk"]
         )
     ]
 )

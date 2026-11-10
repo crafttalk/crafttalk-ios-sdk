@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		F09B00000000000000000003 /* UIImage+create.swift in Sources */ = {isa = PBXBuildFile; fileRef = F09A00000000000000000003 /* UIImage+create.swift */; };
 		96D009121D5102C568206A8E /* Pods_Chat.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 00A782AF0767F05A61ECF655 /* Pods_Chat.framework */; };
 		CF2E6A0025022A53001072F0 /* CTChatViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF2E69FF25022A53001072F0 /* CTChatViewController.swift */; };
 		CF3F900A2528880F00112653 /* CTVisitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF3F90092528880F00112653 /* CTVisitor.swift */; };
@@ -33,6 +34,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		F09A00000000000000000003 /* UIImage+create.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIImage+create.swift"; sourceTree = "<group>"; };
 		00A782AF0767F05A61ECF655 /* Pods_Chat.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Chat.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		30DCD344F56CE8CACE5328E3 /* Pods-Chat.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Chat.release.xcconfig"; path = "Target Support Files/Pods-Chat/Pods-Chat.release.xcconfig"; sourceTree = "<group>"; };
 		33FB85F2FE07C933C7133B1C /* Pods-Chat.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Chat.debug.xcconfig"; path = "Target Support Files/Pods-Chat/Pods-Chat.debug.xcconfig"; sourceTree = "<group>"; };
@@ -159,6 +161,7 @@
 			isa = PBXGroup;
 			children = (
 				CF8933B625D6C343002C49A7 /* URL+mimeType.swift */,
+				F09A00000000000000000003 /* UIImage+create.swift */,
 				CF97DB1325D6E3EA00E2C4A0 /* UIView+fillSuperview.swift */,
 			);
 			path = CTExtensions;
@@ -345,6 +348,7 @@
 				CF3F900A2528880F00112653 /* CTVisitor.swift in Sources */,
 				CF823C3025D413E500A46E3F /* CTPreviewViewController.swift in Sources */,
 				CF8933B725D6C343002C49A7 /* URL+mimeType.swift in Sources */,
+				F09B00000000000000000003 /* UIImage+create.swift in Sources */,
 				F09B00000000000000000002 /* SceneDelegate.swift in Sources */,
 				CFC04DF624E034CE0085352A /* AppDelegate.swift in Sources */,
 				CF4DAFB925091150007EF595 /* CTNetworkManager.swift in Sources */,
