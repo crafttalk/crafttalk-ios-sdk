@@ -1,0 +1,561 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		0271DB804057E33D85F1D250 /* CTBlobDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7775FFDECEA5FE8BEA0C01D6 /* CTBlobDocument.swift */; };
+		22DADE2508B4AAFC1E7702F9 /* CTChat.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8665816E318C45C1A823E0A /* CTChat.swift */; };
+		43CF249E5BF10793A5E37F7A /* CTNetworkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F0EFC03A2BCE84D8DCA88A9 /* CTNetworkManager.swift */; };
+		455A1361CC5ECD53CD0DEB05 /* CTPushRegistationRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CC9A20704F5C783368768ED /* CTPushRegistationRequest.swift */; };
+		58432D344FD10E959B5F7449 /* CTPreviewViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A2D41DBDB09DD90A497141F /* CTPreviewViewController.swift */; };
+		63B95409B9AA837969180AF8 /* CTAttachmentRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04DD6206FEA64C280EED8AA0 /* CTAttachmentRules.swift */; };
+		63FCA28DC51A601BA8098A70 /* CTChatViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA03A98B00C850F1638516B2 /* CTChatViewController.swift */; };
+		64A208D45A67793D8043BB6D /* CTBundleUtil.swift in Sources */ = {isa = PBXBuildFile; fileRef = E984F8E1C6399565D56646F7 /* CTBundleUtil.swift */; };
+		6E99EE455C44F45EA81F6ACC /* CTVisitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46A6266CDDB6A9B8CB56416A /* CTVisitor.swift */; };
+		6FD2C876ADFBD389045C9C74 /* Runtime in Resources */ = {isa = PBXBuildFile; fileRef = DAFC5B91951BF442AE093718 /* Runtime */; };
+		7DC2003E01DFA3EC4550093F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7834361BD9207BBE87C289D8 /* AppDelegate.swift */; };
+		80D7DBC94C0492CEF4726A94 /* CTSecurityConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DD192BDE29E672D52DD2169 /* CTSecurityConfiguration.swift */; };
+		92837F4ACE8A226C1D90BEBA /* UIImage+create.swift in Sources */ = {isa = PBXBuildFile; fileRef = 466D14FE6EAC89FC10CB4063 /* UIImage+create.swift */; };
+		97BDDB277345EBAFE66D49C2 /* URL+mimeType.swift in Sources */ = {isa = PBXBuildFile; fileRef = E605E753C6BCB62C742B05BA /* URL+mimeType.swift */; };
+		A8D79DF0359400464F24BEA1 /* UIView+fillSuperview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F83B20A4B028135B34D8EF4 /* UIView+fillSuperview.swift */; };
+		B09EA757308FDA5C310266C6 /* CTTrustEvaluator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22D5D64B8B3AD2E05F5C06F2 /* CTTrustEvaluator.swift */; };
+		B4FB8E364C0580A28BF722DF /* CTImageScrollView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C200CB72BF19672D03DF334 /* CTImageScrollView.swift */; };
+		D21535D24A8610141882FBDF /* CTCertificate.der in Resources */ = {isa = PBXBuildFile; fileRef = 16CA431429D5262A1B6EE0D2 /* CTCertificate.der */; };
+		D30FEA3C0D0F0BEB5FCFA09F /* CTVideoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DEF9410FC72186D5B91C200 /* CTVideoView.swift */; };
+		DBD554E33041C903826F0D72 /* CTWebKitUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BCA8694C581563295BFA2E3 /* CTWebKitUITests.swift */; };
+		DDBCBE081255B568157DB4F2 /* Runtime in Resources */ = {isa = PBXBuildFile; fileRef = DAFC5B91951BF442AE093718 /* Runtime */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		17E317E6DCA6DA08AFECB355 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5FE684DE0C7F0D305E741335 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8C8A7434E76E3635DD057825;
+			remoteInfo = CraftTalkUIHost;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		04DD6206FEA64C280EED8AA0 /* CTAttachmentRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CTAttachmentRules.swift; sourceTree = "<group>"; };
+		16CA431429D5262A1B6EE0D2 /* CTCertificate.der */ = {isa = PBXFileReference; path = CTCertificate.der; sourceTree = "<group>"; };
+		22D5D64B8B3AD2E05F5C06F2 /* CTTrustEvaluator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CTTrustEvaluator.swift; sourceTree = "<group>"; };
+		2DD192BDE29E672D52DD2169 /* CTSecurityConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CTSecurityConfiguration.swift; sourceTree = "<group>"; };
+		2DEF9410FC72186D5B91C200 /* CTVideoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CTVideoView.swift; sourceTree = "<group>"; };
+		2F83B20A4B028135B34D8EF4 /* UIView+fillSuperview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIView+fillSuperview.swift"; sourceTree = "<group>"; };
+		3C200CB72BF19672D03DF334 /* CTImageScrollView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CTImageScrollView.swift; sourceTree = "<group>"; };
+		466D14FE6EAC89FC10CB4063 /* UIImage+create.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIImage+create.swift"; sourceTree = "<group>"; };
+		46A6266CDDB6A9B8CB56416A /* CTVisitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CTVisitor.swift; sourceTree = "<group>"; };
+		5A2D41DBDB09DD90A497141F /* CTPreviewViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CTPreviewViewController.swift; sourceTree = "<group>"; };
+		6F0EFC03A2BCE84D8DCA88A9 /* CTNetworkManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CTNetworkManager.swift; sourceTree = "<group>"; };
+		7775FFDECEA5FE8BEA0C01D6 /* CTBlobDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CTBlobDocument.swift; sourceTree = "<group>"; };
+		7834361BD9207BBE87C289D8 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		7BCA8694C581563295BFA2E3 /* CTWebKitUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CTWebKitUITests.swift; sourceTree = "<group>"; };
+		8CC9A20704F5C783368768ED /* CTPushRegistationRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CTPushRegistationRequest.swift; sourceTree = "<group>"; };
+		BD252A405FDC11262D3AD922 /* CraftTalkUIHost.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = CraftTalkUIHost.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		C8665816E318C45C1A823E0A /* CTChat.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CTChat.swift; sourceTree = "<group>"; };
+		DAFC5B91951BF442AE093718 /* Runtime */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Runtime; path = ../CraftTalkTests/Fixtures/Runtime; sourceTree = SOURCE_ROOT; };
+		E605E753C6BCB62C742B05BA /* URL+mimeType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "URL+mimeType.swift"; sourceTree = "<group>"; };
+		E984F8E1C6399565D56646F7 /* CTBundleUtil.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CTBundleUtil.swift; sourceTree = "<group>"; };
+		EA03A98B00C850F1638516B2 /* CTChatViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CTChatViewController.swift; sourceTree = "<group>"; };
+		FDFDE179859039B18995FBD2 /* CraftTalkUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = CraftTalkUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		139BBBCF0FD177500EE8E3CA /* CTChat */ = {
+			isa = PBXGroup;
+			children = (
+				04DD6206FEA64C280EED8AA0 /* CTAttachmentRules.swift */,
+				7775FFDECEA5FE8BEA0C01D6 /* CTBlobDocument.swift */,
+				C8665816E318C45C1A823E0A /* CTChat.swift */,
+				2DD192BDE29E672D52DD2169 /* CTSecurityConfiguration.swift */,
+				22D5D64B8B3AD2E05F5C06F2 /* CTTrustEvaluator.swift */,
+				2348B37C90322D865FA61D78 /* CTChatViewController */,
+				640B7475541F0C057ADE1012 /* CTExtensions */,
+				50CA658551DC94FCF4BA3A9E /* CTModel */,
+				77F80C184D43871E188DC850 /* CTNetwork */,
+				1FC007F67321BC9E211A4DF0 /* CTPreviewViewController */,
+				B22474EC838472D891F8268F /* CTUtils */,
+			);
+			name = CTChat;
+			path = ../../CTChat;
+			sourceTree = "<group>";
+		};
+		1FC007F67321BC9E211A4DF0 /* CTPreviewViewController */ = {
+			isa = PBXGroup;
+			children = (
+				5A2D41DBDB09DD90A497141F /* CTPreviewViewController.swift */,
+				F7EF290D993D1A28E49D3799 /* Views */,
+			);
+			path = CTPreviewViewController;
+			sourceTree = "<group>";
+		};
+		2348B37C90322D865FA61D78 /* CTChatViewController */ = {
+			isa = PBXGroup;
+			children = (
+				EA03A98B00C850F1638516B2 /* CTChatViewController.swift */,
+			);
+			path = CTChatViewController;
+			sourceTree = "<group>";
+		};
+		34C06C7DD85BE2F9FDF6CCFE /* App */ = {
+			isa = PBXGroup;
+			children = (
+				7834361BD9207BBE87C289D8 /* AppDelegate.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		379CC9BA6AE9377EA8E63E43 /* UITests */ = {
+			isa = PBXGroup;
+			children = (
+				7BCA8694C581563295BFA2E3 /* CTWebKitUITests.swift */,
+			);
+			path = UITests;
+			sourceTree = "<group>";
+		};
+		50CA658551DC94FCF4BA3A9E /* CTModel */ = {
+			isa = PBXGroup;
+			children = (
+				46A6266CDDB6A9B8CB56416A /* CTVisitor.swift */,
+			);
+			path = CTModel;
+			sourceTree = "<group>";
+		};
+		640B7475541F0C057ADE1012 /* CTExtensions */ = {
+			isa = PBXGroup;
+			children = (
+				466D14FE6EAC89FC10CB4063 /* UIImage+create.swift */,
+				2F83B20A4B028135B34D8EF4 /* UIView+fillSuperview.swift */,
+				E605E753C6BCB62C742B05BA /* URL+mimeType.swift */,
+			);
+			path = CTExtensions;
+			sourceTree = "<group>";
+		};
+		77F80C184D43871E188DC850 /* CTNetwork */ = {
+			isa = PBXGroup;
+			children = (
+				6F0EFC03A2BCE84D8DCA88A9 /* CTNetworkManager.swift */,
+				B15CA099057A6E078BBCBA55 /* Model */,
+			);
+			path = CTNetwork;
+			sourceTree = "<group>";
+		};
+		986830FDCCB45EA0ADFE8D8B = {
+			isa = PBXGroup;
+			children = (
+				DAFC5B91951BF442AE093718 /* Runtime */,
+				34C06C7DD85BE2F9FDF6CCFE /* App */,
+				139BBBCF0FD177500EE8E3CA /* CTChat */,
+				B404DFD362A11D49EF0E4909 /* Runtime */,
+				379CC9BA6AE9377EA8E63E43 /* UITests */,
+				F288A5D672BDA0FAC2E86289 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		B15CA099057A6E078BBCBA55 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				8CC9A20704F5C783368768ED /* CTPushRegistationRequest.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		B22474EC838472D891F8268F /* CTUtils */ = {
+			isa = PBXGroup;
+			children = (
+				E984F8E1C6399565D56646F7 /* CTBundleUtil.swift */,
+			);
+			path = CTUtils;
+			sourceTree = "<group>";
+		};
+		B404DFD362A11D49EF0E4909 /* Runtime */ = {
+			isa = PBXGroup;
+			children = (
+				16CA431429D5262A1B6EE0D2 /* CTCertificate.der */,
+			);
+			name = Runtime;
+			path = ../CraftTalkTests/Fixtures/Runtime;
+			sourceTree = "<group>";
+		};
+		F288A5D672BDA0FAC2E86289 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				BD252A405FDC11262D3AD922 /* CraftTalkUIHost.app */,
+				FDFDE179859039B18995FBD2 /* CraftTalkUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		F7EF290D993D1A28E49D3799 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				3C200CB72BF19672D03DF334 /* CTImageScrollView.swift */,
+				2DEF9410FC72186D5B91C200 /* CTVideoView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		8C8A7434E76E3635DD057825 /* CraftTalkUIHost */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B8768C17E55ADD1354846092 /* Build configuration list for PBXNativeTarget "CraftTalkUIHost" */;
+			buildPhases = (
+				CE8DFD27CDF0AC860517C053 /* Sources */,
+				5938EEE1ECE370B1CCC23A75 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = CraftTalkUIHost;
+			packageProductDependencies = (
+			);
+			productName = CraftTalkUIHost;
+			productReference = BD252A405FDC11262D3AD922 /* CraftTalkUIHost.app */;
+			productType = "com.apple.product-type.application";
+		};
+		9C182047A7D95E7E9A20831B /* CraftTalkUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C6589DB024B0D4DF0C33A24E /* Build configuration list for PBXNativeTarget "CraftTalkUITests" */;
+			buildPhases = (
+				E921F5987F78F9B8F1DE5DD5 /* Sources */,
+				AEAB2C92664117BDC3D7BC50 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				A354A9F4130E01B072B5E07F /* PBXTargetDependency */,
+			);
+			name = CraftTalkUITests;
+			packageProductDependencies = (
+			);
+			productName = CraftTalkUITests;
+			productReference = FDFDE179859039B18995FBD2 /* CraftTalkUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		5FE684DE0C7F0D305E741335 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					9C182047A7D95E7E9A20831B = {
+						TestTargetID = 8C8A7434E76E3635DD057825;
+					};
+				};
+			};
+			buildConfigurationList = 9BC396AD99F29E8CF1C1AB73 /* Build configuration list for PBXProject "CraftTalkUIHost" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 986830FDCCB45EA0ADFE8D8B;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = F288A5D672BDA0FAC2E86289 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				8C8A7434E76E3635DD057825 /* CraftTalkUIHost */,
+				9C182047A7D95E7E9A20831B /* CraftTalkUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		5938EEE1ECE370B1CCC23A75 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D21535D24A8610141882FBDF /* CTCertificate.der in Resources */,
+				6FD2C876ADFBD389045C9C74 /* Runtime in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AEAB2C92664117BDC3D7BC50 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DDBCBE081255B568157DB4F2 /* Runtime in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		CE8DFD27CDF0AC860517C053 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7DC2003E01DFA3EC4550093F /* AppDelegate.swift in Sources */,
+				63B95409B9AA837969180AF8 /* CTAttachmentRules.swift in Sources */,
+				0271DB804057E33D85F1D250 /* CTBlobDocument.swift in Sources */,
+				64A208D45A67793D8043BB6D /* CTBundleUtil.swift in Sources */,
+				22DADE2508B4AAFC1E7702F9 /* CTChat.swift in Sources */,
+				63FCA28DC51A601BA8098A70 /* CTChatViewController.swift in Sources */,
+				B4FB8E364C0580A28BF722DF /* CTImageScrollView.swift in Sources */,
+				43CF249E5BF10793A5E37F7A /* CTNetworkManager.swift in Sources */,
+				58432D344FD10E959B5F7449 /* CTPreviewViewController.swift in Sources */,
+				455A1361CC5ECD53CD0DEB05 /* CTPushRegistationRequest.swift in Sources */,
+				80D7DBC94C0492CEF4726A94 /* CTSecurityConfiguration.swift in Sources */,
+				B09EA757308FDA5C310266C6 /* CTTrustEvaluator.swift in Sources */,
+				D30FEA3C0D0F0BEB5FCFA09F /* CTVideoView.swift in Sources */,
+				6E99EE455C44F45EA81F6ACC /* CTVisitor.swift in Sources */,
+				92837F4ACE8A226C1D90BEBA /* UIImage+create.swift in Sources */,
+				A8D79DF0359400464F24BEA1 /* UIView+fillSuperview.swift in Sources */,
+				97BDDB277345EBAFE66D49C2 /* URL+mimeType.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E921F5987F78F9B8F1DE5DD5 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DBD554E33041C903826F0D72 /* CTWebKitUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		A354A9F4130E01B072B5E07F /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8C8A7434E76E3635DD057825 /* CraftTalkUIHost */;
+			targetProxy = 17E317E6DCA6DA08AFECB355 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		54939120A0D16E3A41F014BC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.crafttalk.tests.webkit;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = CraftTalkUIHost;
+			};
+			name = Debug;
+		};
+		68BEDF41EE3A57A2C6B6193B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGNING_ALLOWED = NO;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		8F98767CF4D1C8EE411E8047 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.crafttalk.tests.webkit;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = CraftTalkUIHost;
+			};
+			name = Release;
+		};
+		C53F61C796CADCBB87C4A0F8 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				INFOPLIST_FILE = "../../.build/ci/ui-host.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.crafttalk.tests.webkithost;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		E29B837202B21632D3C73E52 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				INFOPLIST_FILE = "../../.build/ci/ui-host.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.crafttalk.tests.webkithost;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		EE532E1074ADC6AE05490289 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGNING_ALLOWED = NO;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		9BC396AD99F29E8CF1C1AB73 /* Build configuration list for PBXProject "CraftTalkUIHost" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				68BEDF41EE3A57A2C6B6193B /* Debug */,
+				EE532E1074ADC6AE05490289 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		B8768C17E55ADD1354846092 /* Build configuration list for PBXNativeTarget "CraftTalkUIHost" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E29B837202B21632D3C73E52 /* Debug */,
+				C53F61C796CADCBB87C4A0F8 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		C6589DB024B0D4DF0C33A24E /* Build configuration list for PBXNativeTarget "CraftTalkUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				54939120A0D16E3A41F014BC /* Debug */,
+				8F98767CF4D1C8EE411E8047 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 5FE684DE0C7F0D305E741335 /* Project object */;
+}

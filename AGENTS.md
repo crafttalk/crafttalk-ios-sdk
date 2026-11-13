@@ -22,6 +22,7 @@ python3 scripts/sync-sdk.py --check  # Проверка копий без изм
 python3 scripts/sync-sdk.py --sync   # Синхронизация из корневого CTChat
 bash scripts/ci.sh build-spm        # Сборка SDK для iOS Simulator
 bash scripts/ci.sh test-spm         # XCTest на iPhone 16 / iOS 18.6
+bash scripts/ci.sh test-ui          # WebKit XCUITest на iPhone 16 / iOS 18.6
 bash scripts/ci.sh build-example    # Сборка Example без подписи
 ```
 
@@ -33,6 +34,7 @@ See [CI and testing](docs/ci-and-testing.md) for simulator overrides, artifacts,
 - `Example/Chat/CTChat/` — mirrored SDK sources compiled into the Example app.
 - `Example/Chat.xcworkspace` — Example app and committed Pods; shared scheme `Chat`.
 - `Tests/CraftTalkTests/` — Swift package XCTest tests.
+- `Tests/WebKitHost/` — isolated app host and WebKit XCUITest scenarios.
 - `scripts/` and `.github/workflows/` — shared local/CI commands and GitHub Actions.
 - `docs/` — integration constraints and development instructions.
 
@@ -54,6 +56,7 @@ See [CI and testing](docs/ci-and-testing.md) for simulator overrides, artifacts,
 - [Integration](README.md) — consumer setup and current compatibility claims.
 - [Security configuration](docs/security-configuration.md) — consult for TLS, redirects, downloads, legacy behavior and initialization constraints.
 - [CI and testing](docs/ci-and-testing.md) — consult when changing tests, build scripts, SDK synchronization or workflows.
+- [Writing and reviewing tests](docs/testing.md) — consult before adding or reviewing tests; covers independent assertions, async ordering, isolation after failure, and limits of test evidence.
 
 ## Self-Improvement
 
@@ -64,9 +67,9 @@ When a task reveals verified, non-obvious reusable knowledge or a stale instruct
 | Change type | Run |
 | --- | --- |
 | Docs only | Check commands, paths and links; no Xcode build required |
-| SDK logic | Sync and check copies; SPM build/tests and Example build |
-| Tests only | `bash scripts/ci.sh test-spm`; inspect executed test counts |
+| SDK logic | Sync and check copies; SPM build/tests and Example build; `test-ui` for WebKit/lifecycle changes |
+| Tests only | `bash scripts/ci.sh test-spm` or `test-ui` for the changed suite; inspect executed test counts |
 | Example project/config | `bash scripts/ci.sh build-example`; check copies if touched |
 | CI/scripts/package | Relevant shared commands; verify failure exit codes and diagnostic artifacts |
 
-Report what actually ran and any environment limits. The initial suite has two address-policy tests, not TLS/WebKit integration coverage. Do not claim a GitHub Actions run based only on local builds.
+Report what actually ran and any environment limits. See docs/ci-and-testing.md for the current suite and expected test count. Blob bridge coverage does not prove TLS, navigation, downloads, or UI lifecycle coverage. Do not claim a GitHub Actions run based only on local builds.

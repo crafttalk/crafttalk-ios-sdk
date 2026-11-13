@@ -9,3 +9,8 @@ DerivedData
 .build/
 artifacts/
 *.xcresult/
+Tests/CraftTalkTests/Fixtures/Runtime/
+__pycache__/
+!Tests/WebKitHost/CraftTalkUIHost.xcodeproj/xcshareddata/
+!Tests/WebKitHost/CraftTalkUIHost.xcodeproj/xcshareddata/xcschemes/
+!Tests/WebKitHost/CraftTalkUIHost.xcodeproj/xcshareddata/xcschemes/*.xcscheme

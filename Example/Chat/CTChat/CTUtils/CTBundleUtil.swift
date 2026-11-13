@@ -28,6 +28,16 @@ internal final class CTBundleUtil {
         return nil
     }
     
+    static func certificateData(in bundles: [Bundle]) -> Data? {
+        // Сохраняем legacy-приоритет: сначала расширение, затем порядок bundles.
+        for fileType in ["der", "cer", "crt"] {
+            if let path = certificatePath(with: "CTCertificate", and: fileType, in: bundles) {
+                return FileManager.default.contents(atPath: path)
+            }
+        }
+        return nil
+    }
+
     static let externalURLSchemes: [String] = {
         var result: [String] = []
         for bundle in relevantBundles {
