@@ -25,73 +25,90 @@ public final class CTChat {
     
     internal var namespace: String = ""
     
-    internal var webchatURL: URL { URL(string: baseURL + "/webchat/" + namespace)! }
+    internal var webchatURL: URL {
+        URL(string: baseURL + "/webchat/" + namespace)!
+    }
     
     internal var visitor: CTVisitor!
     
-    internal lazy var certificate: Data? = {
-        let certName = "CTCertificate"
-        let certTypes = ["der", "cer", "crt"]
-        
-        var certPath: String?
-        let bundles = CTBundleUtil.relevantBundles
-        for certType in certTypes {
-            if let path = CTBundleUtil.certificatePath(with: certName, and: certType, in: bundles) {
-                certPath = path
-                break
-            }
-        }
-        
-        if let certPath = certPath, let cert = FileManager.default.contents(atPath: certPath) {
-            return cert
-        }
-        return nil
-    }()
-    
-    internal let networkManager: CTNetworkManager = CTNetworkManager()
-    
+    internal lazy var certificate: Data? = CTBundleUtil.certificateData(in: certificateBundles())
+
+    internal let networkManager: CTNetworkManager
+
     // MARK: - Private Properties
     private var fcmToken: String = ""
+    private let infoValue: (String) -> Any?
+    private let certificateBundles: () -> [Bundle]
+    private let schedulePush: ((TimeInterval, @escaping () -> Void) -> Void)?
+
+    internal init(infoValue: @escaping (String) -> Any? = { Bundle.main.object(forInfoDictionaryKey: $0) },
+                  networkManager: CTNetworkManager = CTNetworkManager(),
+                  certificateBundles: @escaping () -> [Bundle] = { CTBundleUtil.relevantBundles },
+                  schedulePush: ((TimeInterval, @escaping () -> Void) -> Void)? = nil) {
+        self.infoValue = infoValue
+        self.networkManager = networkManager
+        self.certificateBundles = certificateBundles
+        self.schedulePush = schedulePush
+        networkManager.reportError = { [weak self] in self?.report($0) }
+    }
+
+    deinit {
+        networkManager.invalidate()
+    }
     
     public let ctqueue = DispatchQueue(label: "crafttalk.chat.queue", qos: .utility, attributes: [.concurrent])
     
     // MARK: - Public methods
     public func configure() {
-        securityPolicy = nil
-        configureFromInfoPlist()
-    }
-
-    /// Validates synchronously. An invalid configuration leaves the previous policy intact.
-    /// Info.plist initialization remains asynchronous, just as in configure().
-    public func configure(security: CTSecurityConfiguration) throws {
-        let url = (Bundle.main.object(forInfoDictionaryKey: "CTChatBaseURL") as? String).flatMap(URL.init(string:))
-        let policy = try CTSecurityPolicy(configuration: security, baseURL: url)
-        securityPolicy = policy
-        configureFromInfoPlist()
-    }
-
-    private func configureFromInfoPlist() {
-        ctqueue.async {
-            guard let baseURL = Bundle.main.object(forInfoDictionaryKey: "CTChatBaseURL") as? String else {
-                fatalError("CTChat: No CTChatBaseURL in Info.plist")
-            }
-            guard URL(string: baseURL) != nil else {
-                fatalError("CTChat: Incorrect baseURL")
-            }
-            guard let salt = Bundle.main.object(forInfoDictionaryKey: "CTChatBaseURL") as? String else {
-                fatalError("CTChat: No CTSalt in Info.plist")
-            }
-            guard let namespace = Bundle.main.object(forInfoDictionaryKey: "CTChatNamespace") as? String else {
-                fatalError("CTChat: No CTChatNamespace in Info.plist")
-            }
-            
-            self.baseURL = baseURL
-            self.salt = salt
-            self.namespace = namespace
-            
-            self.networkManager.set(baseURL: baseURL, namespace: namespace)
-            
+        do {
+            let settings = try readSettings()
+            apply(settings, policy: nil)
+        } catch let error as CTChatError {
+            report(error)
+        } catch {
+            report(CTChatError(stage: .configuration, host: nil, code: 4))
         }
+    }
+
+    /// Проверяет и применяет настройки до возврата; при ошибке сохраняет предыдущую конфигурацию.
+    public func configure(security: CTSecurityConfiguration) throws {
+        let settings = try readSettings()
+        let policy = try CTSecurityPolicy(configuration: security, baseURL: URL(string: settings.baseURL))
+        apply(settings, policy: policy)
+    }
+
+    private struct Settings {
+        let baseURL: String
+        let salt: String
+        let namespace: String
+    }
+
+    private func readSettings() throws -> Settings {
+        guard let baseURL = infoValue("CTChatBaseURL") as? String,
+              let url = URL(string: baseURL),
+              ["http", "https"].contains(url.scheme?.lowercased() ?? ""),
+              let host = url.host, !host.isEmpty, url.query == nil, url.fragment == nil else {
+            throw CTChatError(stage: .configuration, host: nil, code: 4)
+        }
+        guard let salt = infoValue("CTSalt") as? String else {
+            throw CTChatError(stage: .configuration, host: nil, code: 7)
+        }
+        guard let namespace = infoValue("CTChatNamespace") as? String,
+              let chatURL = URL(string: baseURL + "/webchat/" + namespace),
+              chatURL.query == nil, chatURL.fragment == nil else {
+            throw CTChatError(stage: .configuration, host: nil, code: 8)
+        }
+        return Settings(baseURL: baseURL, salt: salt, namespace: namespace)
+    }
+
+    private func apply(_ settings: Settings, policy: CTSecurityPolicy?) {
+        // Все проверки завершены до первой записи. Настройка вызывается до открытия чата.
+        baseURL = settings.baseURL
+        salt = settings.salt
+        namespace = settings.namespace
+        networkManager.set(baseURL: settings.baseURL, namespace: settings.namespace)
+        securityPolicy = policy
+        networkManager.securityPolicy = policy
     }
     
     public func registerVisitor(_ visitor: CTVisitor) {
@@ -111,9 +128,13 @@ public final class CTChat {
         guard !fcmToken.isEmpty else { return }
         let localFCMToken = fcmToken
         let localUUID = visitor.uuid
-        ctqueue.asyncAfter(deadline: .now() + .seconds(5)) {
+        let action = {
             self.networkManager.registerFCMToken(localFCMToken, uuid: localUUID)
         }
+        if let schedulePush = schedulePush {
+            schedulePush(5, action)
+        } else {
+            ctqueue.asyncAfter(deadline: .now() + .seconds(5), execute: action)
+        }
     }
-    
 }
