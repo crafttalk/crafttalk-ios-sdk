@@ -6,11 +6,14 @@
 ## Что проверяет CI
 
 Workflow `CI` запускается для каждого pull request, push в `master` и вручную
-через `workflow_dispatch`. Устаревший запуск для того же события и ветки/PR отменяется;
-ручные запуски имеют отдельную concurrency-группу и не отменяются автоматическим push.
-На PR и push выполняются сборки SDK/Example, Python-проверки и проверка копий.
+через `workflow_dispatch`. Он выполняет сборки SDK/Example, Python-проверки и проверку копий.
 Все Swift XCTest требуют iOS Simulator; они запускаются локально в `pre-push`,
-а в Actions — **только вручную**. При ручном запуске UI-набор делится на четыре jobs:
+а в Actions — **только вручную** в отдельном workflow `Simulator tests — manual`
+([simulator-tests.yml](../.github/workflows/simulator-tests.yml)). Он сначала проверяет
+копии SDK и Python helpers, затем запускает SDK-тесты и четыре UI-части.
+Имена workflows входят в concurrency-группы, поэтому обычный push не отменяет
+ручной прогон симуляторов. Повторный запуск того же workflow для той же ветки/события
+отменяет предыдущий.
 
 | Проверка | Окружение | Действия |
 | --- | --- | --- |
@@ -20,8 +23,9 @@ Workflow `CI` запускается для каждого pull request, push в
 | Test WebKit user flows (1/4–4/4, только вручную) | macos-15-intel, Xcode 16.4 | Четыре части XCUITest на iPhone 16 / iOS 18.6 |
 | Build Example app | macos-15-intel, Xcode 16.4 | Debug-сборка схемы `Chat` для устройства без подписи |
 
-На автоматическом запуске тестовые jobs имеют статус skipped по условию события;
-это не результат тестов. Тестовая job при ручном запуске сама
+В обычном `CI` jobs с симуляторами отсутствуют, поэтому нет строк `skipped`
+для этих тестов. Зелёный `CI` подтверждает только его сборки и проверки.
+Тестовая job в ручном workflow сама
 собирает пакет и тестовый bundle через `xcodebuild build-for-testing`, затем
 запускает `test-without-building`; артефакты сборки
 между jobs не передаются.
@@ -91,13 +95,13 @@ hooks в стандартном каталоге он не заменяет: у�
 Коммиты не ждут тестов. Hook нужно установить в каждом клоне; локальный
 `git push --no-verify` обходит его, поэтому он не является серверной гарантией.
 
-Для проверки в GitHub: **Actions → CI → Run workflow → выбрать ветку** либо:
+Для тестов в GitHub: **Actions → Simulator tests — manual → Run workflow → выбрать ветку** либо:
 
 ```bash
-gh workflow run ci.yml --ref add-ios-sdk-tests
+gh workflow run simulator-tests.yml --ref add-ios-sdk-tests
 ```
 
-Ручной запуск выполняет также SDK-тесты и все четыре UI-части на закреплённом
+Этот workflow выполняет SDK-тесты и все четыре UI-части на закреплённом
 окружении CI. GitHub требует наличие workflow с `workflow_dispatch` в default
 branch; до его попадания туда кнопка/dispatch могут быть недоступны.
 Локальный зелёный прогон на другом Xcode не подтверждает ручной CI.

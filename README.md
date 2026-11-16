@@ -1,6 +1,6 @@
 **SDK для подключения виджета чата CraftTalk для iOS**
 
-Разработка: [сборка, тесты и CI](docs/ci-and-testing.md).
+Разработка: [локальные проверки и CI](#разработка-и-проверки), [подробные команды](docs/ci-and-testing.md).
 
 **Поддерживаемая минимальная версия**
 
@@ -113,3 +113,25 @@ try CTChat.shared.configure(security: security)
 - Privacy — Camera Usage Description (`NSCameraUsageDescription`)
 - Privacy — Photo Library Additions Usage Description (`NSPhotoLibraryAddUsageDescription`)
 - Privacy — Photo Library Usage Description (`NSPhotoLibraryUsageDescription`)
+
+## Разработка и проверки
+
+Для разработки нужны macOS, полный Xcode и iOS Simulator runtime.
+После клонирования подключите локальные проверки перед push:
+
+```bash
+bash scripts/install-hooks.sh
+```
+
+| Где | Что выполняется |
+| --- | --- |
+| Локальный `pre-push` | Полные SDK- и WebKit UI-тесты на симуляторе; ошибка блокирует push |
+| GitHub Actions → `CI` | На PR и push в `master`: сборки SDK/Example, Python-проверки и проверка копий SDK |
+| GitHub Actions → `Simulator tests — manual` | SDK- и UI-тесты по кнопке **Run workflow** для выбранной ветки |
+
+Pre-push проверяет отправляемый коммит в отдельной временной копии. Полный прогон
+может занимать более 20 минут; логи сохраняются в `artifacts/ci/`.
+Hook подключается в каждом клоне отдельно. Ручной workflow станет доступен после
+добавления его файла в default branch репозитория.
+
+[Версии Xcode/runtime, отдельные команды и диагностика](docs/ci-and-testing.md).
