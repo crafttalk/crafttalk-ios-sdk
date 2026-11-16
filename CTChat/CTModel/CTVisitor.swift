@@ -22,7 +22,7 @@ public final class CTVisitor {
     let customProperties: [String: Any]?
     
     // MARK: - Initialization
-    public init(firstName: String? = nil,
+    public convenience init(firstName: String? = nil,
                 lastName: String? = nil,
                 email: String? = nil,
                 phone: String? = nil,
@@ -31,6 +31,21 @@ public final class CTVisitor {
                 uuid: String,
                 hash: String? = nil,
                 customProperties: [String: Any]? = nil) {
+        self.init(firstName: firstName, lastName: lastName, email: email, phone: phone,
+                  contract: contract, birthday: birthday, uuid: uuid, hash: hash,
+                  customProperties: customProperties, salt: CTChat.shared.salt)
+    }
+
+    internal init(firstName: String? = nil,
+                  lastName: String? = nil,
+                  email: String? = nil,
+                  phone: String? = nil,
+                  contract: String? = nil,
+                  birthday: String? = nil,
+                  uuid: String,
+                  hash: String? = nil,
+                  customProperties: [String: Any]? = nil,
+                  salt: String) {
         self.firstName = firstName
         self.lastName = lastName
         self.email = email
@@ -38,7 +53,7 @@ public final class CTVisitor {
         self.contract = contract
         self.birthday = birthday
         self.uuid = uuid
-        self.hash = hash ?? CTVisitor.calculateHash(salt: CTChat.shared.salt,
+        self.hash = hash ?? CTVisitor.calculateHash(salt: salt,
                                              sourceString: "\(uuid)\(firstName ?? "")\(lastName ?? "")\(contract ?? "")\(phone ?? "")\(email ?? "")\(birthday ?? "")")
         self.customProperties = customProperties
     }

@@ -1,0 +1,11 @@
+[
+  "CTWebKitUITests/testCancelledInteractiveBackPreservesActiveDownload()",
+  "CTWebKitUITests/testCancelledInteractiveBackPreservesLegacyPreview()",
+  "CTWebKitUITests/testRotationPreservesDraftAndDownloadMenu()",
+  "CTWebKitUITests/testDocumentPickerUploadsSelectedFileWithoutReloadingChat()",
+  "CTWebKitUITests/testAllowedCrossHostRedirectDownloadsOnce()",
+  "CTWebKitUITests/testDownloadTLSHTTPAndRedirectFailuresAllowRetry()",
+  "CTWebKitUITests/testIframeRedirectDownloadsKeepMainPage()",
+  "CTWebKitUITests/testPOSTRedirectDownloadPreservesBodyAndCookiesWithoutReplay()",
+  "CTWebKitUITests/testLegacyPreviewShareCanRepeatWithoutDeletingPreviewFile()"
+]

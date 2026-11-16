@@ -1,0 +1,41 @@
+#!/bin/bash
+set -euo pipefail
+
+root="$(git rev-parse --show-toplevel)"
+checked=" "
+snapshot=""
+cleanup() {
+    if [[ -n "$snapshot" ]]; then rm -rf -- "$snapshot"; fi
+}
+trap cleanup EXIT
+trap 'exit 130' INT
+trap 'exit 143' TERM
+
+while read -r local_ref local_oid remote_ref remote_oid; do
+    # Удаление ссылки не отправляет код; несколько ссылок на один коммит проверяем один раз.
+    [[ "$local_oid" =~ ^0+$ ]] && continue
+    commit="$(git rev-parse --verify "$local_oid^{commit}")"
+    [[ "$checked" == *" $commit "* ]] && continue
+
+    snapshot="$(mktemp -d "${TMPDIR:-/tmp}/crafttalk-pre-push.XXXXXX")"
+    git archive "$commit" | tar -x -C "$snapshot"
+    mkdir -p "$root/artifacts/ci"
+    run_dir="$(mktemp -d "$root/artifacts/ci/pre-push.${commit:0:12}.XXXXXX")"
+    printf '%s\n' "$commit" > "$run_dir/commit.txt"
+    echo "[pre-push] Проверка $local_ref ($commit); логи: $run_dir"
+    (
+        # Тесты работают с неизменяемым снимком отправляемого коммита, без stash.
+        # Git-переменные hook не должны направлять внутренние проверки в исходный репозиторий.
+        while IFS= read -r variable; do unset "$variable"; done < <(git rev-parse --local-env-vars)
+        cd "$snapshot"
+        export DEVELOPER_DIR="${DEVELOPER_DIR:-/Applications/Xcode.app/Contents/Developer}"
+        export ARTIFACTS_DIR="$run_dir"
+        unset UI_TEST_MANIFEST CI_HELPER_TESTS_CHECKED
+        bash scripts/ci.sh test-spm </dev/null
+        # Python-проверки уже выполнены первой командой; UI-набор всегда полный.
+        CI_HELPER_TESTS_CHECKED=1 bash scripts/ci.sh test-ui </dev/null
+    )
+    cleanup
+    snapshot=""
+    checked+="$commit "
+done

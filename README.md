@@ -1,6 +1,6 @@
 **SDK для подключения виджета чата CraftTalk для iOS**
 
-Разработка: [сборка, тесты и CI](docs/ci-and-testing.md).
+Разработка: [локальные проверки и CI](#разработка-и-проверки), [подробные команды](docs/ci-and-testing.md).
 
 **Поддерживаемая минимальная версия**
 
@@ -57,8 +57,12 @@
    CTChat.shared.registerVisitor(CTVisitor(firstName: "Имя", lastName: "Фамилия", uuid: "visitor-id"))
    ```
 
-   Инициализация остаётся асинхронной; гонка `configure()` и ошибка чтения `CTSalt`
-   пока не исправлены. [Подробнее об ограничениях](docs/security-configuration.md#ограничения-инициализации).
+   При корректном Info.plist настройки готовы сразу после возврата из `configure()`
+   или успешного `configure(security:)`: посетителя можно создавать без задержки.
+   Автоматический hash использует `CTSalt`; явно переданный `hash` сохраняется.
+   В `customProperties` используйте собственные ключи: стандартные поля посетителя
+   имеют приоритет, включая `uuid` и `hash`.
+   [Ошибки и ограничения настройки](docs/security-configuration.md#ограничения-инициализации).
 
 6. В storyboard задайте контроллеру класс `CTChatViewController` в Identity inspector.
    Дополнительные view не нужны. Для создания через код:
@@ -73,6 +77,12 @@
 
 8. Не удерживайте несколько экземпляров `CTChatViewController`: каждый запускает
    собственный веб-чат и отправляет `/start` при открытии.
+
+Push-регистрация сохраняет прежнее поведение: при обработке сообщений моста
+SDK планирует отдельный запрос через пять секунд, если токен непустой.
+Посетитель должен быть зарегистрирован заранее. Запрос использует токен и UUID
+на момент планирования; последующая смена данных его не отменяет.
+[Подробности контракта и ограничения](docs/security-configuration.md#посетитель-и-push).
 
 **Дополнительные корневые сертификаты и редиректы**
 
@@ -103,3 +113,25 @@ try CTChat.shared.configure(security: security)
 - Privacy — Camera Usage Description (`NSCameraUsageDescription`)
 - Privacy — Photo Library Additions Usage Description (`NSPhotoLibraryAddUsageDescription`)
 - Privacy — Photo Library Usage Description (`NSPhotoLibraryUsageDescription`)
+
+## Разработка и проверки
+
+Для разработки нужны macOS, полный Xcode и iOS Simulator runtime.
+После клонирования подключите локальные проверки перед push:
+
+```bash
+bash scripts/install-hooks.sh
+```
+
+| Где | Что выполняется |
+| --- | --- |
+| Локальный `pre-push` | Полные SDK- и WebKit UI-тесты на симуляторе; ошибка блокирует push |
+| GitHub Actions → `CI` | На PR и push в `master`: сборки SDK/Example, Python-проверки и проверка копий SDK |
+| GitHub Actions → `Simulator tests — manual` | SDK- и UI-тесты по кнопке **Run workflow** для выбранной ветки |
+
+Pre-push проверяет отправляемый коммит в отдельной временной копии. Полный прогон
+может занимать более 20 минут; логи сохраняются в `artifacts/ci/`.
+Hook подключается в каждом клоне отдельно. Ручной workflow станет доступен после
+добавления его файла в default branch репозитория.
+
+[Версии Xcode/runtime, отдельные команды и диагностика](docs/ci-and-testing.md).

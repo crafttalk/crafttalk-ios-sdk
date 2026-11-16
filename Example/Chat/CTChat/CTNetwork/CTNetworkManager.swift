@@ -8,12 +8,28 @@ internal final class CTNetworkManager: NSObject, FileLoader {
     private var baseURL: String!
     private var namespace: String!
     private var session: URLSession!
+    private let temporaryDirectory: URL
+    internal var securityPolicy: CTSecurityPolicy?
+    internal var reportError: (CTChatError) -> Void = { _ in }
+    private var invalidationCompletions: [() -> Void] = []
+    private var isInvalidated = false
 
-    override init() {
+    init(configuration: URLSessionConfiguration = .ephemeral,
+         temporaryDirectory: URL = FileManager.default.temporaryDirectory) {
+        self.temporaryDirectory = temporaryDirectory
         super.init()
-        let config = URLSessionConfiguration.ephemeral
+        let config = configuration.copy() as! URLSessionConfiguration
         config.tlsMinimumSupportedProtocol = .tlsProtocol12
         session = URLSession(configuration: config, delegate: self, delegateQueue: nil)
+    }
+
+    internal func invalidate(completion: (() -> Void)? = nil) {
+        lock.lock()
+        let alreadyInvalidated = isInvalidated
+        if !alreadyInvalidated, let completion = completion { invalidationCompletions.append(completion) }
+        lock.unlock()
+        if alreadyInvalidated { completion?(); return }
+        session.invalidateAndCancel()
     }
 
     // A push response must never be appended to a concurrently downloaded file.
@@ -34,8 +50,8 @@ internal final class CTNetworkManager: NSObject, FileLoader {
 
     internal func registerFCMToken(_ fcmToken: String, uuid: String) {
         let request = CTPushRegistationRequest(baseURL: baseURL, namespace: namespace, fcmToken: fcmToken, uuid: uuid).urlRequest()
-        if let policy = CTChat.shared.securityPolicy, let url = request.url, !policy.allows(url) {
-            CTChat.shared.report(policy.rejection(for: url, stage: .pushRegistration))
+        if let policy = securityPolicy, let url = request.url, !policy.allows(url) {
+            reportError(policy.rejection(for: url, stage: .pushRegistration))
             return
         }
         session.dataTask(with: request).resume()
@@ -52,13 +68,13 @@ internal final class CTNetworkManager: NSObject, FileLoader {
     internal func loadDocumentFrom(request: URLRequest, webCookies: [HTTPCookie]?, completion: @escaping (Result<URL, Error>) -> Void) {
         guard let url = request.url else {
             let error = CTChatError(stage: .download, host: nil, code: NSURLErrorBadURL, domain: NSURLErrorDomain)
-            CTChat.shared.report(error)
+            reportError(error)
             DispatchQueue.main.async { completion(.failure(error)) }
             return
         }
-        if let policy = CTChat.shared.securityPolicy, !policy.allows(url) {
+        if let policy = securityPolicy, !policy.allows(url) {
             let error = policy.rejection(for: url, stage: .download)
-            CTChat.shared.report(error)
+            reportError(error)
             DispatchQueue.main.async { completion(.failure(error)) }
             return
         }
@@ -66,7 +82,7 @@ internal final class CTNetworkManager: NSObject, FileLoader {
         guard download == nil else {
             lock.unlock()
             let error = CTChatError(stage: .download, host: url.host, code: 6)
-            CTChat.shared.report(error)
+            reportError(error)
             DispatchQueue.main.async { completion(.failure(error)) }
             return
         }
@@ -95,10 +111,19 @@ internal final class CTNetworkManager: NSObject, FileLoader {
 }
 
 extension CTNetworkManager: URLSessionDelegate, URLSessionDataDelegate {
+    func urlSession(_ session: URLSession, didBecomeInvalidWithError error: Error?) {
+        lock.lock()
+        isInvalidated = true
+        let completions = invalidationCompletions
+        invalidationCompletions.removeAll()
+        lock.unlock()
+        completions.forEach { $0() }
+    }
+
     func urlSession(_ session: URLSession, task: URLSessionTask, didReceive challenge: URLAuthenticationChallenge,
                     completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
         // Historically the native session used system trust, not the WebView's legacy pin.
-        CTTrustEvaluator.handle(challenge, policy: CTChat.shared.securityPolicy,
+        CTTrustEvaluator.handle(challenge, policy: securityPolicy,
                                 legacyCertificate: nil, legacyBaseURL: nil, reportError: { error in
                                     self.lock.lock()
                                     self.failures[task.taskIdentifier] = error
@@ -108,7 +133,7 @@ extension CTNetworkManager: URLSessionDelegate, URLSessionDataDelegate {
 
     func urlSession(_ session: URLSession, task: URLSessionTask, willPerformHTTPRedirection response: HTTPURLResponse,
                     newRequest request: URLRequest, completionHandler: @escaping (URLRequest?) -> Void) {
-        if let policy = CTChat.shared.securityPolicy,
+        if let policy = securityPolicy,
            request.url.map({ policy.allows($0) }) != true {
             lock.lock()
             failures[task.taskIdentifier] = policy.rejection(for: request.url)
@@ -156,15 +181,15 @@ extension CTNetworkManager: URLSessionDelegate, URLSessionDataDelegate {
         let isTLSError = error.map { (-1206 ... -1200).contains(($0 as NSError).code) } ?? false
         let stage: CTChatError.Stage = isTLSError ? .tls : (active == nil ? .pushRegistration : .download)
         if let failure = recorded ?? error.map({ CTChatError(stage: stage, url: task.currentRequest?.url, error: $0) }) {
-            CTChat.shared.report(failure)
+            reportError(failure)
             if let active = active { DispatchQueue.main.async { active.completion(.failure(failure)) } }
             return
         }
         guard let active = active else { return }
-        let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
+        let directory = temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
         let suggested = active.usesResponseFilename ? task.response?.suggestedFilename : nil
-        let name = ((suggested ?? task.currentRequest?.url?.lastPathComponent ?? "download") as NSString).lastPathComponent
-        let fileURL = directory.appendingPathComponent(name.isEmpty || name == "." || name == ".." ? "download" : name)
+        let name = CTAttachmentRules.safeFilename(suggested ?? task.currentRequest?.url?.lastPathComponent)
+        let fileURL = directory.appendingPathComponent(name)
         do {
             try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true, attributes: nil)
             try active.data.write(to: fileURL, options: [.atomic, .completeFileProtection])
@@ -172,7 +197,7 @@ extension CTNetworkManager: URLSessionDelegate, URLSessionDataDelegate {
         } catch {
             try? FileManager.default.removeItem(at: directory)
             let failure = CTChatError(stage: .download, url: task.currentRequest?.url, error: error)
-            CTChat.shared.report(failure)
+            reportError(failure)
             DispatchQueue.main.async { active.completion(.failure(failure)) }
         }
     }
