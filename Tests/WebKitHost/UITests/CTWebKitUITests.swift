@@ -670,9 +670,10 @@ final class CTWebKitUITests: XCTestCase {
         if editDraft {
             let draft = app.webViews.textFields["Draft"]
             draft.tap()
-            draft.typeText("-edited-before-download")
+            // Короткий маркер проверяет реальный ввод без длинной последовательности клавиш в CI.
+            draft.typeText("-edited")
             draftBeforeAction = try XCTUnwrap(draft.value as? String)
-            XCTAssertTrue(draftBeforeAction.contains("-edited-before-download"))
+            XCTAssertTrue(draftBeforeAction.contains("-edited"))
             app.webViews.buttons["Finish draft"].tap()
             try waitState { ($0["page"] as? [String: Any])?["draft"] as? String == self.draftBeforeAction }
         }
@@ -934,7 +935,8 @@ final class CTWebKitUITests: XCTestCase {
 
     private func closeShare(expected: String = "synthetic-file") throws {
         let isPad = try state()["idiom"] as? String == "pad"
-        let close = app.buttons["Close"].firstMatch
+        // Системное меню использует Close или close в разных сборках iOS/Xcode.
+        let close = app.buttons.matching(NSPredicate(format: "identifier == 'header.closeButton' OR label ==[c] 'close'")).firstMatch
         if isPad {
             try waitState { $0["presented"] as? String == "UIActivityViewController" }
         } else {

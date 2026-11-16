@@ -7,19 +7,28 @@
 
 Workflow `CI` запускается для каждого pull request, push в `master` и вручную
 через `workflow_dispatch`. Устаревший запуск для той же ветки/PR отменяется.
-Пять независимых проверок:
+Пять видов проверок; UI-набор выполняется четырьмя независимыми jobs:
 
 | Проверка | Окружение | Действия |
 | --- | --- | --- |
 | Check SDK matches its copy in Example | Ubuntu 24.04, Python 3 | Совпадение 1:1 путей и содержимого всех `.swift` в `CTChat/` и `Example/Chat/CTChat/` |
 | Build SDK | macos-15-intel, Xcode 16.4 | Сборка пакета `CraftTalk` для iOS Simulator |
 | Test SDK | macos-15 (Apple Silicon), Xcode 16.4 | XCTest на iPhone 16 / iOS 18.6 |
-| Test WebKit user flows | macos-15-intel, Xcode 16.4 | XCUITest тестового приложения на iPhone 16 / iOS 18.6 |
+| Test WebKit user flows (1/4–4/4) | macos-15 (Apple Silicon), Xcode 16.4 | Четыре части XCUITest на iPhone 16 / iOS 18.6 |
 | Build Example app | macos-15-intel, Xcode 16.4 | Debug-сборка схемы `Chat` для устройства без подписи |
 
 Сборка SDK и тесты отображаются отдельными статусами в PR. Тестовая job сама
 собирает пакет и тестовый bundle через `xcodebuild test`; артефакты сборки
 между jobs не передаются.
+
+UI-матрица делит `Tests/expected-ui-tests.json` через `scripts/split-ui-tests.py`:
+каждый сценарий входит ровно в одну часть. Каждая job имеет собственные runner,
+HTTPS-стенд, симулятор и артефакт `webkit-tests-<часть>-<попытка>`; внутри части
+тесты остаются последовательными. `fail-fast: false` позволяет собрать результаты
+всех частей даже при падении одной. Полный UI-прогон подтверждён только тогда,
+когда все четыре части завершились успешно и каждая сверена со своим манифестом.
+Цель длительности CI — 10–15 минут при доступных runners; это метрика, а не новый
+таймаут отмены. Ускорение UI-матрицы нужно измерить в Actions после публикации.
 
 Xcode и runtime выбраны явно; отсутствие окружения завершает проверку ошибкой,
 а не переключает её незаметно на другую версию. Состав образа может меняться:
@@ -71,6 +80,16 @@ UI_TEST_MANIFEST=Tests/ui-compatibility-tests.json SIMULATOR_OS=17.4 SIMULATOR_D
 непустой список уникальных имён из основного манифеста; выбранный состав сохраняется
 в `selected-tests.json`. Поднабор не считается полным прогоном. Команда `test-ui`
 включает code coverage в `.xcresult`.
+
+Для воспроизведения одной части UI-матрицы:
+
+```bash
+python3 scripts/split-ui-tests.py --count 4 --output-dir .build/ci/ui-shards
+UI_TEST_MANIFEST=.build/ci/ui-shards/shard-2.json bash scripts/ci.sh test-ui
+```
+
+Не запускайте части одновременно в одном checkout: они используют общий
+`Fixtures/Runtime` и DerivedData. В CI изоляцию обеспечивают отдельные jobs.
 
 Скрипт по умолчанию ищет iPhone 16 с iOS 18.6. `EXPECTED_XCODE_VERSION=16.4`
 в CI дополнительно проверяет версию Xcode; локально эта проверка включается
