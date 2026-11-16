@@ -98,4 +98,5 @@ main() {
     esac
 }
 
-main 2>&1 | tee "$run_dir/output.log"
+# При Ctrl-C дочерний процесс ещё пишет диагностику cleanup; tee должен дождаться EOF.
+main 2>&1 | tee -i "$run_dir/output.log"

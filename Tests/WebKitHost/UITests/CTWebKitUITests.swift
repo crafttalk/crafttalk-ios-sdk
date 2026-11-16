@@ -956,6 +956,26 @@ final class CTWebKitUITests: XCTestCase {
                        "Accessibility не подтвердил завершение ввода")
     }
 
+    private func deleteTypedCharacter() {
+        let delete = app.keyboards.keys["delete"].firstMatch
+        // На свежем симуляторе подсказка Slide to Type может закрыть клавиатуру уже после ввода.
+        let introduction = app.otherElements["UIContinuousPathIntroductionView"].buttons["Continue"]
+        let available = {
+            (delete.exists && delete.isHittable) || (introduction.exists && introduction.isHittable)
+        }
+        if !available() {
+            let ready = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in available() }, object: nil)
+            XCTAssertEqual(XCTWaiter.wait(for: [ready], timeout: 30), .completed,
+                           "Не появилась клавиша Delete или подсказка Slide to Type")
+        }
+        if introduction.exists && introduction.isHittable {
+            introduction.tap()
+        }
+        waitUntilHittable(delete)
+        // Нажимаем один раз: повтор мог бы удалить часть исходного черновика.
+        delete.tap()
+    }
+
     func testOffscreenDownloadLinkScrollsIntoView() throws {
         var file = attachment()
         file["oneUse"] = true
@@ -1045,10 +1065,7 @@ final class CTWebKitUITests: XCTestCase {
         let edited = try XCTUnwrap(draft.value as? String)
         XCTAssertNotEqual(edited, expected)
         XCTAssertEqual(edited.count, expected.count + 1)
-        // Нажимаем настоящую клавишу один раз; повтор мог бы удалить часть черновика.
-        let delete = app.keyboards.keys["delete"].firstMatch
-        waitUntilHittable(delete)
-        delete.tap()
+        deleteTypedCharacter()
         waitForValue(draft) { $0 == expected }
         XCTAssertEqual(draft.value as? String, expected)
         app.webViews.buttons["Finish draft"].tap()
