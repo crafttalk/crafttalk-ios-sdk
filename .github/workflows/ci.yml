@@ -60,7 +60,7 @@ jobs:
 
   test-sdk:
     name: Test SDK
-    runs-on: macos-15-intel
+    runs-on: macos-15
     timeout-minutes: 30
     env:
       DEVELOPER_DIR: /Applications/Xcode_16.4.app/Contents/Developer

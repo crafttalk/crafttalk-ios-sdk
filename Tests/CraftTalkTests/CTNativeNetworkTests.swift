@@ -13,7 +13,8 @@ final class CTNativeNetworkTests: XCTestCase {
         directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
         let configuration = URLSessionConfiguration.ephemeral
-        configuration.timeoutIntervalForRequest = 3
+        // Даём HTTPS-стенду запас на задержки симулятора в CI.
+        configuration.timeoutIntervalForRequest = 10
         configuration.timeoutIntervalForResource = 12
         manager = CTNetworkManager(configuration: configuration, temporaryDirectory: directory)
         manager.securityPolicy = try fixture.policy()
@@ -215,7 +216,9 @@ final class CTNativeNetworkTests: XCTestCase {
         var held = CTHTTPSFixture.response(payload)
         held["hold"] = true
         try fixture.configure(["slow": held])
-        let error = try failure(download("slow"))
+        // Короткий таймаут нужен только сценарию с намеренно удерживаемым ответом.
+        let request = URLRequest(url: fixture.url("slow"), timeoutInterval: 3)
+        let error = try failure(download(request))
         try fixture.release("slow")
         XCTAssertEqual(error.code, NSURLErrorTimedOut)
         XCTAssertEqual(error.domain, NSURLErrorDomain)
