@@ -84,7 +84,8 @@ jobs:
 
   test-webkit:
     name: Test WebKit user flows (${{ matrix.shard }}/4)
-    runs-on: macos-15
+    # ARM-пул не выдал runners трём UI-частям; оставляем его только для Test SDK.
+    runs-on: macos-15-intel
     timeout-minutes: 30
     strategy:
       fail-fast: false

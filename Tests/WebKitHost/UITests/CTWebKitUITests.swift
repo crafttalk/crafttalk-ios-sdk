@@ -937,12 +937,10 @@ final class CTWebKitUITests: XCTestCase {
         let isPad = try state()["idiom"] as? String == "pad"
         // Системное меню использует Close или close в разных сборках iOS/Xcode.
         let close = app.buttons.matching(NSPredicate(format: "identifier == 'header.closeButton' OR label ==[c] 'close'")).firstMatch
-        if isPad {
-            try waitState { $0["presented"] as? String == "UIActivityViewController" }
-        } else {
-            XCTAssertTrue(close.waitForExistence(timeout: 10), app.debugDescription)
+        try waitState {
+            $0["presented"] as? String == "UIActivityViewController" &&
+            ($0["files"] as? [[String: Any]])?.count == 1
         }
-        try waitState { ($0["files"] as? [[String: Any]])?.count == 1 }
         let files = try XCTUnwrap(try state()["files"] as? [[String: Any]])
         XCTAssertEqual(Data(base64Encoded: files[0]["body"] as? String ?? ""), Data(expected.utf8))
         if isPad {
@@ -950,7 +948,15 @@ final class CTWebKitUITests: XCTestCase {
             app.coordinate(withNormalizedOffset: CGVector(dx: 0.03, dy: 0.12)).tap()
             try waitState { $0["presented"] as? String == "" }
         } else {
+            // На свежем симуляторе сервис ShareSheet в CI запускался около 26 секунд.
+            // Загрузка SDK уже проверена выше; здесь ждём доступности системной кнопки.
+            let ready = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
+                close.exists && close.isHittable
+            }, object: nil)
+            XCTAssertEqual(XCTWaiter.wait(for: [ready], timeout: 30), .completed,
+                           "Системное меню не предоставило доступную кнопку закрытия")
             close.tap()
+            try waitState { $0["presented"] as? String == "" }
         }
     }
 
