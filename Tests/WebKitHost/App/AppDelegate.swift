@@ -79,6 +79,7 @@ final class HarnessController: UIViewController, UINavigationControllerDelegate 
     private var pageObservationStarted = 0
     private var pageObservationCompleted = 0
     private var pageObservationError = ""
+    private var pageObservationStartTime: TimeInterval = 0
     private var opened: [WeakChat] = []
     private let diagnostics = URLSession(configuration: .ephemeral)
     private var publishing = false
@@ -210,11 +211,15 @@ final class HarnessController: UIViewController, UINavigationControllerDelegate 
         if let web = lastWebView, !evaluating {
             evaluating = true
             pageObservationStarted += 1
+            pageObservationStartTime = ProcessInfo.processInfo.systemUptime
             let attempt = pageObservationStarted
             web.evaluateJavaScript("""
                 ({url:location.href,pageID:window.testPageID || '',draft:document.getElementById('draft')?.value || '',
                   visitor:window.testVisitor || null,accept:document.getElementById('webchat-file-input')?.getAttribute('accept'),
                   autocorrect:document.getElementById('draft')?.getAttribute('autocorrect'),
+                  readyState:document.readyState,focusedElement:document.activeElement?.id || '',
+                  selectionStart:document.getElementById('draft')?.selectionStart,
+                  selectionEnd:document.getElementById('draft')?.selectionEnd,
                   marker:document.getElementById('marker')?.textContent || ''})
                 """) { [weak self, weak web] value, error in
                     guard let self = self else { return }
@@ -273,6 +278,11 @@ final class HarnessController: UIViewController, UINavigationControllerDelegate 
                                        "pageObservationStarted": pageObservationStarted,
                                        "pageObservationCompleted": pageObservationCompleted,
                                        "pageObservationError": pageObservationError,
+                                       "pageObservationPendingSeconds": evaluating ? ProcessInfo.processInfo.systemUptime - pageObservationStartTime : 0,
+                                       "webViewLoading": lastWebView?.isLoading ?? false,
+                                       "webViewProgress": lastWebView?.estimatedProgress ?? 0,
+                                       "webViewHasURL": lastWebView?.url != nil,
+                                       "webViewInWindow": lastWebView?.window != nil,
                                        "directories": directories,
                                        "presented": lastChat?.presentedViewController.map { String(describing: type(of: $0)) } ?? ""]
         if let data = try? JSONSerialization.data(withJSONObject: snapshot, options: [.sortedKeys]), let text = String(data: data, encoding: .utf8) {

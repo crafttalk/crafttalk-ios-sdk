@@ -28,6 +28,8 @@ bash scripts/ci.sh build-example    # Сборка Example без подписи
 
 See [CI and testing](docs/ci-and-testing.md) for simulator overrides, artifacts, and toolchain requirements. Do not use macOS `swift test` for this UIKit SDK.
 
+Install the versioned pre-push hook with `bash scripts/install-hooks.sh`. It runs both full simulator suites on archived pushed commits. Automatic CI runs builds and Python/sync checks; simulator jobs run only on `workflow_dispatch`.
+
 ## Repo Layout
 
 - `CTChat/` — canonical SDK sources; networking, security policy, WebView, previews and helpers.

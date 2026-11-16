@@ -10,7 +10,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -63,6 +63,7 @@ jobs:
 
   test-sdk:
     name: Test SDK
+    if: github.event_name == 'workflow_dispatch'
     needs: sdk-sync
     runs-on: macos-15
     timeout-minutes: 30
@@ -89,6 +90,7 @@ jobs:
 
   test-webkit:
     name: Test WebKit user flows (${{ matrix.shard }}/4)
+    if: github.event_name == 'workflow_dispatch'
     needs: sdk-sync
     # ARM-пул не выдал runners трём UI-частям; оставляем его только для Test SDK.
     runs-on: macos-15-intel

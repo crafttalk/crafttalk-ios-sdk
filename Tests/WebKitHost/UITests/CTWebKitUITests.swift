@@ -170,20 +170,21 @@ final class CTWebKitUITests: XCTestCase {
         choose.tap()
         try waitState { $0["presented"] as? String == "UIDocumentPickerViewController" }
         let file = app.cells.matching(NSPredicate(format: "label CONTAINS 'sdk-upload'")).firstMatch
-        // iPhone может сразу открыть Documents, а iPad начинает с Recents.
-        if !file.waitForExistence(timeout: 2) {
-            let browse = app.buttons["Browse"]
-            if browse.exists { browse.tap() }
-            if !file.waitForExistence(timeout: 2) {
-                let local = app.cells.matching(NSPredicate(format: "label BEGINSWITH 'On My'")).firstMatch
-                XCTAssertTrue(local.waitForExistence(timeout: 5), app.debugDescription)
-                local.tap()
-                let folder = app.cells.matching(NSPredicate(format: "label CONTAINS 'CraftTalk UI Host'")).firstMatch
-                XCTAssertTrue(folder.waitForExistence(timeout: 5), app.debugDescription)
-                folder.tap()
-            }
+        let browse = app.buttons["Browse"].firstMatch
+        let local = app.cells.matching(NSPredicate(format: "label BEGINSWITH 'On My'")).firstMatch
+        // Выбираем только появившееся состояние: публикация Browse может запаздывать.
+        let initial = waitForFirstElement([file, local, browse])
+        if initial == 2 {
+            waitUntilHittable(browse)
+            browse.tap()
         }
-        XCTAssertTrue(file.waitForExistence(timeout: 5), app.debugDescription)
+        if initial != 0 && waitForFirstElement([file, local]) == 1 {
+            local.tap()
+            let folder = app.cells.matching(NSPredicate(format: "label CONTAINS 'CraftTalk UI Host'")).firstMatch
+            XCTAssertTrue(folder.waitForExistence(timeout: 30), app.debugDescription)
+            folder.tap()
+        }
+        XCTAssertTrue(file.waitForExistence(timeout: 30), app.debugDescription)
         file.tap()
         try waitState { ($0["page"] as? [String: Any])?["marker"] as? String == "Uploaded sdk-upload.txt" }
         let uploads = try records("upload")
@@ -933,6 +934,18 @@ final class CTWebKitUITests: XCTestCase {
                        "Элемент недоступен для нажатия: \(element)")
     }
 
+    private func waitForFirstElement(_ elements: [XCUIElement]) -> Int {
+        if let index = elements.firstIndex(where: { $0.exists }) { return index }
+        var found: Int?
+        let ready = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
+            found = elements.firstIndex(where: { $0.exists })
+            return found != nil
+        }, object: nil)
+        XCTAssertEqual(XCTWaiter.wait(for: [ready], timeout: 30), .completed,
+                       "Не появилось ни одно ожидаемое состояние системного экрана")
+        return found ?? -1
+    }
+
     private func waitForValue(_ element: XCUIElement, matching condition: @escaping (String) -> Bool) {
         if let value = element.value as? String, condition(value) { return }
         let updated = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
@@ -1032,7 +1045,10 @@ final class CTWebKitUITests: XCTestCase {
         let edited = try XCTUnwrap(draft.value as? String)
         XCTAssertNotEqual(edited, expected)
         XCTAssertEqual(edited.count, expected.count + 1)
-        draft.typeText(XCUIKeyboardKey.delete.rawValue)
+        // Нажимаем настоящую клавишу один раз; повтор мог бы удалить часть черновика.
+        let delete = app.keyboards.keys["delete"].firstMatch
+        waitUntilHittable(delete)
+        delete.tap()
         waitForValue(draft) { $0 == expected }
         XCTAssertEqual(draft.value as? String, expected)
         app.webViews.buttons["Finish draft"].tap()
