@@ -25,6 +25,7 @@
   "CTWebKitUITests/testLegacyPreviewShareCanRepeatWithoutDeletingPreviewFile()",
   "CTWebKitUITests/testLegacyPreviewSurvivesBackgroundAndCanShareAfterReturn()",
   "CTWebKitUITests/testMalformedBlobMessagesPreserveActualChatPageAndEditedDraft()",
+  "CTWebKitUITests/testOffscreenDownloadLinkScrollsIntoView()",
   "CTWebKitUITests/testOpenAndClosedShadowDOMRecognizeRealExternalClicks()",
   "CTWebKitUITests/testPOSTDownloadPreservesBodyWithoutReplay()",
   "CTWebKitUITests/testPOSTRedirectDownloadPreservesBodyAndCookiesWithoutReplay()",

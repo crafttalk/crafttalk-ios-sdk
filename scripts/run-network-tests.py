@@ -14,6 +14,8 @@ import sys
 import tempfile
 import uuid
 
+from ci_stage import Stage
+
 
 def run(*args, **kwargs):
     return subprocess.run(args, check=True, text=True, **kwargs)
@@ -49,7 +51,8 @@ def main():
             spec = importlib.util.spec_from_file_location("https_fixture", root / "scripts/https-fixture.py")
             module = importlib.util.module_from_spec(spec)
             spec.loader.exec_module(module)
-            fixture = module.Fixture(directory, resources, Path(artifacts) / "server-requests.jsonl")
+            with Stage(artifacts, "https-fixture"):
+                fixture = module.Fixture(directory, resources, Path(artifacts) / "server-requests.jsonl")
             if ui:
                 config_path = resources / "config.json"
                 config = json.loads(config_path.read_text())
@@ -71,26 +74,38 @@ def main():
             devices = json.loads((Path(artifacts) / "simulators.json").read_text())["devices"]
             runtime, device = next((runtime, device) for runtime, devices in devices.items()
                                    for device in devices if device["udid"] == original)
-            simulator = run("xcrun", "simctl", "create", "CraftTalk Tests " + str(uuid.uuid4()),
-                            device["deviceTypeIdentifier"], runtime, capture_output=True).stdout.strip()
+            with Stage(artifacts, "simulator-create"):
+                simulator = run("xcrun", "simctl", "create", "CraftTalk Tests " + str(uuid.uuid4()),
+                                device["deviceTypeIdentifier"], runtime, capture_output=True).stdout.strip()
             (Path(artifacts) / "fixture.json").write_text(json.dumps({"simulator": simulator, "runtime": runtime,
                                                                     "ports": fixture.ports, "verifyTime": fixture.verify_time}))
-            run("xcrun", "simctl", "boot", simulator)
-            run("xcrun", "simctl", "bootstatus", simulator, "-b", timeout=240)
-            run("xcrun", "simctl", "keychain", simulator, "add-root-cert", str(Path(directory) / "system-root.pem"))
-            print("HTTPS-стенд готов; отдельный симулятор:", simulator, flush=True)
+            # boot запускает загрузку асинхронно; сборка идёт во время миграций симулятора.
+            with Stage(artifacts, "simulator-boot-request"):
+                run("xcrun", "simctl", "boot", simulator)
             selection = (["-project", str(root / "Tests/WebKitHost/CraftTalkUIHost.xcodeproj"), "-scheme", "CraftTalkUIHost"] if ui
                          else ["-scheme", "CraftTalk"])
-            process = subprocess.Popen([
+            command = [
                 "xcodebuild", *selection, "-configuration", "Debug",
                 "-destination", "platform=iOS Simulator,id=" + simulator, "-destination-timeout", "60",
-                "-derivedDataPath", str(root / (".build/ci/ui" if ui else ".build/ci/spm")), "-resultBundlePath", str(Path(artifacts) / "tests.xcresult"),
+                "-derivedDataPath", str(root / (".build/ci/ui" if ui else ".build/ci/spm")),
                 "-parallel-testing-enabled", "NO", "-test-timeouts-enabled", "YES",
                 "-default-test-execution-time-allowance", "180" if ui else "60", "-maximum-test-execution-time-allowance", "240" if ui else "120",
                 *(["-enableCodeCoverage", "YES"] if ui else []),
                 *["-only-testing:CraftTalkUITests/" + name.removesuffix("()") for name in selected],
-                "CODE_SIGNING_ALLOWED=NO", "test"], cwd=root)
-            status = process.wait()
+                "CODE_SIGNING_ALLOWED=NO"]
+            with Stage(artifacts, "build-for-testing") as stage:
+                process = subprocess.Popen(command + ["-resultBundlePath", str(Path(artifacts) / "build.xcresult"), "build-for-testing"], cwd=root)
+                stage.status = process.wait()
+            if stage.status:
+                return stage.status
+            with Stage(artifacts, "simulator-ready"):
+                # Измеряем оставшееся ожидание после сборки; загрузка уже шла параллельно.
+                run("xcrun", "simctl", "bootstatus", simulator, "-b", timeout=240)
+                run("xcrun", "simctl", "keychain", simulator, "add-root-cert", str(Path(directory) / "system-root.pem"))
+            print("HTTPS-стенд готов; отдельный симулятор:", simulator, flush=True)
+            with Stage(artifacts, "test-without-building") as stage:
+                process = subprocess.Popen(command + ["-resultBundlePath", str(Path(artifacts) / "tests.xcresult"), "test-without-building"], cwd=root)
+                status = stage.status = process.wait()
     finally:
         if process is not None and process.poll() is None:
             process.terminate()
@@ -105,8 +120,9 @@ def main():
         finally:
             try:
                 if simulator:
-                    subprocess.run(["xcrun", "simctl", "shutdown", simulator], capture_output=True)
-                    run("xcrun", "simctl", "delete", simulator)
+                    with Stage(artifacts, "simulator-cleanup"):
+                        subprocess.run(["xcrun", "simctl", "shutdown", simulator], capture_output=True)
+                        run("xcrun", "simctl", "delete", simulator)
             finally:
                 shutil.rmtree(resources)
 

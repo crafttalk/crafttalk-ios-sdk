@@ -659,19 +659,25 @@ final class CTWebKitUITests: XCTestCase {
 
     private func open(legacy: Bool = false, editDraft: Bool = false) throws {
         let previousPageID = pageID
-        app.buttons[legacy ? "Open legacy" : "Open secure"].tap()
-        try waitState {
+        XCTAssertTrue(app.wait(for: .runningForeground, timeout: 30))
+        let openButton = app.buttons[legacy ? "Open legacy" : "Open secure"]
+        waitUntilHittable(openButton)
+        openButton.tap()
+        try waitState(timeout: 30) {
             guard let page = $0["page"] as? [String: Any], let identifier = page["pageID"] as? String else { return false }
             return page["marker"] as? String == "Chat ready" && !identifier.isEmpty && identifier != previousPageID
         }
         pageID = try XCTUnwrap((try state()["page"] as? [String: Any])?["pageID"] as? String)
         pageRequestCount = try records("webchat/channel").count
         draftBeforeAction = "unsent draft"
+        // Готовность DOM не означает, что WebKit уже опубликовал accessibility-дерево.
+        waitUntilHittable(app.webViews.textFields["Draft"])
         if editDraft {
             let draft = app.webViews.textFields["Draft"]
             draft.tap()
             // Короткий маркер проверяет реальный ввод без длинной последовательности клавиш в CI.
             draft.typeText("-edited")
+            waitForValue(draft) { $0.contains("-edited") }
             draftBeforeAction = try XCTUnwrap(draft.value as? String)
             XCTAssertTrue(draftBeforeAction.contains("-edited"))
             app.webViews.buttons["Finish draft"].tap()
@@ -917,14 +923,59 @@ final class CTWebKitUITests: XCTestCase {
         }
     }
 
+    private func waitUntilHittable(_ element: XCUIElement, timeout: TimeInterval = 30) {
+        // Не ждём первого тика predicate, если элемент уже готов.
+        if element.exists && element.isHittable { return }
+        let ready = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
+            element.exists && element.isHittable
+        }, object: nil)
+        XCTAssertEqual(XCTWaiter.wait(for: [ready], timeout: timeout), .completed,
+                       "Элемент недоступен для нажатия: \(element)")
+    }
+
+    private func waitForValue(_ element: XCUIElement, matching condition: @escaping (String) -> Bool) {
+        if let value = element.value as? String, condition(value) { return }
+        let updated = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
+            guard let value = element.value as? String else { return false }
+            return condition(value)
+        }, object: nil)
+        XCTAssertEqual(XCTWaiter.wait(for: [updated], timeout: 10), .completed,
+                       "Accessibility не подтвердил завершение ввода")
+    }
+
+    func testOffscreenDownloadLinkScrollsIntoView() throws {
+        var file = attachment()
+        file["oneUse"] = true
+        try prepare(links: "<div style='height:2000px'></div>" + link("Offscreen download", route: "file"),
+                    routes: ["file": file])
+        app.launch()
+        try open()
+        let download = app.webViews.links["Offscreen download"].firstMatch
+        XCTAssertTrue(download.waitForExistence(timeout: 30))
+        XCTAssertFalse(download.isHittable, "Ссылка должна находиться ниже видимой области")
+        try tapLink("Offscreen download")
+        try closeShare()
+        try waitState {
+            ($0["files"] as? [[String: Any]])?.isEmpty == true &&
+            ($0["directories"] as? [String])?.isEmpty == true
+        }
+        let page = try freshPage()
+        XCTAssertEqual(page["pageID"] as? String, pageID)
+        XCTAssertEqual(page["draft"] as? String, draftBeforeAction)
+        XCTAssertEqual(try records("file").count, 1)
+        XCTAssertEqual(try records("webchat/channel").count, pageRequestCount)
+        XCTAssertEqual(try state()["errors"] as? [String], [])
+    }
+
     private func tapLink(_ title: String) throws {
         let link = app.webViews.links[title].firstMatch
-        XCTAssertTrue(link.waitForExistence(timeout: 10), title)
+        // tap() сам прокручивает к ссылке; isHittable до прокрутки может оставаться false.
+        XCTAssertTrue(link.waitForExistence(timeout: 30), title)
         link.tap()
     }
 
     private func closeSafari() throws {
-        XCTAssertTrue(app.webViews.staticTexts["External page"].firstMatch.waitForExistence(timeout: 10))
+        XCTAssertTrue(app.webViews.staticTexts["External page"].firstMatch.waitForExistence(timeout: 30))
         let done = app.buttons["Done"]
         let ready = XCTNSPredicateExpectation(predicate: NSPredicate(format: "hittable == true"), object: done)
         XCTAssertEqual(XCTWaiter.wait(for: [ready], timeout: 10), .completed)
@@ -977,10 +1028,12 @@ final class CTWebKitUITests: XCTestCase {
         // Проверяем реальный ввод и возвращаем черновик к исходному значению для следующего действия.
         draft.tap()
         draft.typeText("x")
+        waitForValue(draft) { $0 != expected && $0.count == expected.count + 1 }
         let edited = try XCTUnwrap(draft.value as? String)
         XCTAssertNotEqual(edited, expected)
         XCTAssertEqual(edited.count, expected.count + 1)
         draft.typeText(XCUIKeyboardKey.delete.rawValue)
+        waitForValue(draft) { $0 == expected }
         XCTAssertEqual(draft.value as? String, expected)
         app.webViews.buttons["Finish draft"].tap()
         let restored = try freshPage()

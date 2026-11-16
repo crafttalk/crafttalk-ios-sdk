@@ -30,12 +30,22 @@ check_xcode() {
     xcrun swift --version
 }
 
+export_results() {
+    local kind="$1" output="$2"
+    python3 scripts/ci_stage.py "$run_dir" "results-$kind" \
+        bash -c 'xcrun xcresulttool get test-results "$1" --path "$2" > "$3"' \
+        bash "$kind" "$run_dir/tests.xcresult" "$output"
+}
+
 test_spm() {
     local simulator_id status manifest
-    python3 -m unittest discover -s scripts/tests -v
+    if [[ "${CI_HELPER_TESTS_CHECKED:-0}" != 1 ]]; then
+        python3 scripts/ci_stage.py "$run_dir" python-tests python3 -m unittest discover -s scripts/tests -v
+    fi
     manifest=Tests/expected-tests.json
     if [[ "$command_name" == test-ui ]]; then manifest="${UI_TEST_MANIFEST:-Tests/expected-ui-tests.json}"; fi
-    xcrun simctl list devices available --json > "$run_dir/simulators.json"
+    python3 scripts/ci_stage.py "$run_dir" simulator-list \
+        bash -c 'xcrun simctl list devices available --json > "$1"' bash "$run_dir/simulators.json"
     simulator_id="$(python3 - "$run_dir/simulators.json" "${SIMULATOR_OS:-18.6}" "${SIMULATOR_DEVICE:-iPhone 16}" <<'PY'
 import json
 import sys
@@ -52,19 +62,16 @@ print(matches[0]["udid"])
 PY
 )"
     if python3 scripts/run-network-tests.py "$simulator_id" "$run_dir" "$command_name"; then
-        xcrun xcresulttool get test-results summary --path "$run_dir/tests.xcresult" \
-            > "$run_dir/test-summary.json"
-        xcrun xcresulttool get test-results tests --path "$run_dir/tests.xcresult" \
-            > "$run_dir/test-results.json"
-        python3 scripts/verify-test-results.py "$run_dir/test-summary.json" \
+        export_results summary "$run_dir/test-summary.json"
+        export_results tests "$run_dir/test-results.json"
+        python3 scripts/ci_stage.py "$run_dir" verify-results \
+            python3 scripts/verify-test-results.py "$run_dir/test-summary.json" \
             "$run_dir/test-results.json" "$manifest"
     else
         status=$?
         if [[ -d "$run_dir/tests.xcresult" ]]; then
-            xcrun xcresulttool get test-results summary --path "$run_dir/tests.xcresult" \
-                > "$run_dir/test-summary.json" || true
-            xcrun xcresulttool get test-results tests --path "$run_dir/tests.xcresult" \
-                > "$run_dir/test-results.json" || true
+            export_results summary "$run_dir/test-summary.json" || true
+            export_results tests "$run_dir/test-results.json" || true
         fi
         return "$status"
     fi

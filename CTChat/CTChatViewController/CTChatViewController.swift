@@ -58,7 +58,16 @@ public final class CTChatViewController: UIViewController {
     public override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         if isBeingDismissed || isMovingFromParent || navigationController?.isBeingDismissed == true {
-            closeBlobPreview()
+            if let coordinator = transitionCoordinator {
+                // Интерактивный переход может отмениться: файл нужен оставшемуся на экране preview.
+                coordinator.animate(alongsideTransition: nil) { [weak self] context in
+                    if !context.isCancelled {
+                        self?.closeBlobPreview()
+                    }
+                }
+            } else {
+                closeBlobPreview()
+            }
         }
     }
     
