@@ -11,11 +11,113 @@ import SafariServices
 
 public final class CTChatViewController: UIViewController {
     
-    internal let mimeTypes = CTAttachmentRules.mimeTypes
-    internal var chat: CTChat = .shared
+    internal let mimeTypes = [
+        "html": "text/html",
+        "htm": "text/html",
+        "shtml": "text/html",
+        "css": "text/css",
+        "xml": "text/xml",
+        "gif": "image/gif",
+        "jpeg": "image/jpeg",
+        "jpg": "image/jpeg",
+        "js": "application/javascript",
+        "atom": "application/atom+xml",
+        "rss": "application/rss+xml",
+        "mml": "text/mathml",
+        "txt": "text/plain",
+        "jad": "text/vnd.sun.j2me.app-descriptor",
+        "wml": "text/vnd.wap.wml",
+        "htc": "text/x-component",
+        "png": "image/png",
+        "tif": "image/tiff",
+        "tiff": "image/tiff",
+        "wbmp": "image/vnd.wap.wbmp",
+        "ico": "image/x-icon",
+        "jng": "image/x-jng",
+        "bmp": "image/x-ms-bmp",
+        "svg": "image/svg+xml",
+        "svgz": "image/svg+xml",
+        "webp": "image/webp",
+        "woff": "application/font-woff",
+        "jar": "application/java-archive",
+        "war": "application/java-archive",
+        "ear": "application/java-archive",
+        "json": "application/json",
+        "hqx": "application/mac-binhex40",
+        "doc": "application/msword",
+        "pdf": "application/pdf",
+        "ps": "application/postscript",
+        "eps": "application/postscript",
+        "ai": "application/postscript",
+        "rtf": "application/rtf",
+        "m3u8": "application/vnd.apple.mpegurl",
+        "xls": "application/vnd.ms-excel",
+        "eot": "application/vnd.ms-fontobject",
+        "ppt": "application/vnd.ms-powerpoint",
+        "wmlc": "application/vnd.wap.wmlc",
+        "kml": "application/vnd.google-earth.kml+xml",
+        "kmz": "application/vnd.google-earth.kmz",
+        "7z": "application/x-7z-compressed",
+        "cco": "application/x-cocoa",
+        "jardiff": "application/x-java-archive-diff",
+        "jnlp": "application/x-java-jnlp-file",
+        "run": "application/x-makeself",
+        "pl": "application/x-perl",
+        "pm": "application/x-perl",
+        "prc": "application/x-pilot",
+        "pdb": "application/x-pilot",
+        "rar": "application/x-rar-compressed",
+        "rpm": "application/x-redhat-package-manager",
+        "sea": "application/x-sea",
+        "swf": "application/x-shockwave-flash",
+        "sit": "application/x-stuffit",
+        "tcl": "application/x-tcl",
+        "tk": "application/x-tcl",
+        "der": "application/x-x509-ca-cert",
+        "pem": "application/x-x509-ca-cert",
+        "crt": "application/x-x509-ca-cert",
+        "xpi": "application/x-xpinstall",
+        "xhtml": "application/xhtml+xml",
+        "xspf": "application/xspf+xml",
+        "zip": "application/zip",
+        "bin": "application/octet-stream",
+        "exe": "application/octet-stream",
+        "dll": "application/octet-stream",
+        "deb": "application/octet-stream",
+        "dmg": "application/octet-stream",
+        "iso": "application/octet-stream",
+        "img": "application/octet-stream",
+        "msi": "application/octet-stream",
+        "msp": "application/octet-stream",
+        "msm": "application/octet-stream",
+        "docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "pptx": "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+        "mid": "audio/midi",
+        "midi": "audio/midi",
+        "kar": "audio/midi",
+        "mp3": "audio/mpeg",
+        "ogg": "audio/ogg",
+        "m4a": "audio/x-m4a",
+        "ra": "audio/x-realaudio",
+        "3gpp": "video/3gpp",
+        "3gp": "video/3gpp",
+        "ts": "video/mp2t",
+        "mp4": "video/mp4",
+        "mpeg": "video/mpeg",
+        "mpg": "video/mpeg",
+        "mov": "video/quicktime",
+        "webm": "video/webm",
+        "flv": "video/x-flv",
+        "m4v": "video/x-m4v",
+        "mng": "video/x-mng",
+        "asx": "video/x-ms-asf",
+        "asf": "video/x-ms-asf",
+        "wmv": "video/x-ms-wmv",
+        "avi": "video/x-msvideo"
+    ]
 
-    private var blobFile: CTBlobFile?
-    private weak var blobPreview: UIView?
+    private var shareItem: URL?
     
     
     
@@ -24,7 +126,6 @@ public final class CTChatViewController: UIViewController {
     private var chatURL: URL!
     private var visitor: CTVisitor!
     private var fileLoader: FileLoader!
-    private lazy var scriptMessageHandler = CTWeakScriptMessageHandler(self)
     private let secureLinkToken = UUID().uuidString
     private var pendingUserLink: (url: URL, download: Bool, frameURL: URL?, mainFrame: Bool, expiresAt: TimeInterval)?
     private var attachmentTransfers: [ObjectIdentifier: CTAttachmentTransfer] = [:]
@@ -44,9 +145,9 @@ public final class CTChatViewController: UIViewController {
     
     public override func viewDidLoad() {
         super.viewDidLoad()
-        chatURL = chat.webchatURL
-        visitor = chat.visitor
-        fileLoader = chat.networkManager
+        chatURL = CTChat.shared.webchatURL
+        visitor = CTChat.shared.visitor
+        fileLoader = CTChat.shared.networkManager
         setupWebView()
     }
     
@@ -57,18 +158,7 @@ public final class CTChatViewController: UIViewController {
     
     public override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        if isBeingDismissed || isMovingFromParent || navigationController?.isBeingDismissed == true {
-            if let coordinator = transitionCoordinator {
-                // Интерактивный переход может отмениться: файл нужен оставшемуся на экране preview.
-                coordinator.animate(alongsideTransition: nil) { [weak self] context in
-                    if !context.isCancelled {
-                        self?.closeBlobPreview()
-                    }
-                }
-            } else {
-                closeBlobPreview()
-            }
-        }
+        
     }
     
     // MARK: - Methods
@@ -87,7 +177,7 @@ public final class CTChatViewController: UIViewController {
         func getUserAuthScript() -> WKUserScript {
             let visitor = self.visitor.toJSON() ?? ""
             let source: String = """
-                \( chat.isConsoleEnabled ? "javascript:(function () { var script = document.createElement('script'); script.src=\"//cdn.jsdelivr.net/npm/eruda\"; document.body.appendChild(script); script.onload = function () { eruda.init() } })();" : "")
+                \( CTChat.shared.isConsoleEnabled ? "javascript:(function () { var script = document.createElement('script'); script.src=\"//cdn.jsdelivr.net/npm/eruda\"; document.body.appendChild(script); script.onload = function () { eruda.init() } })();" : "")
                 window.__WebchatUserCallback = function() {
                     webkit.messageHandlers.handler.postMessage("User registred");
                     return \(visitor);
@@ -129,8 +219,8 @@ public final class CTChatViewController: UIViewController {
         wkWebViewConfig.userContentController.addUserScript(getZoomDisableScript())
         wkWebViewConfig.userContentController.addUserScript(getUserAuthScript())
         wkWebViewConfig.userContentController.addUserScript(setupWebViewLongPressure())
-        wkWebViewConfig.userContentController.add(scriptMessageHandler, name: "handler")
-        if chat.securityPolicy != nil {
+        wkWebViewConfig.userContentController.add(self, name: "handler")
+        if CTChat.shared.securityPolicy != nil {
             observeUserLinks(in: wkWebViewConfig.userContentController)
         }
         
@@ -217,17 +307,17 @@ public final class CTChatViewController: UIViewController {
         })();
         """ }
         if #available(iOS 14.0, *) {
-            controller.add(scriptMessageHandler, contentWorld: .defaultClient, name: "ctSecureLinkActivation")
+            controller.add(self, contentWorld: .defaultClient, name: "ctSecureLinkActivation")
             controller.addUserScript(WKUserScript(source: source(document: true, shadowRoots: false), injectionTime: .atDocumentStart,
                                                   forMainFrameOnly: false, in: .defaultClient))
             // attachShadow must be observed in the same world as the component creating it.
-            controller.add(scriptMessageHandler, contentWorld: .page, name: "ctSecureLinkActivation")
+            controller.add(self, contentWorld: .page, name: "ctSecureLinkActivation")
             controller.addUserScript(WKUserScript(source: source(document: false, shadowRoots: true), injectionTime: .atDocumentStart,
                                                   forMainFrameOnly: false, in: .page))
         } else {
             // Older WebKit has no isolated worlds. Keep the per-view token and bound handler
             // private in the document-start closure so page scripts cannot forge a click message.
-            controller.add(scriptMessageHandler, name: "ctSecureLinkActivation")
+            controller.add(self, name: "ctSecureLinkActivation")
             controller.addUserScript(WKUserScript(source: source(document: true, shadowRoots: true), injectionTime: .atDocumentStart,
                                                   forMainFrameOnly: false))
         }
@@ -244,7 +334,12 @@ public final class CTChatViewController: UIViewController {
     }
 
     private func isAttachmentLink(_ url: URL, hasDownloadAttribute: Bool) -> Bool {
-        return CTAttachmentRules.isAttachmentLink(url, hasDownloadAttribute: hasDownloadAttribute)
+        // Identify the SDK's extensionless file endpoint before its one-use URL is consumed.
+        // Do not probe with HEAD/GET: those requests can also consume signed tickets.
+        let mime = mimeTypes[url.pathExtension.lowercased()]
+        let knownFile = mime != nil && mime != "text/html" && mime != "application/xhtml+xml"
+        return hasDownloadAttribute || knownFile ||
+            (url.pathComponents.contains("webchat") && url.pathComponents.contains("file"))
     }
     
     /// Download the file from the given url and store it locally in the app's temp folder.
@@ -274,16 +369,15 @@ public final class CTChatViewController: UIViewController {
         self.present(vc, animated: true)
     }
 
-    private func presentAttachment(at fileURL: URL, cleanup: (() -> Void)? = nil) {
+    private func presentAttachment(at fileURL: URL) {
         let directory = fileURL.deletingLastPathComponent()
-        let cleanup = cleanup ?? { try? FileManager.default.removeItem(at: directory) }
         guard presentedViewController == nil, viewIfLoaded?.window != nil else {
-            cleanup()
+            try? FileManager.default.removeItem(at: directory)
             return
         }
         let controller = UIActivityViewController(activityItems: [fileURL], applicationActivities: nil)
         controller.completionWithItemsHandler = { _, _, _, _ in
-            cleanup()
+            try? FileManager.default.removeItem(at: directory)
         }
         // A popover anchor is required on iPad.
         controller.popoverPresentationController?.sourceView = view
@@ -295,8 +389,8 @@ public final class CTChatViewController: UIViewController {
         // Called only before WebKit sends the initial GET. Redirects and TLS are
         // checked by the same secured session; never restart a received response.
         let load: ([HTTPCookie]) -> Void = { [weak self] cookies in
-            guard let self = self else { return }
-            self.chat.networkManager.loadDocumentFrom(request: request, webCookies: cookies) { [weak self] result in
+            guard self != nil else { return }
+            CTChat.shared.networkManager.loadDocumentFrom(request: request, webCookies: cookies) { [weak self] result in
                 guard case let .success(fileURL) = result else { return }
                 let directory = fileURL.deletingLastPathComponent()
                 guard let self = self else { try? FileManager.default.removeItem(at: directory); return }
@@ -311,7 +405,6 @@ public final class CTChatViewController: UIViewController {
     }
     
     private func setInputAttribute() {
-        guard wkWebView != nil else { return }
         DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(500)) { [weak self] in
             let source: String = """
                 var inputElement = document.getElementById('webchat-file-input');
@@ -359,19 +452,19 @@ extension CTChatViewController: WKNavigationDelegate, WKUIDelegate {
             return
         }
         let stage: CTChatError.Stage = (-1206 ... -1200).contains(failure.code) ? .tls : .navigation
-        chat.report(CTChatError(stage: stage, url: url, error: error))
+        CTChat.shared.report(CTChatError(stage: stage, url: url, error: error))
     }
 
     public func webView(_ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse,
                         decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void) {
-        guard let policy = chat.securityPolicy, let url = navigationResponse.response.url,
+        guard let policy = CTChat.shared.securityPolicy, let url = navigationResponse.response.url,
               url.scheme?.lowercased() != "blob" else {
             decisionHandler(.allow)
             return
         }
         guard policy.allows(url) else {
             if navigationResponse.isForMainFrame { shouldDownloadMainFrame = false }
-            chat.report(policy.rejection(for: url))
+            CTChat.shared.report(policy.rejection(for: url))
             decisionHandler(.cancel)
             return
         }
@@ -391,7 +484,7 @@ extension CTChatViewController: WKNavigationDelegate, WKUIDelegate {
             } else {
                 attachmentNavigationURLs.insert(url)
                 decisionHandler(.cancel)
-                chat.report(CTChatError(stage: .download, host: url.host,
+                CTChat.shared.report(CTChatError(stage: .download, host: url.host,
                                                 code: NSURLErrorUnsupportedURL, domain: NSURLErrorDomain))
             }
             return
@@ -440,13 +533,13 @@ extension CTChatViewController: WKNavigationDelegate, WKUIDelegate {
             if userLink && (scheme == "https" || scheme == "http") {
                 openURLInSafariViewController(url)
             } else {
-                chat.report(policy.rejection(for: url))
+                CTChat.shared.report(policy.rejection(for: url))
             }
         }
     }
     
     public func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
-        if let policy = chat.securityPolicy,
+        if let policy = CTChat.shared.securityPolicy,
            navigationAction.request.url?.scheme?.lowercased() != "blob" {
             decideSecureNavigation(navigationAction, webView: webView, policy: policy, completion: decisionHandler)
             return
@@ -488,7 +581,7 @@ extension CTChatViewController: WKNavigationDelegate, WKUIDelegate {
 
             wkWebView.evaluateJavaScript(scriptDownl, completionHandler: nil);
             if (philip == 1){
-                wkWebView.configuration.userContentController.add(scriptMessageHandler, name: "readBlob")
+                wkWebView.configuration.userContentController.add(self, name: "readBlob")
                 philip = philip - 1
                 
                 //decisionHandler(.cancel)
@@ -538,10 +631,10 @@ extension CTChatViewController: WKNavigationDelegate, WKUIDelegate {
     
     
     public func webView(_ webView: WKWebView, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
-        let policy = chat.securityPolicy
+        let policy = CTChat.shared.securityPolicy
         CTTrustEvaluator.handle(challenge, policy: policy,
-                                legacyCertificate: policy == nil ? chat.certificate : nil,
-                                legacyBaseURL: chat.baseURL, reportError: chat.report,
+                                legacyCertificate: policy == nil ? CTChat.shared.certificate : nil,
+                                legacyBaseURL: CTChat.shared.baseURL,
                                 completion: completionHandler)
     }
 
@@ -552,7 +645,7 @@ extension CTChatViewController: WKNavigationDelegate, WKUIDelegate {
     }
     
     //preview View Controller
-    private func loadCustomViewIntoController(url: URL) {
+    private func loadCustomViewIntoController(html: Data, url: URL) {
         let customViewFrame = CGRect(x: 0, y: 50, width: view.bounds.width, height: view.bounds.height)
         let customView = UIView(frame: customViewFrame)
         customView.backgroundColor = .white
@@ -581,54 +674,60 @@ extension CTChatViewController: WKNavigationDelegate, WKUIDelegate {
         shareButton.addTarget(self, action: #selector(share(_:)), for: .touchUpInside)
         customView.addSubview(shareButton)
                          
-        view.addSubview(customView)
-        blobPreview = customView
+        UIApplication.shared.windows.first(where: { $0.isKeyWindow })?.addSubview(customView)
         customView.isHidden = false
         let request = URLRequest(url: url)
         wkWView.load(request)
     }
     
     @objc func goBack(_ sender: Any) {
-        closeBlobPreview()
-    }
-
-    private func closeBlobPreview() {
-        blobPreview?.removeFromSuperview()
-        blobPreview = nil
-        blobFile = nil
+        let button = (sender as! UIButton)
+        button.superview?.removeFromSuperview()
     }
 
     @objc func share(_ sender: Any) {
-        guard let file = blobFile, presentedViewController == nil else {
+        guard let shareItem else {
             return
         }
-        let items = [file.url]
+        let items = [shareItem]
         let ac = UIActivityViewController(activityItems: items, applicationActivities: nil)
-        // Меню удерживает файл, даже если preview закроется до завершения отправки.
-        ac.completionWithItemsHandler = { _, _, _, _ in withExtendedLifetime(file) {} }
-        ac.popoverPresentationController?.sourceView = view
-        ac.popoverPresentationController?.sourceRect = CGRect(x: view.bounds.midX, y: view.bounds.midY, width: 1, height: 1)
         present(ac, animated: true)
     }
 
-    private func handleDocument(messageBody: Any) {
+    private func handleDocument(messageBody: String) {
+        // messageBody is in the format ;data:;base64,
+          
+        // split on the first ";", to reveal the filename
+        let filenameSplits = messageBody.split(separator: ";", maxSplits: 1, omittingEmptySubsequences: false)
+                            
+        // split the remaining part on the first ",", to reveal the base64 data
+        let dataSplits = filenameSplits[1].split(separator: ",", maxSplits: 1, omittingEmptySubsequences: false)
+        
+        let mime = filenameSplits[0].split(separator: ":", maxSplits: 1, omittingEmptySubsequences: false)[1]
+     
+        
+        let ext = mimeTypes.key(from: String(mime))
+        
+        let filename = String(Date().timeIntervalSince1970) + "." + ext!
+        
+        let data = Data(base64Encoded: String(dataSplits[1]))
+          
+        _ = Data(base64Encoded: String(dataSplits[1]))
+     
+        if (data == nil) {
+            debugPrint("Could not construct data from base64")
+            return
+        }
+          
+        let localFileURL = FileManager.default.temporaryDirectory.appendingPathComponent(filename.removingPercentEncoding ?? filename)
+          
         do {
-            let document = try CTBlobDocument(messageBody: messageBody, mimeTypes: mimeTypes)
-            guard blobFile == nil, attachmentTransfers.isEmpty, presentedViewController == nil else {
-                throw CTChatError(stage: .download, host: chatURL?.host, code: 6)
-            }
-            let file = try document.write()
-            if chat.securityPolicy != nil || document.fileExtension == "bin" {
-                presentAttachment(at: file.url, cleanup: { file.remove() })
-            } else if viewIfLoaded?.window != nil {
-                blobFile = file
-                loadCustomViewIntoController(url: file.url)
-            }
-            // Если контроллер уже закрыт, локальный владелец удалит файл при освобождении.
-        } catch let error as CTChatError {
-            chat.report(error)
+            try data!.write(to: localFileURL);
+            shareItem = localFileURL
+            loadCustomViewIntoController(html: data!, url: localFileURL)
         } catch {
-            chat.report(CTChatError(stage: .download, url: chatURL, error: error))
+            debugPrint(error)
+            return
         }
     }
     
@@ -638,7 +737,7 @@ extension CTChatViewController: WKNavigationDelegate, WKUIDelegate {
 extension CTChatViewController: WKScriptMessageHandler {
     public func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
         if message.name == "ctSecureLinkActivation" {
-            guard chat.securityPolicy != nil, message.webView === wkWebView,
+            guard CTChat.shared.securityPolicy != nil, message.webView === wkWebView,
                   let body = message.body as? [String: Any],
                   body["token"] as? String == secureLinkToken else { return }
             pendingUserLink = (body["url"] as? String).flatMap(URL.init(string:)).map {
@@ -655,10 +754,10 @@ extension CTChatViewController: WKScriptMessageHandler {
         */
          
         if message.name == "readBlob" {
-            handleDocument(messageBody: message.body)
+            handleDocument(messageBody: message.body as! String)
         }
         setInputAttribute()
-        chat.registerPushNotifications()
+        CTChat.shared.registerPushNotifications()
     }
 }
 
@@ -675,18 +774,17 @@ extension CTChatViewController {
     private func receiveAttachment(_ download: WKDownload) {
         shouldDownloadMainFrame = false
         if let url = download.originalRequest?.url { attachmentNavigationURLs.insert(url) }
-        guard let policy = chat.securityPolicy else { download.cancel(nil); return }
+        guard let policy = CTChat.shared.securityPolicy else { download.cancel(nil); return }
         if #available(iOS 18.2, *), !download.originatingFrame.isMainFrame, !download.isUserInitiated {
             download.cancel(nil)
             return
         }
-        guard attachmentTransfers.isEmpty, blobFile == nil, presentedViewController == nil else {
+        guard attachmentTransfers.isEmpty, presentedViewController == nil else {
             download.cancel(nil)
-            chat.report(CTChatError(stage: .download, host: download.originalRequest?.url?.host, code: 6))
+            CTChat.shared.report(CTChatError(stage: .download, host: download.originalRequest?.url?.host, code: 6))
             return
         }
         let identifier = ObjectIdentifier(download)
-        let reportError = chat.report
         attachmentTransfers[identifier] = CTAttachmentTransfer(download: download, policy: policy) { [weak self] result in
             // Release state before onError/presentation so a retry can start immediately.
             self?.attachmentTransfers.removeValue(forKey: identifier)
@@ -698,23 +796,9 @@ extension CTChatViewController {
                 }
                 self.presentAttachment(at: fileURL)
             case .failure(let error):
-                reportError(error)
+                CTChat.shared.report(error)
             }
         }
-    }
-}
-
-// WebKit удерживает посредника, но не контроллер: закрытый чат может освободиться.
-private final class CTWeakScriptMessageHandler: NSObject, WKScriptMessageHandler {
-    private weak var handler: WKScriptMessageHandler?
-
-    init(_ handler: WKScriptMessageHandler) {
-        self.handler = handler
-        super.init()
-    }
-
-    func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
-        handler?.userContentController(userContentController, didReceive: message)
     }
 }
 
@@ -768,7 +852,8 @@ extension CTAttachmentTransfer: WKDownloadDelegate {
             finish(.failure(CTChatError(stage: .download, host: response.url?.host, code: http.statusCode, domain: "HTTP")))
             return
         }
-        let destination = directory.appendingPathComponent(CTAttachmentRules.safeFilename(suggestedFilename))
+        let name = (suggestedFilename as NSString).lastPathComponent
+        let destination = directory.appendingPathComponent(name.isEmpty || name == "." || name == ".." ? "download" : name)
         do {
             try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true,
                                                     attributes: [.protectionKey: FileProtectionType.complete])
@@ -814,5 +899,11 @@ extension CTAttachmentTransfer: WKDownloadDelegate {
     func download(_ download: WKDownload, didFailWithError error: Error, resumeData: Data?) {
         let stage: CTChatError.Stage = (-1206 ... -1200).contains((error as NSError).code) ? .tls : .download
         finish(.failure(failure ?? CTChatError(stage: stage, url: currentURL, error: error)))
+    }
+}
+
+extension Dictionary where Value: Equatable {
+    func key(from value: Value) -> Key? {
+        return self.first(where: { $0.value == value })?.key
     }
 }

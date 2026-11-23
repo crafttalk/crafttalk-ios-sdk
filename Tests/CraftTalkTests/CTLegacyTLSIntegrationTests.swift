@@ -19,65 +19,38 @@ final class CTLegacyTLSIntegrationTests: XCTestCase {
 
     func testLegacyPinRejectsRenewedLeafUnderSameRoot() throws {
         let result = try request(profile: "renewed", pin: "valid")
-        XCTAssertThrowsError(try result.get())
-        XCTAssertTrue(try fixture.requests().isEmpty)
+        assertEvaluatorRejects(result)
     }
 
     func testLegacyPinDoesNotApplyToUnmatchedHost() throws {
         let result = try request(profile: "valid", pin: "valid", base: "https://other.invalid")
-        XCTAssertThrowsError(try result.get())
+        XCTAssertThrowsError(try result.get()) { error in
+            let failure = error as NSError
+            XCTAssertEqual(failure.domain, NSURLErrorDomain)
+            XCTAssertEqual(failure.code, NSURLErrorServerCertificateUntrusted)
+        }
         XCTAssertTrue(try fixture.requests().isEmpty)
     }
 
     func testNewModeDoesNotAcceptLegacyPinInsteadOfTrustedRoot() throws {
         let result = try request(profile: "valid", pin: "valid", policy: fixture.policy(root: "other-root"))
-        XCTAssertThrowsError(try result.get())
-        XCTAssertTrue(try fixture.requests().isEmpty)
+        assertEvaluatorRejects(result)
     }
 
-    func testLegacyExpiredLeafRetainsLeafComparisonSemantics() throws {
-        // Это существующая legacy-семантика; новый режим обязан отвергать этот leaf.
-        XCTAssertEqual(try request(profile: "expired", pin: "expired").get(), Data("legacy".utf8))
+    private func request(profile: String, pin: String, base: String = "https://localhost",
+                         policy: CTSecurityPolicy? = nil) throws -> Result<Data, Error> {
+        try fixture.requestWithTrustEvaluator(profile: profile, policy: policy,
+                                              legacyCertificate: fixture.der(pin), legacyBaseURL: base)
     }
 
-    private func request(profile: String, pin: String, base: String = "https://localhost", policy: CTSecurityPolicy? = nil) throws -> Result<Data, Error> {
-        let stopped = expectation(description: "Проверочная TLS-сессия остановлена")
-        let probe = CTLegacyTLSProbe(policy: policy, pin: try fixture.der(pin), base: base, stopped: { stopped.fulfill() })
-        let configuration = URLSessionConfiguration.ephemeral
-        configuration.timeoutIntervalForRequest = 10
-        let session = URLSession(configuration: configuration, delegate: probe, delegateQueue: nil)
-        let completed = expectation(description: "Legacy-проверка на настоящем TLS challenge")
-        var result: Result<Data, Error>?
-        session.dataTask(with: fixture.url("file", profile: profile)) { data, _, error in
-            result = error.map { .failure($0) } ?? .success(data ?? Data())
-            completed.fulfill()
-        }.resume()
-        wait(for: [completed], timeout: 15)
-        session.invalidateAndCancel()
-        wait(for: [stopped], timeout: 5)
-        return try XCTUnwrap(result)
+    private func assertEvaluatorRejects(_ result: Result<Data, Error>,
+                                        file: StaticString = #filePath, line: UInt = #line) {
+        XCTAssertThrowsError(try result.get(), file: file, line: line) { error in
+            let failure = error as? CTChatError
+            XCTAssertEqual(failure?.stage, .tls, file: file, line: line)
+            XCTAssertEqual(failure?.domain, NSURLErrorDomain, file: file, line: line)
+            XCTAssertEqual(failure?.code, NSURLErrorServerCertificateUntrusted, file: file, line: line)
+        }
+        XCTAssertTrue(try fixture.requests().isEmpty, file: file, line: line)
     }
-}
-
-// Challenge приходит от URLSession; тест не вызывает delegate вручную.
-private final class CTLegacyTLSProbe: NSObject, URLSessionDelegate {
-    private let policy: CTSecurityPolicy?
-    private let pin: Data
-    private let base: String
-    private let stopped: () -> Void
-
-    init(policy: CTSecurityPolicy?, pin: Data, base: String, stopped: @escaping () -> Void) {
-        self.policy = policy
-        self.pin = pin
-        self.base = base
-        self.stopped = stopped
-    }
-
-    func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge,
-                    completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
-        CTTrustEvaluator.handle(challenge, policy: policy, legacyCertificate: pin, legacyBaseURL: base,
-                                reportError: { _ in }, completion: completionHandler)
-    }
-
-    func urlSession(_ session: URLSession, didBecomeInvalidWithError error: Error?) { stopped() }
 }

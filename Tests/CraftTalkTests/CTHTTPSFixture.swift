@@ -20,7 +20,7 @@ final class CTHTTPSFixture {
 
     let configuration: Configuration
     let identifier = UUID().uuidString
-    private let test: XCTestCase
+    private unowned let test: XCTestCase
     private let controlSession = URLSession(configuration: .ephemeral)
     private let resources: URL
 
@@ -59,6 +59,32 @@ final class CTHTTPSFixture {
 
     func release(_ route: String) throws { _ = try control(["release": route]) }
 
+    func requestWithTrustEvaluator(profile: String, host: String = "localhost", policy: CTSecurityPolicy?,
+                                   legacyCertificate: Data? = nil, legacyBaseURL: String? = nil) throws -> Result<Data, Error> {
+        let stopped = test.expectation(description: "Проверочная TLS-сессия остановлена")
+        let probe = CTTrustChallengeProbe(policy: policy, pin: legacyCertificate, base: legacyBaseURL,
+                                          stopped: { stopped.fulfill() })
+        let configuration = URLSessionConfiguration.ephemeral
+        configuration.timeoutIntervalForRequest = 10
+        let session = URLSession(configuration: configuration, delegate: probe, delegateQueue: nil)
+        let completed = test.expectation(description: "Настоящее TLS-соединение: " + profile)
+        var result: Result<Data, Error>?
+        session.dataTask(with: url("file", profile: profile, host: host)) { data, response, error in
+            if let error = error {
+                result = .failure(probe.failure ?? error)
+            } else if (response as? HTTPURLResponse)?.statusCode == 200, let data = data {
+                result = .success(data)
+            } else {
+                result = .failure(URLError(.badServerResponse))
+            }
+            completed.fulfill()
+        }.resume()
+        test.wait(for: [completed], timeout: 15)
+        session.invalidateAndCancel()
+        test.wait(for: [stopped], timeout: 5)
+        return try XCTUnwrap(result)
+    }
+
     static func response(_ data: Data = Data("attachment".utf8), status: Int = 200, headers: [String: String] = [:]) -> [String: Any] {
         ["body": data.base64EncodedString(), "status": status, "headers": headers]
     }
@@ -81,4 +107,28 @@ final class CTHTTPSFixture {
     }
 
     deinit { controlSession.invalidateAndCancel() }
+}
+
+// Challenge приходит из реального TLS-соединения. Оценку доверия выполняет SDK.
+private final class CTTrustChallengeProbe: NSObject, URLSessionDelegate {
+    private let policy: CTSecurityPolicy?
+    private let pin: Data?
+    private let base: String?
+    private let stopped: () -> Void
+    private(set) var failure: CTChatError?
+
+    init(policy: CTSecurityPolicy?, pin: Data?, base: String?, stopped: @escaping () -> Void) {
+        self.policy = policy
+        self.pin = pin
+        self.base = base
+        self.stopped = stopped
+    }
+
+    func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge,
+                    completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
+        CTTrustEvaluator.handle(challenge, policy: policy, legacyCertificate: pin, legacyBaseURL: base,
+                                reportError: { self.failure = $0 }, completion: completionHandler)
+    }
+
+    func urlSession(_ session: URLSession, didBecomeInvalidWithError error: Error?) { stopped() }
 }

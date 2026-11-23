@@ -28,6 +28,12 @@ class SplitUITests(unittest.TestCase):
                 self.assertFalse(set(shard) & set(other))
         self.assertLessEqual(max(map(len, shards)) - min(map(len, shards)), 1)
 
+    def test_compatibility_manifest_is_a_unique_subset(self):
+        expected = json.loads((root / "Tests/expected-ui-tests.json").read_text())
+        compatibility = json.loads((root / "Tests/ui-compatibility-tests.json").read_text())
+        self.assertEqual(module.split_tests(compatibility, 1), [compatibility])
+        self.assertLess(set(compatibility), set(expected))
+
     def test_invalid_manifests_and_counts_are_rejected(self):
         valid = ["CTWebKitUITests/testOne()", "CTWebKitUITests/testTwo()"]
         for invalid in [[], {}, [42], ["Other/testOne()"], [valid[0], valid[0]]]:

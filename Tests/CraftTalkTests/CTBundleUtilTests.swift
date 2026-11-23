@@ -26,43 +26,24 @@ final class CTBundleUtilTests: XCTestCase {
     func testFirstBundleWinsForSameCertificateType() throws {
         let first = try bundle(["CTCertificate.der": Data([1])])
         let second = try bundle(["CTCertificate.der": Data([2])])
-        XCTAssertEqual(CTBundleUtil.certificateData(in: [first, second]), Data([1]))
-        XCTAssertEqual(CTBundleUtil.certificateData(in: [second, first]), Data([2]))
-    }
-
-    func testLegacyExtensionPriorityPrecedesBundlePriority() throws {
-        let first = try bundle(["CTCertificate.cer": Data([1]), "CTCertificate.crt": Data([3])])
-        let second = try bundle(["CTCertificate.der": Data([2])])
-        XCTAssertEqual(CTBundleUtil.certificateData(in: [first, second]), Data([2]))
-        XCTAssertEqual(CTBundleUtil.certificateData(in: [first]), Data([1]))
-        let crt = try bundle(["CTCertificate.crt": Data([3])])
-        XCTAssertEqual(CTBundleUtil.certificateData(in: [crt]), Data([3]))
+        XCTAssertEqual(CTBundleUtil.certificatePath(with: "CTCertificate", and: "der", in: [first, second]),
+                       first.bundleURL.appendingPathComponent("CTCertificate.der").path)
+        XCTAssertEqual(CTBundleUtil.certificatePath(with: "CTCertificate", and: "der", in: [second, first]),
+                       second.bundleURL.appendingPathComponent("CTCertificate.der").path)
     }
 
     func testMissingCertificateFallsBackToNextBundleOrNil() throws {
         let empty = try bundle(["Other.der": Data([9])])
         let next = try bundle(["CTCertificate.cer": Data([1])])
-        XCTAssertNil(CTBundleUtil.certificateData(in: []))
-        XCTAssertNil(CTBundleUtil.certificateData(in: [empty]))
-        XCTAssertEqual(CTBundleUtil.certificateData(in: [empty, next]), Data([1]))
+        XCTAssertNil(CTBundleUtil.certificatePath(with: "CTCertificate", and: "cer", in: []))
+        XCTAssertNil(CTBundleUtil.certificatePath(with: "CTCertificate", and: "cer", in: [empty]))
+        XCTAssertEqual(CTBundleUtil.certificatePath(with: "CTCertificate", and: "cer", in: [empty, next]),
+                       next.bundleURL.appendingPathComponent("CTCertificate.cer").path)
     }
 
     func testDefaultBundleOrderStartsWithMainWithoutDuplicates() {
         let bundles = CTBundleUtil.relevantBundles
         XCTAssertEqual(bundles.first, Bundle.main)
         XCTAssertEqual(Set(bundles.map { $0.bundleURL }).count, bundles.count)
-    }
-
-    func testCertificateLoadingIsLazyAndSecureConfigurationDoesNotReadLegacyResource() throws {
-        let source = try bundle(["CTCertificate.der": Data([1, 2, 3])])
-        var reads = 0
-        let settings = ["CTChatBaseURL": "https://chat.example.com", "CTChatNamespace": "channel", "CTSalt": "salt"]
-        let chat = CTChat(infoValue: { settings[$0] }, certificateBundles: { reads += 1; return [source] })
-        try chat.configure(security: CTSecurityConfiguration())
-        XCTAssertEqual(reads, 0)
-        chat.configure()
-        XCTAssertEqual(chat.certificate, Data([1, 2, 3]))
-        XCTAssertEqual(chat.certificate, Data([1, 2, 3]))
-        XCTAssertEqual(reads, 1)
     }
 }

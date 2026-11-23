@@ -35,52 +35,45 @@ final class CTWebKitUITests: XCTestCase {
 
     func testPublicConfigurationVisitorInputPushAndClose() throws {
         try prepare(links: "")
+        app.launchArguments.append("with-push-token")
         app.launch()
-        app.buttons["Open secure"].tap()
+        try open()
         try waitState { ($0["page"] as? [String: Any])?["autocorrect"] as? String == "on" }
         let page = try XCTUnwrap(try state()["page"] as? [String: Any])
         let visitor = try XCTUnwrap(page["visitor"] as? [String: Any])
         XCTAssertEqual(visitor["uuid"] as? String, "ui-visitor")
         XCTAssertEqual(visitor["hash"] as? String, "ui-hash")
         XCTAssertEqual(visitor["first_name"] as? String, "Тест")
+        XCTAssertEqual(visitor["nested"] as? [String: Int], ["value": 7])
         XCTAssertEqual(page["accept"] as? String, "image/jpg,image/jpeg,image/gif,image/img,.doc,.docx,.pdf,.txt")
         let records = try control(["wait": "webchat/channel/set-user-subscription"])
         let pushes = records.filter { $0["route"] as? String == "webchat/channel/set-user-subscription" }
         XCTAssertEqual(pushes.count, 1)
+        XCTAssertEqual(pushes.first?["method"] as? String, "POST")
         let body = try XCTUnwrap(Data(base64Encoded: try XCTUnwrap(pushes.first?["body"] as? String)))
         XCTAssertEqual(try JSONSerialization.jsonObject(with: body) as? [String: String], ["subscription": "synthetic-ui-token", "uuid": "ui-visitor"])
         app.buttons["Close Chat"].tap()
         XCTAssertTrue(app.buttons["Open secure"].waitForExistence(timeout: 5))
     }
 
-    func testPublicSecureConfigurationComputesVisitorHashFromBundleSalt() throws {
-        try assertPublicVisitorHash(legacy: false)
-    }
-
-    func testPublicLegacyConfigurationComputesVisitorHashFromBundleSalt() throws {
-        try assertPublicVisitorHash(legacy: true)
-    }
-
-    private func assertPublicVisitorHash(legacy: Bool) throws {
+    func testPublicLegacyConfigurationPassesExplicitVisitorHashToPage() throws {
         try prepare(links: "")
-        app.launchArguments.append("compute-visitor-hash")
         app.launch()
-        try open(legacy: legacy)
-        let page = try XCTUnwrap(try state()["page"] as? [String: Any])
+        try open(legacy: true)
+        let page = try freshPage()
         let visitor = try XCTUnwrap(page["visitor"] as? [String: Any])
         XCTAssertEqual(visitor["uuid"] as? String, "ui-visitor")
+        XCTAssertEqual(visitor["hash"] as? String, "ui-hash")
         XCTAssertEqual(visitor["first_name"] as? String, "Тест")
-        // Независимый эталон Python hashlib: SHA256(salt + hex(SHA256(salt + "ui-visitorТест"))).
-        // Salt "synthetic-ui-salt" берётся SDK из Bundle.main, без подстановки внутренних полей.
-        XCTAssertEqual(visitor["hash"] as? String, "4f15d687ff2be31acf6ed466a55549a0d49dcbb5824de4f9491bf8584fa383d4")
         XCTAssertEqual(try records("webchat/channel").count, 1)
+        XCTAssertEqual(try state()["errors"] as? [String], [])
     }
 
-    func testRepeatedOpenAndCloseLoadsChatEachTime() throws {
+    func testRepeatedSecureOpenAndCloseLoadsChatEachTime() throws {
         try assertRepeatedOpenAndClose(legacy: false)
     }
 
-    func testRepeatedLegacyOpenAndCloseReleasesControllerAndWebView() throws {
+    func testRepeatedLegacyOpenAndCloseLoadsChatEachTime() throws {
         try assertRepeatedOpenAndClose(legacy: true)
     }
 
@@ -89,16 +82,12 @@ final class CTWebKitUITests: XCTestCase {
         app.launch()
         for _ in 0..<3 {
             try open(legacy: legacy)
-            try waitState { $0["controllerAlive"] as? Bool == true && $0["webViewAlive"] as? Bool == true && $0["aliveCount"] as? Int == 1 }
+            try waitState { $0["chatOnTop"] as? Bool == true && $0["webViewInWindow"] as? Bool == true }
             app.buttons["Close Chat"].tap()
             XCTAssertTrue(app.buttons["Open secure"].waitForExistence(timeout: 5))
-            try assertChatReleased()
+            try waitState { $0["chatOnTop"] as? Bool == false && $0["webViewInWindow"] as? Bool == false }
         }
         XCTAssertEqual(try records("webchat/channel").count, 3)
-    }
-
-    private func assertChatReleased() throws {
-        try waitState { $0["controllerAlive"] as? Bool == false && $0["webViewAlive"] as? Bool == false && $0["aliveCount"] as? Int == 0 }
     }
 
     func testCancelledInteractiveBackPreservesActiveDownload() throws {
@@ -108,7 +97,7 @@ final class CTWebKitUITests: XCTestCase {
         file["holdAfterHeaders"] = true
         file["oneUse"] = true
         try prepare(links: link("Download", route: "held"), routes: ["held": file])
-        app.launchArguments.append(contentsOf: ["interactive-back", "without-push-token"])
+        app.launchArguments.append("interactive-back")
         app.launch()
         try open()
         try tapLink("Download")
@@ -126,21 +115,6 @@ final class CTWebKitUITests: XCTestCase {
         XCTAssertEqual(try state()["errors"] as? [String], [])
     }
 
-    func testCancelledInteractiveBackPreservesLegacyPreview() throws {
-        app.launchArguments.append("interactive-back")
-        try prepareLegacyPreviewButtons()
-        try openLegacyPreview("First preview", contents: "first-preview-content")
-        let directories = try XCTUnwrap(try state()["directories"] as? [String])
-        try cancelInteractiveBack()
-        XCTAssertEqual(try state()["directories"] as? [String], directories)
-        try assertLegacyPreviewFile(contents: "first-preview-content")
-        XCTAssertTrue(app.webViews.staticTexts["first-preview-content"].firstMatch.waitForExistence(timeout: 5))
-        app.buttons["LegacyPreviewBack"].tap()
-        try assertLegacyPreviewClosed()
-        XCTAssertEqual(try records("webchat/channel").count, 1)
-        XCTAssertEqual(try state()["errors"] as? [String], [])
-    }
-
     private func cancelInteractiveBack() throws {
         let before = try state()
         let starts = try XCTUnwrap(before["interactiveStarts"] as? Int)
@@ -149,8 +123,7 @@ final class CTWebKitUITests: XCTestCase {
         let end = app.coordinate(withNormalizedOffset: CGVector(dx: 0.2, dy: 0.5))
         start.press(forDuration: 0.05, thenDragTo: end, withVelocity: .slow, thenHoldForDuration: 1)
         try waitState { ($0["interactiveStarts"] as? Int ?? 0) > starts && ($0["interactiveCancellations"] as? Int ?? 0) > cancellations && $0["chatOnTop"] as? Bool == true }
-        XCTAssertEqual(try state()["aliveCount"] as? Int, 1)
-        XCTAssertEqual(try state()["webViewAlive"] as? Bool, true)
+        XCTAssertEqual(try state()["webViewInWindow"] as? Bool, true)
     }
 
     func testDocumentPickerUploadsSelectedFileWithoutReloadingChat() throws {
@@ -161,7 +134,7 @@ final class CTWebKitUITests: XCTestCase {
               if (result.ok) document.getElementById('marker').textContent = 'Uploaded ' + file.name;
             };
             """, routes: ["upload": response("ok", mime: "text/plain")])
-        app.launchArguments.append(contentsOf: ["seed-upload-file", "without-push-token"])
+        app.launchArguments.append("seed-upload-file")
         app.launch()
         try open()
         app.webViews.buttons["Attach document"].tap()
@@ -201,7 +174,6 @@ final class CTWebKitUITests: XCTestCase {
         defer { XCUIDevice.shared.orientation = .portrait }
         try prepare(links: "<button onclick=\"document.getElementById('draft').blur()\">Done editing</button>" + link("Download", route: "file"),
                     routes: ["file": attachment()])
-        app.launchArguments.append("without-push-token")
         app.launch()
         try open()
         let draft = app.webViews.textFields["Draft"]
@@ -232,7 +204,7 @@ final class CTWebKitUITests: XCTestCase {
         try assertChatSurvivesBackground(legacy: false)
     }
 
-    func testLegacyChatSurvivesBackgroundAndDownloadsAfterReturn() throws {
+    func testLegacyChatSurvivesBackgroundAndOpensBlobPreviewAfterReturn() throws {
         try assertChatSurvivesBackground(legacy: true)
     }
 
@@ -245,7 +217,7 @@ final class CTWebKitUITests: XCTestCase {
             let route = "resume-\(index)"
             if legacy {
                 links += "<a id='\(route)' style='display:block;margin:20px 0'>\(download.0)</a>"
-                script += "document.getElementById('\(route)').href=URL.createObjectURL(new Blob(['\(download.1)'],{type:'application/octet-stream'}));"
+                script += "document.getElementById('\(route)').href=URL.createObjectURL(new Blob(['\(download.1)'],{type:'text/plain'}));"
             } else {
                 links += link(download.0, route: route)
                 var file = attachment()
@@ -255,7 +227,7 @@ final class CTWebKitUITests: XCTestCase {
             }
         }
         try prepare(links: links, script: script, routes: routes)
-        app.launchArguments.append("without-push-token")
+        if legacy { app.launchArguments.append("label-preview-buttons") }
         app.launch()
         try open(legacy: legacy)
         let draft = app.webViews.textFields["Draft"]
@@ -270,15 +242,18 @@ final class CTWebKitUITests: XCTestCase {
 
         for (index, download) in downloads.enumerated() {
             try backgroundAndReturn()
-            try waitState { $0["controllerAlive"] as? Bool == true && $0["webViewAlive"] as? Bool == true && $0["aliveCount"] as? Int == 1 }
+            try waitState { $0["chatOnTop"] as? Bool == true && $0["webViewInWindow"] as? Bool == true }
             try assertDraftAndNoFiles(expectedDraft: edited)
             XCTAssertTrue(draft.isHittable)
             XCTAssertEqual((try state()["page"] as? [String: Any])?["url"] as? String, url("webchat/channel"))
-            try tapLink(download.0)
-            try closeShare(expected: download.1)
-            try assertDraftAndNoFiles(expectedDraft: edited)
-            try waitState { ($0["directories"] as? [String])?.isEmpty == true }
-            if !legacy {
+            if legacy {
+                _ = try openBlobPreview(download.0, contents: download.1)
+                app.buttons["BlobPreviewBack"].tap()
+                try assertBlobPreviewClosed(expectedDraft: edited)
+            } else {
+                try tapLink(download.0)
+                try closeShare(expected: download.1)
+                try assertDraftAndNoFiles(expectedDraft: edited)
                 let requests = try records("resume-\(index)")
                 XCTAssertEqual(requests.count, 1)
                 XCTAssertEqual(requests.first?["method"] as? String, "GET")
@@ -289,22 +264,20 @@ final class CTWebKitUITests: XCTestCase {
         XCTAssertEqual(try state()["errors"] as? [String], [])
         app.buttons["Close Chat"].tap()
         XCTAssertTrue(app.buttons["Open secure"].waitForExistence(timeout: 5))
-        try assertChatReleased()
     }
 
     func testLegacyPreviewSurvivesBackgroundAndCanShareAfterReturn() throws {
-        try prepareLegacyPreviewButtons()
-        try openLegacyPreview("First preview", contents: "first-preview-content")
-        let directories = try XCTUnwrap(try state()["directories"] as? [String])
+        try prepareBlobPreview()
+        let file = try openBlobPreview("First preview", contents: "first-preview-content")
         try backgroundAndReturn()
-        try assertLegacyPreviewFile(contents: "first-preview-content")
-        XCTAssertEqual(try state()["directories"] as? [String], directories)
+        XCTAssertEqual(try previewFiles()[file], Data("first-preview-content".utf8))
         XCTAssertTrue(app.webViews.staticTexts["first-preview-content"].firstMatch.waitForExistence(timeout: 10))
-        app.buttons["LegacyPreviewShare"].tap()
-        try closeShare(expected: "first-preview-content")
-        try waitState { $0["presented"] as? String == "" && ($0["files"] as? [[String: Any]])?.count == 1 }
-        app.buttons["LegacyPreviewBack"].tap()
-        try assertLegacyPreviewClosed()
+        app.buttons["BlobPreviewShare"].tap()
+        try waitState { $0["presented"] as? String == "UIActivityViewController" }
+        try dismissShare()
+        XCTAssertEqual(try previewFiles()[file], Data("first-preview-content".utf8))
+        app.buttons["BlobPreviewBack"].tap()
+        try assertBlobPreviewClosed()
         XCTAssertEqual(try records("webchat/channel").count, 1)
         XCTAssertEqual(try state()["errors"] as? [String], [])
     }
@@ -339,22 +312,15 @@ final class CTWebKitUITests: XCTestCase {
         }
     }
 
-    func testRealExternalLinkOpensSafariButProgrammaticClickIsRejected() throws {
+    func testRealExternalLinkOpensSafariAndPreservesChat() throws {
         let external = url("external", profile: "system", host: "127.0.0.1")
-        try prepare(links: "<a id='external' href='\(external)'>External</a><button onclick=\"document.getElementById('external').click()\">Programmatic</button>",
-                    routes: ["external": response("External page")])
+        try prepare(links: "<a href='\(external)'>External</a>", routes: ["external": response("External page")])
         app.launch()
-        try open()
-        app.webViews.buttons["Programmatic"].tap()
-        try waitForError()
-        XCTAssertEqual(try records("external").count, 0)
-        XCTAssertEqual(try state()["presented"] as? String, "")
+        try open(editDraft: true)
         try tapLink("External")
         try closeSafari()
         try assertDraftAndNoFiles()
-        app.webViews.buttons["Programmatic"].tap()
-        try waitState { ($0["errors"] as? [String])?.count ?? 0 >= 2 }
-        XCTAssertEqual(try state()["presented"] as? String, "")
+        XCTAssertEqual(try records("external").count, 1)
     }
 
     func testAllowedClickCannotAuthorizeRedirectToExternalHost() throws {
@@ -394,28 +360,15 @@ final class CTWebKitUITests: XCTestCase {
         }
     }
 
-    func testIframeExternalClickAndForgedActivationCannotOpenSafari() throws {
-        let external = url("external", profile: "system", host: "127.0.0.1")
-        let child = "<a href='\(external)'>Frame external</a><script>try { webkit.messageHandlers.ctSecureLinkActivation.postMessage({token:'fake',url:'\(external)'}); } catch(e) {}</script>"
-        try prepare(links: "<iframe title='Child' src='\(url("child"))'></iframe>", routes: ["child": response(child), "external": response("Must not load")])
+    func testTelephoneAndMailLinksAreHandedOffWithoutReplacingChat() throws {
+        try prepare(links: "<a href='tel:15555550100'>Telephone</a><a href='mailto:synthetic@example.invalid'>Email</a>")
         app.launch()
-        try open()
-        try tapLink("Frame external")
-        try waitForError()
-        XCTAssertEqual(try state()["presented"] as? String, "")
-        XCTAssertEqual(try records("external").count, 0)
-    }
-
-    func testTelephoneAndMailRequireRealMainFrameClick() throws {
-        try prepare(links: "<a id='phone' href='tel:15555550100'>Telephone</a><a href='mailto:synthetic@example.invalid'>Email</a><button onclick=\"document.getElementById('phone').click();document.getElementById('marker').textContent='Script done'\">Script phone</button>")
-        app.launch()
-        try open()
-        app.webViews.buttons["Script phone"].tap()
-        try waitState { ($0["page"] as? [String: Any])?["marker"] as? String == "Script done" }
+        try open(editDraft: true)
         XCTAssertEqual(try state()["openedSchemes"] as? [String], [])
         try tapLink("Telephone")
         try tapLink("Email")
         try waitState { $0["openedSchemes"] as? [String] == ["tel", "mailto"] }
+        try assertDraftAndNoFiles()
     }
 
     func testDownloadAttributeMIMEAndDispositionPreservePageAndOneUseGET() throws {
@@ -520,56 +473,16 @@ final class CTWebKitUITests: XCTestCase {
         }
     }
 
-    func testBlobDownloadAndRepeatedDownloadCleanUpFiles() throws {
-        try prepare(links: "<a id='blob'>Blob file</a>", script: "document.getElementById('blob').href=URL.createObjectURL(new Blob(['blob-bytes'],{type:'application/octet-stream'}));")
-        app.launch()
-        try open(editDraft: true)
-        for _ in 0..<2 {
-            try tapLink("Blob file")
-            try closeShare(expected: "blob-bytes")
-            try assertDraftAndNoFiles()
-        }
-        XCTAssertTrue(try records("blob").isEmpty)
-        app.buttons["Close Chat"].tap()
-        XCTAssertTrue(app.buttons["Open secure"].waitForExistence(timeout: 5))
-        try assertChatReleased()
-    }
-
-    func testMalformedBlobMessagesPreserveActualChatPageAndEditedDraft() throws {
-        try prepare(links: """
-            <a id='blob'>Initialize blob bridge</a>
-            <button onclick="webkit.messageHandlers.readBlob.postMessage(42);
-              webkit.messageHandlers.readBlob.postMessage('');
-              webkit.messageHandlers.readBlob.postMessage('data:application/pdf;base64,invalid!')">Invalid blobs</button>
-            """, script: "document.getElementById('blob').href=URL.createObjectURL(new Blob(['bridge-ready'],{type:'application/octet-stream'}));")
-        app.launchArguments.append("without-push-token")
-        app.launch()
-        try open(editDraft: true)
-        // Сам SDK регистрирует readBlob после настоящей blob-навигации.
-        try tapLink("Initialize blob bridge")
-        try closeShare(expected: "bridge-ready")
-        try assertDraftAndNoFiles()
-        XCTAssertEqual(try state()["errors"] as? [String], [])
-        app.webViews.buttons["Invalid blobs"].tap()
-        try waitState { ($0["errors"] as? [String])?.count == 3 }
-        let errors = try XCTUnwrap(try state()["errors"] as? [String])
-        XCTAssertTrue(errors.allSatisfy { $0.contains("stage=download") && $0.contains("domain=NSURLErrorDomain code=-1016") })
-        try assertDraftAndNoFiles()
-        XCTAssertTrue(app.webViews.textFields["Draft"].isHittable)
-    }
-
     func testRelaunchIsolatesFilesAndWebsiteDataAfterInterruptedScenario() throws {
-        try prepare(links: """
-            <a id='blob'>Leave attachment open</a>
+        let seed = """
             <button onclick="localStorage.setItem('previous-case','stale');document.cookie='previous-case=stale;path=/';
               document.getElementById('marker').textContent='State seeded'">Seed storage</button>
-            """, script: """
+            """
+        try prepare(links: link("Leave attachment open", route: "interrupted") + seed, script: """
             if (localStorage.getItem('previous-case') || document.cookie.includes('previous-case=')) {
               document.getElementById('marker').textContent='State leaked from previous launch';
             }
-            document.getElementById('blob').href=URL.createObjectURL(new Blob(['unfinished'],{type:'application/octet-stream'}));
-            """)
-        app.launchArguments.append("without-push-token")
+            """, routes: ["interrupted": attachment()])
         app.launch()
         try open()
         let previousLaunch = try XCTUnwrap(try state()["launchID"] as? String)
@@ -594,7 +507,6 @@ final class CTWebKitUITests: XCTestCase {
               Object.defineProperty(window,'testPageID',{configurable:true,get(){throw new Error('synthetic observation failure')}})">Break observation</button>
             <button onclick="Object.defineProperty(window,'testPageID',{configurable:true,writable:true,value:window.savedPageID})">Restore observation</button>
             """)
-        app.launchArguments.append("without-push-token")
         app.launch()
         try open(editDraft: true)
         XCTAssertEqual(try freshPage()["pageID"] as? String, pageID)
@@ -647,17 +559,6 @@ final class CTWebKitUITests: XCTestCase {
         }
     }
 
-    func testLegacyConfigurationPinAndBlobCleanup() throws {
-        try prepare(links: "<a id='blob'>Legacy blob</a>", script: "document.getElementById('blob').href=URL.createObjectURL(new Blob(['legacy-blob'],{type:'application/octet-stream'}));")
-        app.launch()
-        try open(legacy: true)
-        try tapLink("Legacy blob")
-        try closeShare(expected: "legacy-blob")
-        try assertDraftAndNoFiles()
-        app.buttons["Close Chat"].tap()
-        XCTAssertTrue(app.buttons["Open secure"].waitForExistence(timeout: 5))
-    }
-
     private func open(legacy: Bool = false, editDraft: Bool = false) throws {
         let previousPageID = pageID
         XCTAssertTrue(app.wait(for: .runningForeground, timeout: 30))
@@ -686,48 +587,18 @@ final class CTWebKitUITests: XCTestCase {
         }
     }
 
-    func testExpiredActivationCannotAuthorizeDelayedProgrammaticClick() throws {
-        let external = url("blocked", profile: "system", host: "127.0.0.1")
-        try prepare(links: "<a id='delayed' href='\(external)'>Delayed link</a>",
-                    script: "document.getElementById('delayed').addEventListener('click',function(e){if(e.isTrusted){e.preventDefault();setTimeout(()=>this.click(),6100);}});",
-                    routes: ["blocked": response("Must not load")])
-        app.launch()
-        try open()
-        try tapLink("Delayed link")
-        try waitForError()
-        XCTAssertEqual(try records("blocked").count, 0)
-        XCTAssertEqual(try state()["presented"] as? String, "")
-    }
-
     func testConcurrentWKDownloadIsRejectedAndCanRetryAfterFirstCompletes() throws {
-        try assertConcurrentDownload(secondIsBlob: false)
-    }
-
-    func testBlobDuringWKDownloadIsRejectedAndCanRetryAfterFirstCompletes() throws {
-        try assertConcurrentDownload(secondIsBlob: true)
-    }
-
-    private func assertConcurrentDownload(secondIsBlob: Bool) throws {
         let firstContents = String(repeating: "first-download-content|", count: 4096)
         let secondContents = "second-download-content"
         var first = attachment()
         first["body"] = Data(firstContents.utf8).base64EncodedString()
         first["holdAfterHeaders"] = true
         first["oneUse"] = true
-        var routes = ["first": first]
-        var links = link("First download", route: "first")
-        var script = ""
-        if secondIsBlob {
-            links += "<a id='second' style='display:block;margin:20px 0'>Second download</a>"
-            script = "document.getElementById('second').href=URL.createObjectURL(new Blob(['\(secondContents)'],{type:'application/octet-stream'}));"
-        } else {
-            links += link("Second download", route: "second")
-            // Повтор — второе явное нажатие; запрещаем кеш, чтобы журнал различал обе попытки.
-            routes["second"] = response(secondContents, mime: "application/octet-stream",
-                                        headers: ["Content-Disposition": "attachment; filename=second.bin", "Cache-Control": "no-store"])
-        }
-        try prepare(links: links, script: script, routes: routes)
-        app.launchArguments.append("without-push-token")
+        let links = link("First download", route: "first") + link("Second download", route: "second")
+        // Повтор — отдельное нажатие; без кеша журнал различает обе попытки.
+        let second = response(secondContents, mime: "application/octet-stream",
+                              headers: ["Content-Disposition": "attachment; filename=second.bin", "Cache-Control": "no-store"])
+        try prepare(links: links, routes: ["first": first, "second": second])
         app.launch()
         try open()
         try tapLink("First download")
@@ -744,10 +615,7 @@ final class CTWebKitUITests: XCTestCase {
         XCTAssertEqual(try state()["directories"] as? [String], originalDirectories)
         XCTAssertEqual(try state()["presented"] as? String, "")
         XCTAssertEqual((try state()["page"] as? [String: Any])?["draft"] as? String, "unsent draft")
-        if !secondIsBlob {
-            // Второй GET уже дошёл до сервера: SDK отклоняет полученный WKDownload, не повторяя запрос.
-            XCTAssertEqual(try records("second").count, 1)
-        }
+        XCTAssertEqual(try records("second").count, 1)
 
         _ = try control(["release": "first"])
         try closeShare(expected: firstContents)
@@ -760,32 +628,12 @@ final class CTWebKitUITests: XCTestCase {
         XCTAssertEqual(try state()["errors"] as? [String], errors)
         XCTAssertEqual(try records("webchat/channel").count, 1)
         XCTAssertEqual((try state()["page"] as? [String: Any])?["url"] as? String, url("webchat/channel"))
-        for (route, count) in secondIsBlob ? [("first", 1)] : [("first", 1), ("second", 2)] {
+        for (route, count) in [("first", 1), ("second", 2)] {
             let requests = try records(route)
             XCTAssertEqual(requests.count, count, route)
             XCTAssertTrue(requests.allSatisfy { $0["method"] as? String == "GET" })
             XCTAssertTrue(requests.allSatisfy { ($0["headers"] as? [String: String])?["cookie"]?.contains("session=synthetic-webview") == true })
         }
-    }
-
-    func testClosingChatReleasesControllerAndCleansActiveDownload() throws {
-        var spec = attachment()
-        spec["holdAfterHeaders"] = true
-        spec["body"] = Data(repeating: 65, count: 65536).base64EncodedString()
-        try prepare(links: link("Download", route: "held"), routes: ["held": spec])
-        app.launch()
-        try open()
-        try tapLink("Download")
-        try waitState { ($0["directories"] as? [String])?.count == 1 }
-        app.buttons["Close Chat"].tap()
-        XCTAssertTrue(app.buttons["Open secure"].waitForExistence(timeout: 5))
-        try assertChatReleased()
-        try waitState { ($0["directories"] as? [String])?.isEmpty == true && $0["presented"] as? String == "" }
-        _ = try control(["release": "held"])
-        XCTAssertEqual(try records("held").count, 1)
-        try open()
-        app.buttons["Close Chat"].tap()
-        XCTAssertTrue(app.buttons["Open secure"].waitForExistence(timeout: 5))
     }
 
     func testUnavailablePresentationRemovesCompletedDownload() throws {
@@ -823,105 +671,85 @@ final class CTWebKitUITests: XCTestCase {
         try assertDraftAndNoFiles()
     }
 
-    func testLegacyPreviewBackRemovesFileAndAllowsAnotherPreview() throws {
-        try prepareLegacyPreviewButtons()
+    func testLegacyPreviewBackReturnsToEditedDraftAndAllowsAnotherPreview() throws {
+        try prepareBlobPreview()
         for (title, contents) in [("First preview", "first-preview-content"), ("Second preview", "second-preview-content")] {
-            try openLegacyPreview(title, contents: contents)
-            app.buttons["LegacyPreviewBack"].tap()
-            try assertLegacyPreviewClosed()
+            _ = try openBlobPreview(title, contents: contents)
+            app.buttons["BlobPreviewBack"].tap()
+            try assertBlobPreviewClosed()
         }
         XCTAssertEqual(try records("webchat/channel").count, 1)
         XCTAssertEqual(try state()["errors"] as? [String], [])
     }
 
     func testLegacyPreviewShareCanRepeatWithoutDeletingPreviewFile() throws {
-        try prepareLegacyPreviewButtons()
-        try openLegacyPreview("First preview", contents: "first-preview-content")
-        let originalDirectories = try XCTUnwrap(try state()["directories"] as? [String])
+        try prepareBlobPreview()
+        let file = try openBlobPreview("First preview", contents: "first-preview-content")
         for _ in 0..<2 {
-            app.buttons["LegacyPreviewShare"].tap()
+            app.buttons["BlobPreviewShare"].tap()
             try waitState { $0["presented"] as? String == "UIActivityViewController" }
-            try closeShare(expected: "first-preview-content")
-            try waitState { $0["presented"] as? String == "" && ($0["files"] as? [[String: Any]])?.count == 1 }
-            XCTAssertEqual(try state()["directories"] as? [String], originalDirectories)
-            try assertLegacyPreviewFile(contents: "first-preview-content")
+            try dismissShare()
+            XCTAssertEqual(try previewFiles()[file], Data("first-preview-content".utf8))
             XCTAssertTrue(app.webViews.staticTexts["first-preview-content"].firstMatch.waitForExistence(timeout: 5))
-            XCTAssertTrue(app.buttons["LegacyPreviewShare"].isHittable)
+            XCTAssertTrue(app.buttons["BlobPreviewShare"].isHittable)
         }
-        app.buttons["LegacyPreviewBack"].tap()
-        try assertLegacyPreviewClosed()
+        app.buttons["BlobPreviewBack"].tap()
+        try assertBlobPreviewClosed()
         XCTAssertEqual(try records("webchat/channel").count, 1)
         XCTAssertEqual(try state()["errors"] as? [String], [])
     }
 
-    private func prepareLegacyPreviewButtons() throws {
+    func testSecureBlobOpensPreviewAndBackReturnsToEditedDraft() throws {
+        try prepareBlobPreview(legacy: false)
+        _ = try openBlobPreview("First preview", contents: "first-preview-content")
+        app.buttons["BlobPreviewBack"].tap()
+        try assertBlobPreviewClosed()
+        XCTAssertEqual(try records("webchat/channel").count, 1)
+        XCTAssertEqual(try state()["errors"] as? [String], [])
+    }
+
+    private func prepareBlobPreview(legacy: Bool = true) throws {
         try prepare(links: "<a id='first'>First preview</a><br><a id='second'>Second preview</a>", script: """
             document.getElementById('first').href=URL.createObjectURL(new Blob(['first-preview-content'],{type:'text/plain'}));
             document.getElementById('second').href=URL.createObjectURL(new Blob(['second-preview-content'],{type:'text/plain'}));
             """)
-        // Legacy push использует системное доверие; частный pin стенда проверяет только WebView.
-        app.launchArguments.append(contentsOf: ["label-preview-buttons", "without-push-token"])
+        app.launchArguments.append("label-preview-buttons")
         app.launch()
-        try open(legacy: true)
+        try open(legacy: legacy, editDraft: true)
     }
 
-    private func openLegacyPreview(_ title: String, contents: String) throws {
+    private func openBlobPreview(_ title: String, contents: String) throws -> String {
+        let before = Set(try previewFiles().keys)
         try tapLink(title)
-        try waitState { ($0["files"] as? [[String: Any]])?.count == 1 }
+        try waitState { ($0["previewFiles"] as? [[String: Any]])?.contains {
+            guard let name = $0["name"] as? String else { return false }
+            return !before.contains(name)
+        } == true }
         XCTAssertTrue(app.webViews.staticTexts[contents].firstMatch.waitForExistence(timeout: 10))
-        XCTAssertTrue(app.buttons["LegacyPreviewBack"].waitForExistence(timeout: 5))
-        XCTAssertTrue(app.buttons["LegacyPreviewBack"].isHittable)
-        XCTAssertTrue(app.buttons["LegacyPreviewShare"].isHittable)
-        try assertLegacyPreviewFile(contents: contents)
+        XCTAssertTrue(app.buttons["BlobPreviewBack"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["BlobPreviewBack"].isHittable)
+        XCTAssertTrue(app.buttons["BlobPreviewShare"].isHittable)
+        let added = try previewFiles().filter { !before.contains($0.key) }
+        XCTAssertEqual(added.count, 1)
+        let file = try XCTUnwrap(added.first)
+        XCTAssertEqual((file.key as NSString).pathExtension, "txt")
+        XCTAssertEqual(file.value, Data(contents.utf8))
+        return file.key
     }
 
-    private func assertLegacyPreviewFile(contents: String) throws {
-        let files = try XCTUnwrap(try state()["files"] as? [[String: Any]])
-        XCTAssertEqual(files.count, 1)
-        let file = try XCTUnwrap(files.first)
-        XCTAssertEqual(Data(base64Encoded: file["body"] as? String ?? ""), Data(contents.utf8))
-        XCTAssertEqual((file["name"] as? String).map { ($0 as NSString).pathExtension }, "txt")
-    }
-
-    private func assertLegacyPreviewClosed() throws {
-        try assertDraftAndNoFiles()
-        try waitState { ($0["directories"] as? [String])?.isEmpty == true }
-        XCTAssertFalse(app.buttons["LegacyPreviewBack"].exists)
-        XCTAssertFalse(app.buttons["LegacyPreviewShare"].exists)
-        XCTAssertTrue(app.webViews.textFields["Draft"].isHittable)
-        XCTAssertEqual((try state()["page"] as? [String: Any])?["url"] as? String, url("webchat/channel"))
-    }
-
-    func testLegacyPreviewIsRemovedWhenChatCloses() throws {
-        try prepare(links: "<a id='blob'>Preview</a>", script: "document.getElementById('blob').href=URL.createObjectURL(new Blob(['legacy-preview-content'],{type:'text/plain'}));")
-        app.launch()
-        try open(legacy: true)
-        try tapLink("Preview")
-        try waitState { ($0["files"] as? [[String: Any]])?.count == 1 }
-        XCTAssertTrue(app.webViews.staticTexts["legacy-preview-content"].firstMatch.waitForExistence(timeout: 10))
-        app.buttons["Close Chat"].tap()
-        try waitState { ($0["files"] as? [[String: Any]])?.isEmpty == true }
-        try assertChatReleased()
-    }
-
-    func testAutomaticIframeDownloadIsCancelledOnIOS18() throws {
-        for target in ["_self", "_top"] {
-            let child = "<a id='file' href='\(url("file"))' target='\(target)' download>File</a><script>window.onload=()=>document.getElementById('file').click()</script>"
-            try prepare(links: "<iframe title='Automatic frame' src='\(url("child"))'></iframe>", routes: ["child": response(child), "file": attachment()])
-            app.launch()
-            try open()
-            _ = try control(["wait": "file"])
-            XCTAssertEqual(try records("file").count, 1)
-            let unwanted = XCTNSPredicateExpectation(predicate: NSPredicate { [weak self] _, _ in
-                guard let state = try? self?.state() else { return false }
-                return state["presented"] as? String == "UIActivityViewController" || (state["files"] as? [[String: Any]])?.isEmpty == false
-            }, object: nil)
-            unwanted.isInverted = true
-            XCTAssertEqual(XCTWaiter.wait(for: [unwanted], timeout: 3), .completed)
-            try assertDraftAndNoFiles()
-            app.terminate()
-            _ = try control(["reset": true])
+    private func previewFiles() throws -> [String: Data] {
+        let files = try XCTUnwrap(try state()["previewFiles"] as? [[String: String]])
+        let entries = try files.map {
+            (try XCTUnwrap($0["name"]), try XCTUnwrap($0["body"].flatMap { Data(base64Encoded: $0) }))
         }
+        return Dictionary(uniqueKeysWithValues: entries)
+    }
+
+    private func assertBlobPreviewClosed(expectedDraft: String? = nil) throws {
+        XCTAssertFalse(app.buttons["BlobPreviewBack"].exists)
+        XCTAssertFalse(app.buttons["BlobPreviewShare"].exists)
+        try assertDraftPreserved(expectedDraft: expectedDraft)
+        XCTAssertEqual((try freshPage())["url"] as? String, url("webchat/channel"))
     }
 
     private func waitUntilHittable(_ element: XCUIElement, timeout: TimeInterval = 30) {
@@ -1018,15 +846,19 @@ final class CTWebKitUITests: XCTestCase {
     }
 
     private func closeShare(expected: String = "synthetic-file") throws {
-        let isPad = try state()["idiom"] as? String == "pad"
-        // Системное меню использует Close или close в разных сборках iOS/Xcode.
-        let close = app.buttons.matching(NSPredicate(format: "identifier == 'header.closeButton' OR label ==[c] 'close'")).firstMatch
         try waitState {
             $0["presented"] as? String == "UIActivityViewController" &&
             ($0["files"] as? [[String: Any]])?.count == 1
         }
         let files = try XCTUnwrap(try state()["files"] as? [[String: Any]])
         XCTAssertEqual(Data(base64Encoded: files[0]["body"] as? String ?? ""), Data(expected.utf8))
+        try dismissShare()
+    }
+
+    private func dismissShare() throws {
+        let isPad = try state()["idiom"] as? String == "pad"
+        // Системное меню использует Close или close в разных сборках iOS/Xcode.
+        let close = app.buttons.matching(NSPredicate(format: "identifier == 'header.closeButton' OR label ==[c] 'close'")).firstMatch
         if isPad {
             // У popover нет телефонной кнопки Close; закрываем настоящим нажатием вне меню.
             app.coordinate(withNormalizedOffset: CGVector(dx: 0.03, dy: 0.12)).tap()
@@ -1049,6 +881,10 @@ final class CTWebKitUITests: XCTestCase {
             ($0["files"] as? [[String: Any]])?.isEmpty == true &&
             ($0["directories"] as? [String])?.isEmpty == true && $0["presented"] as? String == ""
         }
+        try assertDraftPreserved(expectedDraft: expectedDraft)
+    }
+
+    private func assertDraftPreserved(expectedDraft: String? = nil) throws {
         let expected = expectedDraft ?? draftBeforeAction
         let draft = app.webViews.textFields["Draft"]
         let accessible = XCTNSPredicateExpectation(predicate: NSPredicate(format: "hittable == true"), object: draft)

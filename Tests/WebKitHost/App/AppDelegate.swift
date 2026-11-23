@@ -1,6 +1,10 @@
 import UIKit
 import WebKit
 
+private func isSyntheticBlobPreview(_ url: URL) -> Bool {
+    url.pathExtension == "txt" && Double(url.deletingPathExtension().lastPathComponent) != nil
+}
+
 @main
 struct TestMain {
     static func main() {
@@ -35,6 +39,10 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
         do {
             let temporary = FileManager.default.temporaryDirectory
             for folder in try FileManager.default.contentsOfDirectory(at: temporary, includingPropertiesForKeys: nil) {
+                if isSyntheticBlobPreview(folder) {
+                    try FileManager.default.removeItem(at: folder)
+                    continue
+                }
                 guard UUID(uuidString: folder.lastPathComponent) != nil else { continue }
                 try FileManager.default.removeItem(at: folder)
                 removedDirectoryCount += 1
@@ -80,9 +88,9 @@ final class HarnessController: UIViewController, UINavigationControllerDelegate 
     private var pageObservationCompleted = 0
     private var pageObservationError = ""
     private var pageObservationStartTime: TimeInterval = 0
-    private var opened: [WeakChat] = []
     private let diagnostics = URLSession(configuration: .ephemeral)
     private var publishing = false
+    private var opening = false
     private var interactiveStarts = 0
     private var interactiveCancellations = 0
 
@@ -99,12 +107,6 @@ final class HarnessController: UIViewController, UINavigationControllerDelegate 
         let port = (config["ports"] as! [String: Int])["system"]!
         return URL(string: "https://127.0.0.1:\(port)/control/\(config["uiCase"] as! String)")!
     }()
-
-    private final class WeakChat {
-        weak var controller: CTChatViewController?
-        weak var web: WKWebView?
-        init(_ controller: CTChatViewController, _ web: WKWebView?) { self.controller = controller; self.web = web }
-    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -153,6 +155,8 @@ final class HarnessController: UIViewController, UINavigationControllerDelegate 
     @objc private func openLegacy() { open(legacy: true) }
 
     private func open(legacy: Bool) {
+        guard !opening else { return }
+        opening = true
         errors = []
         page = [:]
         pageObservationError = ""
@@ -163,20 +167,30 @@ final class HarnessController: UIViewController, UINavigationControllerDelegate 
                 let allowed: Set<String> = ProcessInfo.processInfo.arguments.contains("allow-target") ? ["127.0.0.1"] : []
                 try CTChat.shared.configure(security: CTSecurityConfiguration(trustedRootsByHost: ["localhost": [data], "127.0.0.1": [data]], allowedRedirectHosts: allowed))
             }
-            let hash: String? = ProcessInfo.processInfo.arguments.contains("compute-visitor-hash") ? nil : "ui-hash"
-            CTChat.shared.registerVisitor(CTVisitor(firstName: "Тест", uuid: "ui-visitor", hash: hash, customProperties: ["nested": ["value": 7]]))
-            let token = ProcessInfo.processInfo.arguments.contains("without-push-token") ? "" : "synthetic-ui-token"
-            CTChat.shared.saveFCMToken(token)
-            let chat = CTChatViewController(nibName: nil, bundle: nil)
-            chat.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Close Chat", style: .plain, target: self, action: #selector(closeChat))
-            if !ProcessInfo.processInfo.arguments.contains("interactive-back") {
-                chat.navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Block UI", style: .plain, target: self, action: #selector(blockUI))
+            // configure читает Info.plist асинхронно на публичной очереди SDK.
+            CTChat.shared.ctqueue.async(flags: .barrier) { [weak self] in
+                DispatchQueue.main.async { self?.showConfiguredChat() }
             }
-            lastChat = chat
-            navigation.pushViewController(chat, animated: false)
-            lastWebView = findWebView(chat.view)
-            opened.append(WeakChat(chat, lastWebView))
-        } catch { errors.append(error.localizedDescription) }
+        } catch {
+            opening = false
+            errors.append(error.localizedDescription)
+        }
+    }
+
+    private func showConfiguredChat() {
+        opening = false
+        CTChat.shared.registerVisitor(CTVisitor(firstName: "Тест", uuid: "ui-visitor", hash: "ui-hash",
+                                              customProperties: ["nested": ["value": 7]]))
+        let token = ProcessInfo.processInfo.arguments.contains("with-push-token") ? "synthetic-ui-token" : ""
+        CTChat.shared.saveFCMToken(token)
+        let chat = CTChatViewController(nibName: nil, bundle: nil)
+        chat.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Close Chat", style: .plain, target: self, action: #selector(closeChat))
+        if !ProcessInfo.processInfo.arguments.contains("interactive-back") {
+            chat.navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Block UI", style: .plain, target: self, action: #selector(blockUI))
+        }
+        lastChat = chat
+        navigation.pushViewController(chat, animated: false)
+        lastWebView = findWebView(chat.view)
     }
 
     @objc private func closeChat() {
@@ -205,8 +219,8 @@ final class HarnessController: UIViewController, UINavigationControllerDelegate 
     }
 
     private func observe() {
-        if ProcessInfo.processInfo.arguments.contains("label-preview-buttons"), let chat = lastChat {
-            labelPreviewButtons(in: chat.view, controller: chat)
+        if ProcessInfo.processInfo.arguments.contains("label-preview-buttons"), let chat = lastChat, let window = view.window {
+            labelPreviewButtons(in: window, controller: chat)
         }
         if let web = lastWebView, !evaluating {
             evaluating = true
@@ -244,10 +258,18 @@ final class HarnessController: UIViewController, UINavigationControllerDelegate 
         // Учитываем только каталоги вложений SDK; системные кеши WebKit не входят в отчёт.
         let temporary = FileManager.default.temporaryDirectory
         var files: [[String: Any]] = []
+        var previewFiles: [[String: Any]] = []
         var directories: [String] = []
         var observationErrors = startupErrors
         do {
             for folder in try FileManager.default.contentsOfDirectory(at: temporary, includingPropertiesForKeys: nil) {
+                if isSyntheticBlobPreview(folder) {
+                    do {
+                        let data = try Data(contentsOf: folder)
+                        previewFiles.append(["name": folder.lastPathComponent, "body": data.base64EncodedString()])
+                    } catch { observationErrors.append("read \(folder.lastPathComponent): \(error)") }
+                    continue
+                }
                 guard UUID(uuidString: folder.lastPathComponent) != nil else { continue }
                 directories.append(folder.lastPathComponent)
                 do {
@@ -264,7 +286,6 @@ final class HarnessController: UIViewController, UINavigationControllerDelegate 
         let lifecycle = UIApplication.shared.delegate as? AppDelegate
         let snapshot: [String: Any] = ["launchID": launchID, "observationErrors": observationErrors,
                                        "resetDirectoryCount": removedDirectoryCount,
-                                       "controllerAlive": lastChat != nil, "webViewAlive": lastWebView != nil,
                                        "idiom": UIDevice.current.userInterfaceIdiom == .pad ? "pad" : "phone",
                                        "viewWidth": lastChat?.view.bounds.width ?? 0,
                                        "viewHeight": lastChat?.view.bounds.height ?? 0,
@@ -272,9 +293,8 @@ final class HarnessController: UIViewController, UINavigationControllerDelegate 
                                        "interactiveStarts": interactiveStarts, "interactiveCancellations": interactiveCancellations,
                                        "backgroundCount": lifecycle?.backgroundCount ?? 0,
                                        "activationCount": lifecycle?.activationCount ?? 0,
-                                       "aliveCount": opened.filter { $0.controller != nil || $0.web != nil }.count,
                                        "openedSchemes": (UIApplication.shared as? TestApplication)?.openedSchemes ?? [],
-                                       "errors": errors, "files": files, "page": page,
+                                       "errors": errors, "files": files, "previewFiles": previewFiles, "page": page,
                                        "pageObservationStarted": pageObservationStarted,
                                        "pageObservationCompleted": pageObservationCompleted,
                                        "pageObservationError": pageObservationError,
@@ -294,13 +314,8 @@ final class HarnessController: UIViewController, UINavigationControllerDelegate 
             var request = URLRequest(url: controlURL)
             request.httpMethod = "POST"
             request.httpBody = data
-            diagnostics.dataTask(with: request) { [weak self] data, _, _ in
-                let reply = data.flatMap { try? JSONSerialization.jsonObject(with: $0) as? [[String: Any]] }
-                DispatchQueue.main.async {
-                    self?.publishing = false
-                    // Приложение-владелец может закрыть чат, пока SDK показывает меню.
-                    if reply?.first?["hostCommand"] as? String == "closeChat" { self?.closeChat() }
-                }
+            diagnostics.dataTask(with: request) { [weak self] _, _, _ in
+                DispatchQueue.main.async { self?.publishing = false }
             }.resume()
         }
     }
@@ -309,8 +324,8 @@ final class HarnessController: UIViewController, UINavigationControllerDelegate 
     private func labelPreviewButtons(in view: UIView, controller: CTChatViewController) {
         if let button = view as? UIButton {
             let actions = button.actions(forTarget: controller, forControlEvent: .touchUpInside) ?? []
-            if actions.contains("goBack:") { button.accessibilityIdentifier = "LegacyPreviewBack" }
-            if actions.contains("share:") { button.accessibilityIdentifier = "LegacyPreviewShare" }
+            if actions.contains("goBack:") { button.accessibilityIdentifier = "BlobPreviewBack" }
+            if actions.contains("share:") { button.accessibilityIdentifier = "BlobPreviewShare" }
         }
         view.subviews.forEach { labelPreviewButtons(in: $0, controller: controller) }
     }

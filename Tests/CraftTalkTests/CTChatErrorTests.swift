@@ -35,7 +35,9 @@ final class CTChatErrorTests: XCTestCase {
     }
 
     func testReportingFromBackgroundArrivesOnMainQueueWithoutChangingError() {
-        let chat = CTChat(infoValue: { _ in nil })
+        let chat = CTChat.shared
+        let original = chat.onError
+        defer { chat.onError = original }
         let delivered = expectation(description: "Callback на главной очереди")
         chat.onError = { error in
             XCTAssertTrue(Thread.isMainThread)

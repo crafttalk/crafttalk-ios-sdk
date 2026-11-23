@@ -134,8 +134,6 @@ class Fixture:
                                 previous["cancelled"] = True
                                 fixture.condition.notify_all()
                         case = fixture.cases.setdefault(identifier, {"routes": {}, "requests": [], "released": set()})
-                        if "hostCommand" in command:
-                            case["hostCommand"] = command["hostCommand"]
                         if "snapshot" in command:
                             case["snapshot"] = command["snapshot"]
                         if "routes" in command:
@@ -146,10 +144,7 @@ class Fixture:
                         if "wait" in command:
                             route = command["wait"]
                             fixture.condition.wait_for(lambda: any(r["route"] == route for r in case["requests"]), timeout=10)
-                        if "snapshot" in command:
-                            result = [{"hostCommand": case.pop("hostCommand", "")}]
-                        else:
-                            result = [case.get("snapshot", {})] if command.get("state") else case["requests"]
+                        result = [case.get("snapshot", {})] if command.get("state") else case["requests"]
                         data = json.dumps(result).encode()
                     self.send(200, data, {"Content-Type": "application/json"})
                     return

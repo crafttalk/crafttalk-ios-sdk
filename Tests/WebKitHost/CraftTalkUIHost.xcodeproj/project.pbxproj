@@ -7,12 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		0271DB804057E33D85F1D250 /* CTBlobDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7775FFDECEA5FE8BEA0C01D6 /* CTBlobDocument.swift */; };
 		22DADE2508B4AAFC1E7702F9 /* CTChat.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8665816E318C45C1A823E0A /* CTChat.swift */; };
 		43CF249E5BF10793A5E37F7A /* CTNetworkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F0EFC03A2BCE84D8DCA88A9 /* CTNetworkManager.swift */; };
 		455A1361CC5ECD53CD0DEB05 /* CTPushRegistationRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CC9A20704F5C783368768ED /* CTPushRegistationRequest.swift */; };
 		58432D344FD10E959B5F7449 /* CTPreviewViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A2D41DBDB09DD90A497141F /* CTPreviewViewController.swift */; };
-		63B95409B9AA837969180AF8 /* CTAttachmentRules.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04DD6206FEA64C280EED8AA0 /* CTAttachmentRules.swift */; };
 		63FCA28DC51A601BA8098A70 /* CTChatViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA03A98B00C850F1638516B2 /* CTChatViewController.swift */; };
 		64A208D45A67793D8043BB6D /* CTBundleUtil.swift in Sources */ = {isa = PBXBuildFile; fileRef = E984F8E1C6399565D56646F7 /* CTBundleUtil.swift */; };
 		6E99EE455C44F45EA81F6ACC /* CTVisitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46A6266CDDB6A9B8CB56416A /* CTVisitor.swift */; };
@@ -41,7 +39,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		04DD6206FEA64C280EED8AA0 /* CTAttachmentRules.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CTAttachmentRules.swift; sourceTree = "<group>"; };
 		16CA431429D5262A1B6EE0D2 /* CTCertificate.der */ = {isa = PBXFileReference; path = CTCertificate.der; sourceTree = "<group>"; };
 		22D5D64B8B3AD2E05F5C06F2 /* CTTrustEvaluator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CTTrustEvaluator.swift; sourceTree = "<group>"; };
 		2DD192BDE29E672D52DD2169 /* CTSecurityConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CTSecurityConfiguration.swift; sourceTree = "<group>"; };
@@ -52,7 +49,6 @@
 		46A6266CDDB6A9B8CB56416A /* CTVisitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CTVisitor.swift; sourceTree = "<group>"; };
 		5A2D41DBDB09DD90A497141F /* CTPreviewViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CTPreviewViewController.swift; sourceTree = "<group>"; };
 		6F0EFC03A2BCE84D8DCA88A9 /* CTNetworkManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CTNetworkManager.swift; sourceTree = "<group>"; };
-		7775FFDECEA5FE8BEA0C01D6 /* CTBlobDocument.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CTBlobDocument.swift; sourceTree = "<group>"; };
 		7834361BD9207BBE87C289D8 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		7BCA8694C581563295BFA2E3 /* CTWebKitUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CTWebKitUITests.swift; sourceTree = "<group>"; };
 		8CC9A20704F5C783368768ED /* CTPushRegistationRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CTPushRegistationRequest.swift; sourceTree = "<group>"; };
@@ -69,8 +65,6 @@
 		139BBBCF0FD177500EE8E3CA /* CTChat */ = {
 			isa = PBXGroup;
 			children = (
-				04DD6206FEA64C280EED8AA0 /* CTAttachmentRules.swift */,
-				7775FFDECEA5FE8BEA0C01D6 /* CTBlobDocument.swift */,
 				C8665816E318C45C1A823E0A /* CTChat.swift */,
 				2DD192BDE29E672D52DD2169 /* CTSecurityConfiguration.swift */,
 				22D5D64B8B3AD2E05F5C06F2 /* CTTrustEvaluator.swift */,
@@ -300,8 +294,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				7DC2003E01DFA3EC4550093F /* AppDelegate.swift in Sources */,
-				63B95409B9AA837969180AF8 /* CTAttachmentRules.swift in Sources */,
-				0271DB804057E33D85F1D250 /* CTBlobDocument.swift in Sources */,
 				64A208D45A67793D8043BB6D /* CTBundleUtil.swift in Sources */,
 				22DADE2508B4AAFC1E7702F9 /* CTChat.swift in Sources */,
 				63FCA28DC51A601BA8098A70 /* CTChatViewController.swift in Sources */,

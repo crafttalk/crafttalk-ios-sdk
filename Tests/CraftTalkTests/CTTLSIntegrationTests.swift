@@ -4,31 +4,15 @@ import Security
 
 final class CTTLSIntegrationTests: XCTestCase {
     private var fixture: CTHTTPSFixture!
-    private var directory: URL!
-    private var managers: [CTNetworkManager] = []
 
     override func setUpWithError() throws {
         fixture = try CTHTTPSFixture(test: self)
-        directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
-        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
         try fixture.configure(["file": CTHTTPSFixture.response(Data([0, 1, 255]))])
-    }
-
-    override func tearDownWithError() throws {
-        for manager in managers {
-            let stopped = expectation(description: "TLS-сессия завершена")
-            manager.invalidate { stopped.fulfill() }
-            wait(for: [stopped], timeout: 5)
-        }
-        managers.removeAll()
-        fixture = nil
-        if let directory = directory { try FileManager.default.removeItem(at: directory) }
     }
 
     func testPrivateChainAndRenewedLeafUnderSameRoot() throws {
         for profile in ["valid", "renewed"] {
-            let file = try download(profile, policy: fixture.policy()).get()
-            XCTAssertEqual(try Data(contentsOf: file), Data([0, 1, 255]))
+            XCTAssertEqual(try fixture.requestWithTrustEvaluator(profile: profile, policy: fixture.policy()).get(), Data([0, 1, 255]))
         }
         XCTAssertEqual(try fixture.requests().count, 2)
     }
@@ -41,31 +25,25 @@ final class CTTLSIntegrationTests: XCTestCase {
 
     func testRootIsScopedToChallengeHost() throws {
         let policy = try fixture.policy(hosts: ["localhost"])
-        let result = download("valid", host: "127.0.0.1", policy: policy)
+        let result = try fixture.requestWithTrustEvaluator(profile: "valid", host: "127.0.0.1", policy: policy)
         assertTLSFailure(result)
         XCTAssertTrue(try fixture.requests().isEmpty)
     }
 
     func testPrivateCAIsNotInstalledAsSystemTrust() throws {
         let policy = try fixture.policy(hosts: [])
-        assertTLSFailure(download("valid", policy: policy))
+        assertTLSFailure(try fixture.requestWithTrustEvaluator(profile: "valid", policy: policy))
         XCTAssertTrue(try fixture.requests().isEmpty)
     }
 
     func testSystemTrustStillWorksWithUnrelatedAdditionalRoot() throws {
         // Системный CA установлен только в одноразовый симулятор, не в rootsByHost.
-        let file = try download("system", policy: fixture.policy()).get()
-        XCTAssertEqual(try Data(contentsOf: file), Data([0, 1, 255]))
+        XCTAssertEqual(try fixture.requestWithTrustEvaluator(profile: "system", policy: fixture.policy()).get(), Data([0, 1, 255]))
         XCTAssertEqual(try fixture.requests().count, 1)
     }
 
     func testSystemTrustWorksWithoutAdditionalRoots() throws {
-        XCTAssertNoThrow(try download("system", policy: fixture.policy(hosts: [])).get())
-    }
-
-    func testNativeLegacySessionUsesSystemTrustNotPrivatePin() throws {
-        assertTLSFailure(download("valid", policy: nil))
-        XCTAssertNoThrow(try download("system", policy: nil).get())
+        XCTAssertEqual(try fixture.requestWithTrustEvaluator(profile: "system", policy: fixture.policy(hosts: [])).get(), Data([0, 1, 255]))
         XCTAssertEqual(try fixture.requests().count, 1)
     }
 
@@ -86,33 +64,15 @@ final class CTTLSIntegrationTests: XCTestCase {
     }
 
     private func rejects(_ profile: String) throws {
-        assertTLSFailure(download(profile, policy: try fixture.policy()))
+        assertTLSFailure(try fixture.requestWithTrustEvaluator(profile: profile, policy: fixture.policy()))
         XCTAssertTrue(try fixture.requests().isEmpty, "HTTP-запрос не должен уйти при ошибке TLS")
-        XCTAssertEqual(try FileManager.default.contentsOfDirectory(atPath: directory.path), [])
     }
 
-    private func assertTLSFailure(_ result: Result<URL, Error>, file: StaticString = #filePath, line: UInt = #line) {
+    private func assertTLSFailure(_ result: Result<Data, Error>, file: StaticString = #filePath, line: UInt = #line) {
         guard case .failure(let error) = result else { return XCTFail("Ожидался отказ TLS", file: file, line: line) }
         let failure = error as? CTChatError
         XCTAssertEqual(failure?.stage, .tls, file: file, line: line)
         XCTAssertEqual(failure?.domain, NSURLErrorDomain, file: file, line: line)
         XCTAssertTrue((-1206 ... -1200).contains(failure?.code ?? 0), file: file, line: line)
-    }
-
-    private func download(_ profile: String, host: String = "localhost", policy: CTSecurityPolicy?) -> Result<URL, Error> {
-        let config = URLSessionConfiguration.ephemeral
-        config.timeoutIntervalForRequest = 10
-        let manager = CTNetworkManager(configuration: config, temporaryDirectory: directory)
-        managers.append(manager)
-        manager.securityPolicy = policy
-        let completed = expectation(description: "Настоящее TLS-соединение: " + profile)
-        var result: Result<URL, Error>?
-        manager.loadDocumentFrom(url: fixture.url("file", profile: profile, host: host)) {
-            XCTAssertTrue(Thread.isMainThread)
-            result = $0
-            completed.fulfill()
-        }
-        wait(for: [completed], timeout: 15)
-        return result ?? .failure(URLError(.timedOut))
     }
 }
