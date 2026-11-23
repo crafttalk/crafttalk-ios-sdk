@@ -1,0 +1,9 @@
+[
+  "CTWebKitUITests/testCancelledInteractiveBackPreservesActiveDownload()",
+  "CTWebKitUITests/testRotationPreservesDraftAndDownloadMenu()",
+  "CTWebKitUITests/testDocumentPickerUploadsSelectedFileWithoutReloadingChat()",
+  "CTWebKitUITests/testAllowedCrossHostRedirectDownloadsOnce()",
+  "CTWebKitUITests/testDownloadTLSHTTPAndRedirectFailuresAllowRetry()",
+  "CTWebKitUITests/testIframeRedirectDownloadsKeepMainPage()",
+  "CTWebKitUITests/testPOSTRedirectDownloadPreservesBodyAndCookiesWithoutReplay()"
+]

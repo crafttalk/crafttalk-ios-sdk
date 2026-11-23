@@ -5,8 +5,8 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 
 case "${1:-}" in
-    build-spm|test-spm|build-example) command_name="$1" ;;
-    *) echo "Использование: bash scripts/ci.sh {build-spm|test-spm|build-example}" >&2; exit 2 ;;
+    build-spm|test-spm|test-ui|build-example) command_name="$1" ;;
+    *) echo "Использование: bash scripts/ci.sh {build-spm|test-spm|test-ui|build-example}" >&2; exit 2 ;;
 esac
 
 artifact_root="${ARTIFACTS_DIR:-$ROOT/artifacts/ci}"
@@ -30,9 +30,22 @@ check_xcode() {
     xcrun swift --version
 }
 
+export_results() {
+    local kind="$1" output="$2"
+    python3 scripts/ci_stage.py "$run_dir" "results-$kind" \
+        bash -c 'xcrun xcresulttool get test-results "$1" --path "$2" > "$3"' \
+        bash "$kind" "$run_dir/tests.xcresult" "$output"
+}
+
 test_spm() {
-    local simulator_id status
-    xcrun simctl list devices available --json > "$run_dir/simulators.json"
+    local simulator_id status manifest
+    if [[ "${CI_HELPER_TESTS_CHECKED:-0}" != 1 ]]; then
+        python3 scripts/ci_stage.py "$run_dir" python-tests python3 -m unittest discover -s scripts/tests -v
+    fi
+    manifest=Tests/expected-tests.json
+    if [[ "$command_name" == test-ui ]]; then manifest="${UI_TEST_MANIFEST:-Tests/expected-ui-tests.json}"; fi
+    python3 scripts/ci_stage.py "$run_dir" simulator-list \
+        bash -c 'xcrun simctl list devices available --json > "$1"' bash "$run_dir/simulators.json"
     simulator_id="$(python3 - "$run_dir/simulators.json" "${SIMULATOR_OS:-18.6}" "${SIMULATOR_DEVICE:-iPhone 16}" <<'PY'
 import json
 import sys
@@ -48,33 +61,17 @@ if not matches:
 print(matches[0]["udid"])
 PY
 )"
-    if xcodebuild -scheme CraftTalk -configuration Debug \
-        -destination "platform=iOS Simulator,id=$simulator_id" -destination-timeout 60 \
-        -derivedDataPath "$ROOT/.build/ci/spm" \
-        -resultBundlePath "$run_dir/tests.xcresult" \
-        -parallel-testing-enabled NO -test-timeouts-enabled YES \
-        -default-test-execution-time-allowance 60 -maximum-test-execution-time-allowance 120 \
-        CODE_SIGNING_ALLOWED=NO test; then
-        xcrun xcresulttool get test-results summary --path "$run_dir/tests.xcresult" \
-            > "$run_dir/test-summary.json"
-        python3 - "$run_dir/test-summary.json" <<'PY'
-import json
-import sys
-
-with open(sys.argv[1]) as stream:
-    result = json.load(stream)
-passed = result.get("passedTests", 0)
-failed = result.get("failedTests", 0)
-skipped = result.get("skippedTests", 0)
-print(f"Результат XCTest: passed={passed}, failed={failed}, skipped={skipped}")
-if passed < 2 or failed != 0 or skipped != 0:
-    sys.exit("Ожидались как минимум два выполненных успешных теста без пропусков.")
-PY
+    if python3 scripts/run-network-tests.py "$simulator_id" "$run_dir" "$command_name"; then
+        export_results summary "$run_dir/test-summary.json"
+        export_results tests "$run_dir/test-results.json"
+        python3 scripts/ci_stage.py "$run_dir" verify-results \
+            python3 scripts/verify-test-results.py "$run_dir/test-summary.json" \
+            "$run_dir/test-results.json" "$manifest"
     else
         status=$?
         if [[ -d "$run_dir/tests.xcresult" ]]; then
-            xcrun xcresulttool get test-results summary --path "$run_dir/tests.xcresult" \
-                > "$run_dir/test-summary.json" || true
+            export_results summary "$run_dir/test-summary.json" || true
+            export_results tests "$run_dir/test-results.json" || true
         fi
         return "$status"
     fi
@@ -90,7 +87,7 @@ main() {
                 -derivedDataPath "$ROOT/.build/ci/spm" \
                 -resultBundlePath "$run_dir/build.xcresult" CODE_SIGNING_ALLOWED=NO build
             ;;
-        test-spm) test_spm ;;
+        test-spm|test-ui) test_spm ;;
         build-example)
             xcodebuild -workspace Example/Chat.xcworkspace -scheme Chat -configuration Debug \
                 -destination 'generic/platform=iOS' \
@@ -101,4 +98,5 @@ main() {
     esac
 }
 
-main 2>&1 | tee "$run_dir/output.log"
+# При Ctrl-C дочерний процесс ещё пишет диагностику cleanup; tee должен дождаться EOF.
+main 2>&1 | tee -i "$run_dir/output.log"

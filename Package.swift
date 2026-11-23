@@ -19,7 +19,8 @@ let package = Package(
         ),
         .testTarget(
             name: "CraftTalkTests",
-            dependencies: ["CraftTalk"]
+            dependencies: ["CraftTalk"],
+            resources: [.copy("Fixtures")]
         )
     ]
 )

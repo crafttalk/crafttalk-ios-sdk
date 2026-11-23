@@ -103,3 +103,25 @@ try CTChat.shared.configure(security: security)
 - Privacy — Camera Usage Description (`NSCameraUsageDescription`)
 - Privacy — Photo Library Additions Usage Description (`NSPhotoLibraryAddUsageDescription`)
 - Privacy — Photo Library Usage Description (`NSPhotoLibraryUsageDescription`)
+
+## Разработка и проверки
+
+Для разработки нужны macOS, полный Xcode и iOS Simulator runtime.
+После клонирования подключите локальные проверки перед push:
+
+```bash
+bash scripts/install-hooks.sh
+```
+
+| Где | Что выполняется |
+| --- | --- |
+| Локальный `pre-push` | Полные SDK- и WebKit UI-тесты на симуляторе. Ошибка блокирует push |
+| GitHub Actions → `CI` | Сборки SDK/Example, Python-проверки и проверка копий SDK на PR и push в `master` |
+| GitHub Actions → `Simulator tests — manual` | SDK- и UI-тесты по кнопке **Run workflow** для выбранной ветки |
+
+Pre-push проверяет отправляемый коммит в отдельной временной копии и сохраняет
+логи в `artifacts/ci/`.
+Hook подключается в каждом клоне отдельно. Ручной workflow станет доступен после
+добавления его файла в default branch репозитория.
+
+[Версии Xcode/runtime, отдельные команды и диагностика](docs/ci-and-testing.md).

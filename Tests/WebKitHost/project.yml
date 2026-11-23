@@ -1,0 +1,49 @@
+name: CraftTalkUIHost
+options:
+  deploymentTarget:
+    iOS: '15.0'
+settings:
+  base:
+    SWIFT_VERSION: '5.0'
+    CODE_SIGNING_ALLOWED: NO
+targets:
+  CraftTalkUIHost:
+    type: application
+    platform: iOS
+    sources:
+      - path: App
+      - path: ../../CTChat
+      - path: ../CraftTalkTests/Fixtures/Runtime
+        type: folder
+        buildPhase: resources
+      - path: ../CraftTalkTests/Fixtures/Runtime/CTCertificate.der
+        buildPhase: resources
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.crafttalk.tests.webkithost
+        INFOPLIST_FILE: ../../.build/ci/ui-host.plist
+        TARGETED_DEVICE_FAMILY: '1,2'
+  CraftTalkUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - path: UITests
+      - path: ../CraftTalkTests/Fixtures/Runtime
+        type: folder
+        buildPhase: resources
+    dependencies:
+      - target: CraftTalkUIHost
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.crafttalk.tests.webkit
+        GENERATE_INFOPLIST_FILE: YES
+        TEST_TARGET_NAME: CraftTalkUIHost
+schemes:
+  CraftTalkUIHost:
+    build:
+      targets:
+        CraftTalkUIHost: all
+        CraftTalkUITests: [test]
+    test:
+      targets: [CraftTalkUITests]
+      gatherCoverageData: false
